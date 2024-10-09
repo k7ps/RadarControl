@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+message SmallRadarTargetInfo {
+    int32 id = 1;
+    double priority = 2;
+    double rad = 3;
+    double fi = 4;
+}
+
+message BigRadarTargetInfo {
+    int32 id = 1;
+    double priority = 2;
+    double rad = 3;
+    double fi = 4;
+    double speedX = 5;
+    double speedY = 6;
+}
