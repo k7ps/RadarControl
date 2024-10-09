@@ -8,8 +8,8 @@ class RadarController {
 public:
     RadarController();
 
-    void Process(BigRadarData);
-    void Process(SmallRadarData);
+    void Process(const std::vector<BigRadarData>&);
+    void Process(const std::vector<SmallRadarData>&);
 
     Result GetDeltaAngleAndTargets();
 
