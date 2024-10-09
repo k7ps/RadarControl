@@ -1,6 +1,5 @@
-#include "lib/test.h"
+#include "lib/radar_controller.h"
 
 int main() {
-    hello();
     return 0;
 }
