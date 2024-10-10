@@ -1,22 +1,17 @@
 #include "visualizer.h"
+#include "util/util.h"
 
 #include <set>
 #include <math.h>
 #include <iostream>
 
-#include <SFML/Graphics.hpp>
-
 
 namespace {
-
-    sf::Vector2f ToWindowXY(double rad, double fi) {
-        return sf::Vector2f(rad * std::cos(fi), -rad * std::sin(fi));
-    }
 
     void DrawTarget(const SmallRadarData& data, sf::RenderWindow& window) {
         sf::CircleShape target;
         target.setRadius(2);
-        target.setPosition(ToWindowXY(data.Rad, data.Angle));
+        target.setPosition(data.X, data.Y);
         target.setFillColor(sf::Color::Red);
         window.draw(target);
     }
@@ -71,7 +66,7 @@ Visualizer::Visualizer(const Json::Value& radarParams, const Json::Value& params
     )
 {}
 
-bool Visualizer::IsWindowOpen() {
+bool Visualizer::IsWindowOpen() const {
     return Window.isOpen();
 }
 

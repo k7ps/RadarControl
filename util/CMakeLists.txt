@@ -1,9 +1,11 @@
 set(UTIL_HEADERS
     json.h
+    util.h
 )
 
 set(UTIL_SOURCES
     json.cpp
+    util.cpp
 )
 
 find_package(jsoncpp REQUIRED)

@@ -12,7 +12,7 @@ public:
     Visualizer(const Json::Value&, const Json::Value&);
     Visualizer(double bigRad, double smallRad, double viewAng, int freq, int antialiasing = 0, int outline = 1);
 
-    bool IsWindowOpen();
+    bool IsWindowOpen() const;
     void ProcessEvents();
 
     void DrawFrame(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&, double);

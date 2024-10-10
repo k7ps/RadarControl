@@ -1,25 +1,24 @@
 #ifndef DATA_H
 #define DATA_H
 
-#include <stdint.h>
 #include <vector>
 
 
 struct SmallRadarData {
-    uint32_t Id;
-    double Priority;
-    double Rad;
-    double Angle;
+    unsigned int Id;
+    float Priority;
+    float X;
+    float Y;
 };
 
 struct BigRadarData : public SmallRadarData {
-    double SpeedX;
-    double SpeedY;
+    float SpeedX;
+    float SpeedY;
 };
 
 struct Result {
     double AngleDelta;
-    std::vector<uint32_t> AttackedTargets;
+    std::vector<unsigned int> AttackedTargets;
 };
 
 
