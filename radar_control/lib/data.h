@@ -22,4 +22,5 @@ struct Result {
     std::vector<uint32_t> AttackedTargets;
 };
 
+
 #endif // DATA_H

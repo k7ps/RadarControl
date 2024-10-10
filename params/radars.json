@@ -1,0 +1,14 @@
+{
+    "small_radar" : {
+        "radius" : 200,
+        "frequency" : 20,
+        "error" : 0.0005,
+        "view_angle" : 60,
+        "angle_speed" : 5
+    },
+    "big_radar" : {
+        "radius" : 400,
+        "frequency" : 5,
+        "error" : 0.01
+    }
+}
