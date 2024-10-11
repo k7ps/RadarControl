@@ -4,7 +4,7 @@
 #include <set>
 #include <math.h>
 #include <iostream>
-
+#include <typeinfo>
 
 namespace {
 
@@ -40,31 +40,18 @@ namespace {
 }
 
 
-Visualizer::Visualizer(double bigRad, double smallRad, double viewAng, int freq, int antialiasing, int outline)
-    : WindowSize(2 * bigRad + 100, bigRad + 100)
-    , WindowSettings(0, 0, antialiasing)
+Visualizer::Visualizer(const Proto::Parameters& params)
+    : Params(params)
+    , WindowSize(2 * Params.big_radar().radius() + 100, Params.big_radar().radius() + 100)
+    , WindowSettings(0, 0, 4)
     , Window(sf::VideoMode(WindowSize.x, WindowSize.y), "RadarControl", sf::Style::Default, WindowSettings)
-    , BigRadarRadius(bigRad)
-    , SmallRadarRadius(smallRad)
-    , SmallRadarViewAngle(viewAng)
-    , RadarsOutlineThickness(outline)
 {
+    std::cout << WindowSize.x << ' ' <<  WindowSize.y << std::endl;
     sf::View view = Window.getView();
     view.setCenter(0, -WindowSize.y / 2);
     Window.setView(view);
-    Window.setFramerateLimit(freq);
+    Window.setFramerateLimit(Params.small_radar().frequency());
 }
-
-Visualizer::Visualizer(const Json::Value& radarParams, const Json::Value& params)
-    : Visualizer(
-        radarParams["big_radar"]["radius"].asDouble(),
-        radarParams["small_radar"]["radius"].asDouble(),
-        radarParams["small_radar"]["view_angle"].asDouble(),
-        radarParams["small_radar"]["frequency"].asUInt(),
-        params["antialiasing_level"].asUInt(),
-        params["radars_vision_outline_thickness"].asUInt()
-    )
-{}
 
 bool Visualizer::IsWindowOpen() const {
     return Window.isOpen();
@@ -108,16 +95,16 @@ void Visualizer::DrawRadars(double radarPosAngle) {
     const auto outlineColor = sf::Color::Black;
     const auto centerRadius = 5;
 
-    sf::CircleShape bigRadar(BigRadarRadius, 100);
-    bigRadar.setOrigin(BigRadarRadius, BigRadarRadius);
+    sf::CircleShape bigRadar(Params.big_radar().radius(), 100);
+    bigRadar.setOrigin(Params.big_radar().radius(), Params.big_radar().radius());
     bigRadar.setFillColor(fillColor);
     bigRadar.setOutlineColor(outlineColor);
-    bigRadar.setOutlineThickness(RadarsOutlineThickness);
+    bigRadar.setOutlineThickness(Params.visualizer().radars_outline_thickness());
 
-    auto smallRadar = GetSector(SmallRadarRadius, SmallRadarViewAngle, radarPosAngle);
+    auto smallRadar = GetSector(Params.small_radar().radius(), Params.small_radar().view_angle(), radarPosAngle);
     smallRadar.setFillColor(fillColor);
     smallRadar.setOutlineColor(outlineColor);
-    smallRadar.setOutlineThickness(RadarsOutlineThickness);
+    smallRadar.setOutlineThickness(Params.visualizer().radars_outline_thickness());
 
     sf::CircleShape center(centerRadius);
     center.setOrigin(centerRadius, centerRadius);

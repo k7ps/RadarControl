@@ -1,0 +1,35 @@
+syntax = "proto2";
+
+package Proto;
+
+message Parameters {
+    message SmallRadar {
+        required double radius = 1;
+        required double view_angle = 2; // degrees
+        required double error = 3;
+        required uint32 frequency = 4;
+        required double angle_speed = 5; // degrees per second
+    }
+
+    message BigRadar {
+        required double radius = 1;
+        required double error = 2;
+        required uint32 frequency = 3;
+    }
+
+    message Simulator {
+        optional uint32 targets_per_minute = 1 [default = 3];
+        optional int32 min_speed = 2 [default = 2];
+        optional int32 max_speed = 3 [default = 5];
+    }
+
+    message Visualizer {
+        optional uint32 antialiasing_level = 1 [default = 0];
+        optional uint32 radars_outline_thickness = 2 [default = 1];
+    }
+
+    required SmallRadar small_radar = 1;
+    required BigRadar big_radar = 2;
+    required Simulator simulator = 3;
+    required Visualizer visualizer = 4;
+}

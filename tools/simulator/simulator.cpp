@@ -27,26 +27,3 @@ BigRadarData Target::GetBigData() const {
     };
     return res;
 }
-
-
-// Simulator::Simulator(
-//     double bigRad, double smallRad, double viewAng, double bigErr,
-//     double smallErr, unsigned int targetPerMin, double speedMin, double speedMax
-// )
-//     :
-// {
-
-// }
-
-// Simulator::Simulator(const Json::Value& radarParams, const Json::Value& params)
-//     : Simulator(
-//         radarParams["big_radar"]["radius"].asDouble(),
-//         radarParams["small_radar"]["radius"].asDouble(),
-//         radarParams["small_radar"]["view_angle"].asDouble(),
-//         radarParams["big_radar"]["error"].asDouble(),
-//         radarParams["small_radar"]["error"].asDouble(),
-//         params["targets_per_minute"].asUInt(),
-//         params["speed_min"].asDouble(),
-//         params["speed_max"].asDouble(),
-//     )
-// {}
