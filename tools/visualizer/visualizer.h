@@ -2,7 +2,7 @@
 #define VISUALIZER_H
 
 #include "radar_control/lib/data.h"
-#include "generated/params.pb.h"
+#include "proto/generated/params.pb.h"
 
 #include <SFML/Graphics.hpp>
 

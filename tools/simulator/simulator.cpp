@@ -27,3 +27,10 @@ BigRadarData Target::GetBigData() const {
     };
     return res;
 }
+
+
+Simulator::Simulator(const Proto::Parameters& params)
+    : Params(params)
+{
+
+}

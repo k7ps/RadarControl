@@ -2,7 +2,7 @@
 #define SIMULATOR_H
 
 #include "radar_control/lib/data.h"
-#include "generated/params.pb.h"
+#include "proto/generated/params.pb.h"
 
 #include <SFML/System/Vector2.hpp>
 
@@ -25,8 +25,12 @@ private:
 
 class Simulator {
 public:
+    Simulator(const Proto::Parameters& params);
+
 
 private:
+    const Proto::Parameters& Params;
+
     std::vector<Target> Targets;
 };
 

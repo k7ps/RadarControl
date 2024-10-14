@@ -11,7 +11,7 @@ int main() {
     auto params = ParseFromFile<Proto::Parameters>("../params/params.pb.txt");
     params.mutable_small_radar()->set_view_angle(params.small_radar().view_angle() * M_PI / 180);
 
-    RadarController radarController;
+    RadarController radarController(params);
     Visualizer visualizer(params);
 
     double angle = M_PI_2;

@@ -9,4 +9,5 @@ set(RC_LIB_SOURCES
 
 add_library(radar_control_lib STATIC ${RC_LIB_HEADERS} ${RC_LIB_SOURCES})
 
-target_link_libraries(radar_control_lib PRIVATE util_lib)
+target_include_directories(radar_control_lib PRIVATE ${CMAKE_SOURCE_DIR})
+target_link_libraries(radar_control_lib PRIVATE util_lib proto_lib)

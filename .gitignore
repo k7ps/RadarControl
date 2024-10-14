@@ -1,8 +1,7 @@
-# cmake build directory
 build
-
 .vscode
 
 # proto generated files
 *.pb.cc
 *.pb.h
+generated

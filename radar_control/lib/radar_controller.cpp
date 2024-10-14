@@ -2,13 +2,19 @@
 
 #include <random>
 
+
 namespace {
+
     double GetRandomDouble(double min, double max) {
         return min + (double) rand() / RAND_MAX * (max - min);
     }
+
 }
 
-RadarController::RadarController() {
+
+RadarController::RadarController(const Proto::Parameters& params)
+    : Params(params)
+{
     srand(time(0));
 }
 

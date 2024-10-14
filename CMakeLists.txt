@@ -3,7 +3,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 project(RadarControl)
 
-add_subdirectory(generated)
 add_subdirectory(proto)
 add_subdirectory(radar_control/bin)
 add_subdirectory(radar_control/lib)
