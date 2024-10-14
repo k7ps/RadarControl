@@ -5,3 +5,6 @@ build
 *.pb.cc
 *.pb.h
 generated
+
+# helping file
+recompile.sh

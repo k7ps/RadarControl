@@ -23,6 +23,7 @@ private:
     sf::Vector2f Speed;
 };
 
+
 class Simulator {
 public:
     Simulator(const Proto::Parameters& params);

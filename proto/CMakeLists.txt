@@ -1,18 +1,20 @@
-set(PROTO_PATH ${CMAKE_SOURCE_DIR}/proto)
-set(GENER_PATH ${CMAKE_SOURCE_DIR}/proto/generated)
+set(GENERATED_PATH ${CMAKE_CURRENT_SOURCE_DIR}/generated)
 
 set(PROTOS
-    ${CMAKE_SOURCE_DIR}/proto/params.proto
+    params.proto
 )
 
-execute_process(COMMAND "mkdir" -p ${GENER_PATH})
+# create dir for proto sources
+execute_process(COMMAND "mkdir" -p ${GENERATED_PATH})
 
+# generate proto sources
 foreach(proto ${PROTOS})
-    execute_process(COMMAND "protoc" --proto_path=${PROTO_PATH} --cpp_out=${GENER_PATH} ${proto})
+    execute_process(COMMAND "protoc" --proto_path=${CMAKE_CURRENT_SOURCE_DIR} --cpp_out=${GENERATED_PATH} ${proto})
 endforeach(proto)
 
-file(GLOB PROTO_HDRS "${GENER_PATH}/*.pb.h")
-file(GLOB PROTO_SRCS "${GENER_PATH}/*.pb.cc")
+# find proto sources and add to target
+file(GLOB PROTO_HDRS "${GENERATED_PATH}/*.pb.h")
+file(GLOB PROTO_SRCS "${GENERATED_PATH}/*.pb.cc")
 
 find_package(Protobuf REQUIRED)
 
