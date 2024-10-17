@@ -17,7 +17,7 @@ struct BigRadarData : public SmallRadarData {
 };
 
 struct Result {
-    double AngleDelta;
+    float AngleDelta;
     std::vector<unsigned int> AttackedTargets;
 };
 

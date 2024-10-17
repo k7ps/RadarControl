@@ -9,27 +9,25 @@
 #include <SFML/System/Clock.hpp>
 
 
-namespace {
+class Target {
+public:
+    Target(unsigned int id, float priority, sf::Vector2f pos, sf::Vector2f speed);
 
-    class Target {
-    public:
-        Target(unsigned int id, float priority, sf::Vector2f pos, sf::Vector2f speed);
+    void UpdatePosition(unsigned int ms);
 
-        void UpdatePosition(unsigned int ms);
+    SmallRadarData GetSmallData() const;
+    BigRadarData GetBigData() const;
+    unsigned int GetId() const;
 
-        SmallRadarData GetSmallData() const;
-        BigRadarData GetBigData() const;
+    bool IsInSector(double rad, double angView, double angPos) const;
+    bool IsOutOfView(double rad) const;
 
-        bool IsInSector(double rad, double angView, double angPos) const;
-
-    private:
-        const unsigned int Id;
-        const float Priority;
-        sf::Vector2f Position;
-        sf::Vector2f Speed;
-    };
-
-}
+private:
+    unsigned int Id;
+    float Priority;
+    sf::Vector2f Position;
+    sf::Vector2f Speed;
+};
 
 
 class Simulator {
@@ -39,12 +37,25 @@ public:
     void UpdateTargets();
     void SetRadarPosition(double angPos);
 
+    void RemoveTargets(std::vector<unsigned int> ids);
+
+    std::vector<BigRadarData> GetBigRadarTargets() const;
+    std::vector<SmallRadarData> GetSmallRadarTargets() const;
+
+private:
+    void AddNewTarget();
+    bool IsTargetInSector(const Target& target) const;
 
 private:
     const Proto::Parameters& Params;
 
     std::vector<Target> Targets;
-    sf::Clock Timer;
+
+    sf::Clock SmallRadarTimer;
+    sf::Clock BigRadarTimer;
+
+    const int BigRadarUpdatePeriod;
+    const float NewTargetProbability;
 
     double SmallRadarPosition;
 };

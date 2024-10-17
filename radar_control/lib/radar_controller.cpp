@@ -1,22 +1,10 @@
 #include "radar_controller.h"
-
-#include <random>
-
-
-namespace {
-
-    double GetRandomDouble(double min, double max) {
-        return min + (double) rand() / RAND_MAX * (max - min);
-    }
-
-}
+#include "util/util.h"
 
 
 RadarController::RadarController(const Proto::Parameters& params)
     : Params(params)
-{
-    srand(time(0));
-}
+{}
 
 void RadarController::Process(const std::vector<BigRadarData>& data) {}
 
@@ -24,7 +12,7 @@ void RadarController::Process(const std::vector<SmallRadarData>& data) {}
 
 Result RadarController::GetDeltaAngleAndTargets() {
     Result res {
-        .AngleDelta = GetRandomDouble(-0.1, 0.1)
+        .AngleDelta = GetRandomFloat(-0.1, 0.1)
     };
     return res;
 }

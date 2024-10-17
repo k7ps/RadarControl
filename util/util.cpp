@@ -4,7 +4,7 @@
 
 
 sf::Vector2f ToWindowXY(float rad, float ang) {
-    return sf::Vector2f(rad * std::cos(ang), -rad * std::sin(ang));
+    return sf::Vector2f(rad * std::cos(ang), - rad * std::sin(ang));
 }
 
 sf::Vector2f ToWindowXY(sf::Vector2f pos) {
@@ -17,4 +17,13 @@ sf::Vector2f ToPolarSystem(float x, float y) {
 
 sf::Vector2f ToPolarSystem(sf::Vector2f pos) {
     return ToPolarSystem(pos.x, pos.y);
+}
+
+bool GetRandomTrue(float probability) {
+    float x = (float) rand() / RAND_MAX;
+    return x <= probability;
+}
+
+float GetRandomFloat(float min, float max) {
+    return min + (float) rand() / RAND_MAX * (max - min);
 }

@@ -13,9 +13,10 @@ big_radar {
 }
 
 simulator {
-    targets_per_minute: 5
-    min_speed: 2
-    max_speed: 5
+    targets_per_minute: 10
+    min_speed: 0.02
+    max_speed: 0.05
+    max_deviation_angle: 15
 }
 
 visualizer {

@@ -10,5 +10,9 @@ sf::Vector2f ToWindowXY(sf::Vector2f);
 sf::Vector2f ToPolarSystem(float x, float y);
 sf::Vector2f ToPolarSystem(sf::Vector2f);
 
+bool GetRandomTrue(float probability);
+float GetRandomFloat(float min, float max);
+
+
 
 #endif // UTIL_H

@@ -10,7 +10,7 @@ namespace {
 
     void DrawTarget(const SmallRadarData& data, sf::RenderWindow& window) {
         sf::CircleShape target;
-        target.setRadius(2);
+        target.setRadius(3);
         target.setPosition(data.X, data.Y);
         target.setFillColor(sf::Color::Red);
         window.draw(target);
@@ -46,7 +46,6 @@ Visualizer::Visualizer(const Proto::Parameters& params)
     , WindowSettings(0, 0, 4)
     , Window(sf::VideoMode(WindowSize.x, WindowSize.y), "RadarControl", sf::Style::Default, WindowSettings)
 {
-    std::cout << WindowSize.x << ' ' <<  WindowSize.y << std::endl;
     sf::View view = Window.getView();
     view.setCenter(0, -WindowSize.y / 2);
     Window.setView(view);
@@ -91,7 +90,7 @@ void Visualizer::DrawTargets(const std::vector<BigRadarData>& bigDatas, const st
 }
 
 void Visualizer::DrawRadars(double radarPosAngle) {
-    const auto fillColor = sf::Color::White;
+    const auto fillColor = sf::Color::Transparent;
     const auto outlineColor = sf::Color::Black;
     const auto centerRadius = 5;
 
