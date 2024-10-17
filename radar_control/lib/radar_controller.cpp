@@ -12,7 +12,7 @@ void RadarController::Process(const std::vector<SmallRadarData>& data) {}
 
 Result RadarController::GetDeltaAngleAndTargets() {
     Result res {
-        .AngleDelta = GetRandomFloat(-0.1, 0.1)
+        .AngleDelta = GetRandomFloat(-0.01, 0.01)
     };
     return res;
 }

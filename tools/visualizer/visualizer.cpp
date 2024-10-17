@@ -8,11 +8,22 @@
 
 namespace {
 
-    void DrawTarget(const SmallRadarData& data, sf::RenderWindow& window) {
+    // gradient between green and red
+    sf::Color GetTargetColor(float priority) {
+        sf::Color color(0, 255, 0);
+        int shift = priority * 510;
+        color.r += std::min(shift, 255);
+        if (shift > 255) {
+            color.g -= shift - 255;
+        }
+        return color;
+    }
+
+    void DrawTarget(const SmallRadarData& data, float rad, sf::RenderWindow& window) {
         sf::CircleShape target;
-        target.setRadius(3);
+        target.setRadius(rad);
         target.setPosition(data.X, data.Y);
-        target.setFillColor(sf::Color::Red);
+        target.setFillColor(GetTargetColor(data.Priority));
         window.draw(target);
     }
 
@@ -46,9 +57,9 @@ Visualizer::Visualizer(const Proto::Parameters& params)
     , WindowSettings(0, 0, 4)
     , Window(sf::VideoMode(WindowSize.x, WindowSize.y), "RadarControl", sf::Style::Default, WindowSettings)
 {
-    sf::View view = Window.getView();
-    view.setCenter(0, -WindowSize.y / 2);
-    Window.setView(view);
+    sf::View centerView = Window.getView();
+    centerView.setCenter(0, -WindowSize.y / 2);
+    Window.setView(centerView);
     Window.setFramerateLimit(Params.small_radar().frequency());
 }
 
@@ -80,11 +91,11 @@ void Visualizer::DrawTargets(const std::vector<BigRadarData>& bigDatas, const st
     std::set<uint32_t> drawnTargets;
     for (const auto& data : smallDatas) {
         drawnTargets.insert(data.Id);
-        DrawTarget(data, Window);
+        DrawTarget(data, Params.visualizer().target_radius(), Window);
     }
     for (const auto& data : bigDatas) {
         if (!drawnTargets.count(data.Id)) {
-            DrawTarget(data, Window);
+            DrawTarget(data, Params.visualizer().target_radius(), Window);
         }
     }
 }
@@ -92,7 +103,7 @@ void Visualizer::DrawTargets(const std::vector<BigRadarData>& bigDatas, const st
 void Visualizer::DrawRadars(double radarPosAngle) {
     const auto fillColor = sf::Color::Transparent;
     const auto outlineColor = sf::Color::Black;
-    const auto centerRadius = 5;
+    const auto centerRadius = 7;
 
     sf::CircleShape bigRadar(Params.big_radar().radius(), 100);
     bigRadar.setOrigin(Params.big_radar().radius(), Params.big_radar().radius());

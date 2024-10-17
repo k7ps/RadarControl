@@ -22,11 +22,13 @@ message Parameters {
         optional double min_speed = 2 [default = 2];
         optional double max_speed = 3 [default = 5];
         optional double max_deviation_angle = 4 [default = 15]; // degrees
+        optional uint32 random_seed = 5; // random if not set
     }
 
     message Visualizer {
         optional uint32 antialiasing_level = 1 [default = 0];
         optional uint32 radars_outline_thickness = 2 [default = 1];
+        optional int32 target_radius = 3 [default = 5];
     }
 
     required SmallRadar small_radar = 1;

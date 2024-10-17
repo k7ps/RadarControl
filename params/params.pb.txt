@@ -1,5 +1,5 @@
 small_radar {
-    radius: 250
+    radius: 400
     view_angle: 60
     error: 0.0005
     frequency: 20
@@ -7,7 +7,7 @@ small_radar {
 }
 
 big_radar {
-    radius: 500
+    radius: 700
     error: 0.01
     frequency: 5
 }
@@ -17,11 +17,13 @@ simulator {
     min_speed: 0.02
     max_speed: 0.05
     max_deviation_angle: 15
+    random_seed: 32
 }
 
 visualizer {
     antialiasing_level: 4
     radars_outline_thickness: 1
+    target_radius: 5
 }
 
 # proto-file: proto/params.proto
