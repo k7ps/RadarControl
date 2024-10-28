@@ -4,7 +4,7 @@
 #include "radar_control/lib/data.h"
 #include "flat/generated/params.h"
 
-// #include <SFML/Graphics.hpp>
+#include "raylib-cpp.hpp"
 
 
 class Visualizer {
@@ -12,22 +12,20 @@ public:
     Visualizer(const Flat::Parameters& params);
 
     bool IsWindowOpen() const;
-    void ProcessEvents();
 
-    void DrawFrame(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&, double);
+    void DrawFrame(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&, float);
 
 private:
     void DrawTargets(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&);
-    void DrawRadars(double);
+    void DrawRadars(float);
 
 private:
     const Flat::Parameters& Params;
 
-    // sf::ContextSettings WindowSettings;
-    // const sf::Vector2i WindowSize;
-    // sf::RenderWindow Window;
+    raylib::Vector2 WindowSize;
+    raylib::Window Window;
 
-    // const sf::Vector2f RadarPosition;
+    const raylib::Vector2 RadarPosition;
 };
 
 

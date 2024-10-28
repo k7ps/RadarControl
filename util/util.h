@@ -13,6 +13,12 @@
 bool GetRandomTrue(float probability);
 float GetRandomFloat(float min, float max);
 
+double RadToDeg(double angle);
+float RadToDeg(float angle);
+
+double DegToRad(double angle);
+float DegToRad(float angle);
+
 
 
 #endif // UTIL_H

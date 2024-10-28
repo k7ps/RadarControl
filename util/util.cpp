@@ -27,3 +27,19 @@ bool GetRandomTrue(float probability) {
 float GetRandomFloat(float min, float max) {
     return min + (float) rand() / RAND_MAX * (max - min);
 }
+
+double RadToDeg(double angle) {
+    return angle * 180 / M_PI;
+}
+
+float RadToDeg(float angle) {
+    return angle * 180 / M_PI;
+}
+
+double DegToRad(double angle) {
+    return angle * M_PI / 180;
+}
+
+float DegToRad(float angle) {
+    return angle * M_PI / 180;
+}
