@@ -2,37 +2,37 @@
 #define SIMULATOR_H
 
 #include "radar_control/lib/data.h"
-#include "proto/generated/params.pb.h"
+#include "flat/generated/params.h"
 #include "util/util.h"
 
-#include <SFML/System/Vector2.hpp>
-#include <SFML/System/Clock.hpp>
+// #include <SFML/System/Vector2.hpp>
+// #include <SFML/System/Clock.hpp>
 
 
-class Target {
-public:
-    Target(unsigned int id, float priority, sf::Vector2f pos, sf::Vector2f speed);
+// class Target {
+// public:
+//     Target(unsigned int id, float priority, sf::Vector2f pos, sf::Vector2f speed);
 
-    void UpdatePosition(unsigned int ms);
+//     void UpdatePosition(unsigned int ms);
 
-    SmallRadarData GetSmallData() const;
-    BigRadarData GetBigData() const;
-    unsigned int GetId() const;
+//     SmallRadarData GetSmallData() const;
+//     BigRadarData GetBigData() const;
+//     unsigned int GetId() const;
 
-    bool IsInSector(double rad, double angView, double angPos) const;
-    bool IsOutOfView(double rad) const;
+//     bool IsInSector(double rad, double angView, double angPos) const;
+//     bool IsOutOfView(double rad) const;
 
-private:
-    unsigned int Id;
-    float Priority;
-    sf::Vector2f Position;
-    sf::Vector2f Speed;
-};
+// private:
+//     unsigned int Id;
+//     float Priority;
+//     // sf::Vector2f Position;
+//     // sf::Vector2f Speed;
+// };
 
 
 class Simulator {
 public:
-    Simulator(const Proto::Parameters& params);
+    Simulator(const Flat::Parameters& params);
 
     void UpdateTargets();
     void SetRadarPosition(double angPos);
@@ -44,15 +44,15 @@ public:
 
 private:
     void AddNewTarget();
-    bool IsTargetInSector(const Target& target) const;
+    // bool IsTargetInSector(const Target& target) const;
 
 private:
-    const Proto::Parameters& Params;
+    const Flat::Parameters& Params;
 
-    std::vector<Target> Targets;
+    // std::vector<Target> Targets;
 
-    sf::Clock SmallRadarTimer;
-    sf::Clock BigRadarTimer;
+    // sf::Clock SmallRadarTimer;
+    // sf::Clock BigRadarTimer;
 
     const int BigRadarUpdatePeriod;
     const float NewTargetProbability;

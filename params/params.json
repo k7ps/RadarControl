@@ -1,0 +1,25 @@
+{
+    "small_radar": {
+        "radius": 450,
+        "view_angle": 1.0471,
+        "frequency": 10,
+        "angle_speed": 5
+    },
+    "big_radar": {
+        "radius": 700,
+        "error": 0.01,
+        "frequency": 5
+    },
+    "simulator": {
+        "targets_per_minute": 10,
+        "min_speed": 0.02,
+        "max_speed": 0.05,
+        "max_deviation_angle": 0.2617,
+        "random_seed": 32
+    },
+    "visualizer": {
+        "antialiasing_level": 4,
+        "radars_outline_thickness": 1,
+        "target_radius": 5
+    }
+}

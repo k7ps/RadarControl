@@ -1,8 +1,5 @@
 build
 .vscode
 
-# proto generated files
-*.pb.cc
-*.pb.h
+# flatbuffers generated files
 generated
-

@@ -1,5 +1,5 @@
 set(UTIL_HEADERS
-    proto.h
+    flat.h
     util.h
 )
 
@@ -8,3 +8,4 @@ set(UTIL_SOURCES
 )
 
 add_library(util_lib STATIC ${UTIL_HEADERS} ${UTIL_SOURCES})
+target_link_libraries(util_lib PRIVATE flatbuf_lib)

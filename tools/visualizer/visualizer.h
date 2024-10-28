@@ -2,14 +2,14 @@
 #define VISUALIZER_H
 
 #include "radar_control/lib/data.h"
-#include "proto/generated/params.pb.h"
+#include "flat/generated/params.h"
 
-#include <SFML/Graphics.hpp>
+// #include <SFML/Graphics.hpp>
 
 
 class Visualizer {
 public:
-    Visualizer(const Proto::Parameters& params);
+    Visualizer(const Flat::Parameters& params);
 
     bool IsWindowOpen() const;
     void ProcessEvents();
@@ -21,13 +21,13 @@ private:
     void DrawRadars(double);
 
 private:
-    const Proto::Parameters& Params;
+    const Flat::Parameters& Params;
 
-    sf::ContextSettings WindowSettings;
-    const sf::Vector2i WindowSize;
-    sf::RenderWindow Window;
+    // sf::ContextSettings WindowSettings;
+    // const sf::Vector2i WindowSize;
+    // sf::RenderWindow Window;
 
-    const sf::Vector2f RadarPosition;
+    // const sf::Vector2f RadarPosition;
 };
 
 

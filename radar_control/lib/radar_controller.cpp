@@ -2,7 +2,7 @@
 #include "util/util.h"
 
 
-RadarController::RadarController(const Proto::Parameters& params)
+RadarController::RadarController(const Flat::Parameters& params)
     : Params(params)
 {}
 

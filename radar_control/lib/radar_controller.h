@@ -2,12 +2,12 @@
 #define RADAR_CONTROLLER_H
 
 #include "data.h"
-#include "proto/generated/params.pb.h"
+#include "flat/generated/params.h"
 
 
 class RadarController {
 public:
-    RadarController(const Proto::Parameters& params);
+    RadarController(const Flat::Parameters& params);
 
     void Process(const std::vector<BigRadarData>&);
     void Process(const std::vector<SmallRadarData>&);
@@ -15,7 +15,7 @@ public:
     Result GetDeltaAngleAndTargets();
 
 private:
-    const Proto::Parameters& Params;
+    const Flat::Parameters& Params;
 
 };
 
