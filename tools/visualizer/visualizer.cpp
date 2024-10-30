@@ -2,30 +2,16 @@
 #include "util/util.h"
 
 #include <set>
-#include <math.h>
 #include <iostream>
-#include <typeinfo>
+
 
 namespace {
 
-    // // gradient between green and red
-    // sf::Color GetTargetColor(float priority) {
-    //     sf::Color color(0, 255, 0);
-    //     int shift = priority * 510;
-    //     color.r += std::min(shift, 255);
-    //     if (shift > 255) {
-    //         color.g -= shift - 255;
-    //     }
-    //     return color;
-    // }
-
-    // void DrawTarget(const SmallRadarData& data, float rad, sf::RenderWindow& window) {
-    //     sf::CircleShape target;
-    //     target.setRadius(rad);
-    //     target.setPosition(data.X, data.Y);
-    //     target.setFillColor(GetTargetColor(data.Priority));
-    //     window.draw(target);
-    // }
+    raylib::Color GetTargetColor(float priority) {
+        const float start = 0; // red
+        const float end = 120; // green
+        return raylib::Color::FromHSV(start + priority * (end - start), 1.f, 1.f);
+    }
 
 }
 
@@ -46,31 +32,32 @@ bool Visualizer::IsWindowOpen() const {
 void Visualizer::DrawFrame(
     const std::vector<BigRadarData>& bigDatas,
     const std::vector<SmallRadarData>& smallDatas,
-    float radarPosAngle
+    double radarPosAngle
 ) {
     BeginDrawing();
     {
         Window.ClearBackground(raylib::Color::RayWhite());
 
+        DrawTargets(bigDatas, smallDatas);
         DrawRadars(radarPosAngle);
     }
     EndDrawing();
 }
 
 void Visualizer::DrawTargets(const std::vector<BigRadarData>& bigDatas, const std::vector<SmallRadarData>& smallDatas) {
-    // std::set<uint32_t> drawnTargets;
-    // for (const auto& data : smallDatas) {
-    //     drawnTargets.insert(data.Id);
-    //     DrawTarget(data, Params.visualizer().target_radius(), Window);
-    // }
-    // for (const auto& data : bigDatas) {
-    //     if (!drawnTargets.count(data.Id)) {
-    //         DrawTarget(data, Params.visualizer().target_radius(), Window);
-    //     }
-    // }
+    std::set<uint32_t> drawnTargets;
+    for (const auto& data : smallDatas) {
+        drawnTargets.insert(data.Id);
+        DrawCircle(RadarPosition.x + data.X, RadarPosition.y - data.Y, Params.visualizer()->target_radius(), GetTargetColor(data.Priority));
+    }
+    for (const auto& data : bigDatas) {
+        if (!drawnTargets.count(data.Id)) {
+            DrawCircle(RadarPosition.x + data.X, RadarPosition.y - data.Y, Params.visualizer()->target_radius(), GetTargetColor(data.Priority));
+        }
+    }
 }
 
-void Visualizer::DrawRadars(float radarPosAngle) {
+void Visualizer::DrawRadars(double radarPosAngle) {
     float radarPosAngleDeg = RadToDeg(radarPosAngle);
     float radarViewAngleDeg = RadToDeg(Params.small_radar()->view_angle());
     float radarStartAngle = radarPosAngleDeg - radarViewAngleDeg / 2;

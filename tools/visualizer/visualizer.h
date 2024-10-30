@@ -13,11 +13,11 @@ public:
 
     bool IsWindowOpen() const;
 
-    void DrawFrame(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&, float);
+    void DrawFrame(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&, double);
 
 private:
     void DrawTargets(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&);
-    void DrawRadars(float);
+    void DrawRadars(double);
 
 private:
     const Flat::Parameters& Params;

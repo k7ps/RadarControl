@@ -1,7 +1,6 @@
 #ifndef FLAT_H
 #define FLAT_H
 
-
 #include "flat/generated/params.h"
 
 #include <iostream>

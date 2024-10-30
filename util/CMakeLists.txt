@@ -1,9 +1,11 @@
 set(UTIL_HEADERS
     flat.h
+    timer.h
     util.h
 )
 
 set(UTIL_SOURCES
+    timer.cpp
     util.cpp
 )
 

@@ -1,14 +1,13 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-// #include <SFML/System/Vector2.hpp>
+#include <utility>
+
+using PairDouble = std::pair<double, double>;
 
 
-// sf::Vector2f ToWindowXY(float rad, float ang);
-// sf::Vector2f ToWindowXY(sf::Vector2f);
-
-// sf::Vector2f ToPolarSystem(float x, float y);
-// sf::Vector2f ToPolarSystem(sf::Vector2f);
+PairDouble PolarToCartesian(double rad, double ang);
+PairDouble CartesianToPolar(double x, double y);
 
 bool GetRandomTrue(float probability);
 float GetRandomFloat(float min, float max);
@@ -18,7 +17,6 @@ float RadToDeg(float angle);
 
 double DegToRad(double angle);
 float DegToRad(float angle);
-
 
 
 #endif // UTIL_H

@@ -7,13 +7,13 @@
 struct SmallRadarData {
     unsigned int Id;
     float Priority;
-    float X;
-    float Y;
+    double X;
+    double Y;
 };
 
 struct BigRadarData : public SmallRadarData {
-    float SpeedX;
-    float SpeedY;
+    double SpeedX;
+    double SpeedY;
 };
 
 struct Result {

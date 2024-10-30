@@ -3,31 +3,31 @@
 
 #include "radar_control/lib/data.h"
 #include "flat/generated/params.h"
+#include "util/timer.h"
 #include "util/util.h"
 
-// #include <SFML/System/Vector2.hpp>
-// #include <SFML/System/Clock.hpp>
 
+class Target {
+public:
+    Target(unsigned int id, float priority, PairDouble pos, PairDouble speed);
 
-// class Target {
-// public:
-//     Target(unsigned int id, float priority, sf::Vector2f pos, sf::Vector2f speed);
+    void UpdatePosition(unsigned int ms);
 
-//     void UpdatePosition(unsigned int ms);
+    SmallRadarData GetSmallData() const;
+    BigRadarData GetBigData() const;
+    unsigned int GetId() const;
 
-//     SmallRadarData GetSmallData() const;
-//     BigRadarData GetBigData() const;
-//     unsigned int GetId() const;
+    bool IsInSector(double rad, double angView, double angPos) const;
+    bool IsOutOfView(double rad) const;
 
-//     bool IsInSector(double rad, double angView, double angPos) const;
-//     bool IsOutOfView(double rad) const;
-
-// private:
-//     unsigned int Id;
-//     float Priority;
-//     // sf::Vector2f Position;
-//     // sf::Vector2f Speed;
-// };
+private:
+    unsigned int Id;
+    float Priority;
+    double PosX;
+    double PosY;
+    double SpeedX;
+    double SpeedY;
+};
 
 
 class Simulator {
@@ -44,15 +44,15 @@ public:
 
 private:
     void AddNewTarget();
-    // bool IsTargetInSector(const Target& target) const;
+    bool IsTargetInSector(const Target& target) const;
 
 private:
     const Flat::Parameters& Params;
 
-    // std::vector<Target> Targets;
+    std::vector<Target> Targets;
 
-    // sf::Clock SmallRadarTimer;
-    // sf::Clock BigRadarTimer;
+    Timer SmallRadarTimer;
+    Timer BigRadarTimer;
 
     const int BigRadarUpdatePeriod;
     const float NewTargetProbability;

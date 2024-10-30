@@ -8,13 +8,12 @@
 
 
 int main() {
-    // SetTraceLogCallback([](int, const char*, va_list) {
-    //     std::cout << '\0';
-    // });
+    SetTraceLogCallback([](int, const char*, va_list) {
+        std::cout << '\0';
+    });
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
 
     const auto& params = *ParseParameters("../params/params.json", "../flat/params.fbs");
-
-    SetConfigFlags(FLAG_MSAA_4X_HINT);
 
     srand(params.simulator()->random_seed());
 
@@ -31,20 +30,20 @@ int main() {
     double angle = M_PI_2;
 
     while (visualizer.IsWindowOpen()) {
-        // auto bigRadarTargets = simulator.GetBigRadarTargets();
-        // auto smallRadarTargets = simulator.GetSmallRadarTargets();
+        auto bigRadarTargets = simulator.GetBigRadarTargets();
+        auto smallRadarTargets = simulator.GetSmallRadarTargets();
 
-        // radarController.Process(bigRadarTargets);
-        // radarController.Process(smallRadarTargets);
+        radarController.Process(bigRadarTargets);
+        radarController.Process(smallRadarTargets);
 
-        // auto res = radarController.GetDeltaAngleAndTargets();
-        // angle += res.AngleDelta;
+        auto res = radarController.GetDeltaAngleAndTargets();
+        angle += res.AngleDelta;
 
-        // visualizer.DrawFrame(bigRadarTargets, smallRadarTargets, angle);
-        // simulator.UpdateTargets();
-        visualizer.DrawFrame({}, {}, angle);
+        visualizer.DrawFrame(bigRadarTargets, smallRadarTargets, angle);
+        simulator.SetRadarPosition(angle);
+        simulator.UpdateTargets();
+        // visualizer.DrawFrame({}, {}, angle);
     }
 
-    // std::cout
     return 0;
 }

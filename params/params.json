@@ -11,11 +11,11 @@
         "frequency": 5
     },
     "simulator": {
-        "targets_per_minute": 10,
+        "targets_per_minute": 20,
         "min_speed": 0.02,
         "max_speed": 0.05,
         "max_deviation_angle": 0.2617,
-        "random_seed": 32
+        "random_seed": 45
     },
     "visualizer": {
         "antialiasing_level": 4,
