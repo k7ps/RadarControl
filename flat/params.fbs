@@ -12,20 +12,28 @@ table SmallRadar {
     view_angle: double; // radians
     frequency: double;
     angle_speed: double; // degrees per second
+    rad_error: double;
+    ang_error: double;
+    h_error: double;
 }
 
 table BigRadar {
     radius: double;
     error: double;
     frequency: double;
+    rad_error: double;
+    ang_error: double;
+    h_error: double;
 }
 
 table Simulator {
     targets_per_minute: int32;
     min_speed: double;
     max_speed: double;
-    max_deviation_angle: double; // radians
-    random_seed: int32; // random if not set
+    max_height: double;
+    max_deviation_angle_vertical: double; // radians
+    probability_of_accurate_missile: double;
+    random_seed: int32 = -1; // random if not set
 }
 
 table Visualizer {

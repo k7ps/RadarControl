@@ -11,13 +11,23 @@ PairDouble CartesianToPolar(double x, double y) {
     return {std::sqrt(x*x + y*y), std::atan2(y, x)};
 }
 
+TripleDouble CylindricalToCartesian(double rad, double ang, double h) {
+    auto polar = PolarToCartesian(rad, ang);
+    return {polar[0], polar[1], h};
+}
+
+TripleDouble CartesianToCylindrical(double x, double y, double z) {
+    auto cartesian = CartesianToPolar(x, y);
+    return {cartesian[0], cartesian[1], z};
+}
+
 bool GetRandomTrue(float probability) {
     float x = (float) rand() / RAND_MAX;
     return x <= probability;
 }
 
-float GetRandomFloat(float min, float max) {
-    return min + (float) rand() / RAND_MAX * (max - min);
+double GetRandomDouble(double min, double max) {
+    return min + (double) rand() / RAND_MAX * (max - min);
 }
 
 double RadToDeg(double angle) {

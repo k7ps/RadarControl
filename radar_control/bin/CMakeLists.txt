@@ -7,4 +7,3 @@ set(RC_BIN_SOURCES
 add_executable(${RC_EXEC_NAME} ${RC_BIN_SOURCES})
 
 target_include_directories(${RC_EXEC_NAME} PRIVATE ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/radar_control)
-target_link_libraries(${RC_EXEC_NAME} PRIVATE radar_control_lib)

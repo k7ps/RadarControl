@@ -3,21 +3,29 @@
 #include <math.h>
 
 
-Target::Target(unsigned int id, float priority, PairDouble pos, PairDouble speed)
-    : Id(id), Priority(priority), PosX(pos.first), PosY(pos.second), SpeedX(speed.first), SpeedY(speed.second)
+Target::Target(unsigned int id, double priority, TripleDouble pos, TripleDouble speed)
+    : Id(id), Priority(priority)
+    , X(pos[0]), Y(pos[1]), Z(pos[2])
+    , SpeedX(speed[0]), SpeedY(speed[1]), SpeedZ(speed[2])
 {}
 
 void Target::UpdatePosition(unsigned int ms) {
-    PosX += SpeedX * float(ms);
-    PosY += SpeedY * float(ms);
+    // Rad -= SpeedRad * double(ms);
+    // Ang += SpeedAng * double(ms);
+    // H   += SpeedH   * double(ms);
+    X += SpeedX * double(ms);
+    Y += SpeedY * double(ms);
+    Z += SpeedZ * double(ms);
 }
 
 SmallRadarData Target::GetSmallData() const {
+    auto cylindrPos = CartesianToCylindrical(X, Y, Z);
     SmallRadarData res{
         .Id = Id,
         .Priority = Priority,
-        .X = PosX,
-        .Y = PosY
+        .Rad = cylindrPos[0],
+        .Ang = cylindrPos[1],
+        .H = cylindrPos[2]
     };
     return res;
 }
@@ -26,7 +34,8 @@ BigRadarData Target::GetBigData() const {
     BigRadarData res {
         GetSmallData(),
         .SpeedX = SpeedX,
-        .SpeedY = SpeedY
+        .SpeedY = SpeedY,
+        .SpeedZ = SpeedZ
     };
     return res;
 }
@@ -36,15 +45,15 @@ unsigned int Target::GetId() const {
 }
 
 bool Target::IsInSector(double rad, double angView, double angPos) const {
-    double ang1 = angPos - angView / 2;
-    double ang2 = angPos + angView / 2;
-    auto polarPos = CartesianToPolar(PosX, PosY);
-    return polarPos.first <= rad && ang1 <= polarPos.second && polarPos.second <= ang2;
+    double startAng = angPos - angView / 2;
+    double endAng = angPos + angView / 2;
+    auto polarPos = CartesianToPolar(X, Y);
+    return polarPos[0] <= rad && startAng <= polarPos[1] && polarPos[1] <= endAng;
 }
 
 bool Target::IsOutOfView(double rad) const {
     const float error = 1;
-    return PosY < error || PosX * PosX + PosY * PosY > (rad + error) * (rad + error);
+    return Y < error || X*X + Y*Y > (rad + error) * (rad + error) || Z < error;
 }
 
 
@@ -97,16 +106,27 @@ void Simulator::SetRadarPosition(double angPos) {
 void Simulator::AddNewTarget() {
     static int lastId = 0;
 
-    float priority = GetRandomFloat(0, 1);
-    float posAng = GetRandomFloat(0, M_PI);
-    float speedAbs = GetRandomFloat(Params.simulator()->min_speed(), Params.simulator()->max_speed());
-    float deviationAng = GetRandomFloat(0, 2 * Params.simulator()->max_deviation_angle());
-    float speedAng = posAng - M_PI + Params.simulator()->max_deviation_angle() - deviationAng;
+    auto priority = GetRandomDouble(0, 1);
+    auto posAng = GetRandomDouble(0, M_PI);
+    auto posH = GetRandomDouble(0, Params.simulator()->max_height());
 
-    auto pos = PolarToCartesian(Params.big_radar()->radius(), posAng);
-    auto speed = PolarToCartesian(speedAbs, speedAng);
+    auto speedAbs = GetRandomDouble(Params.simulator()->min_speed(), Params.simulator()->max_speed());
+    double speedAngVertical, speedHorizontal;
+    if (GetRandomTrue(Params.simulator()->probability_of_accurate_missile())) {
+        speedAngVertical = posAng - M_PI;
+        speedHorizontal = - speedAbs * posH / Params.big_radar()->radius();
+    } else {
+        auto deviationAngVertical = GetRandomDouble(0, 2 * Params.simulator()->max_deviation_angle_vertical());
+        speedAngVertical = posAng - M_PI + Params.simulator()->max_deviation_angle_vertical() - deviationAngVertical;
+        speedHorizontal = - speedAbs * posH / Params.big_radar()->radius() * GetRandomDouble(0.7, 1.2);
+    }
 
-    Targets.emplace_back(lastId, priority, pos, speed);
+    Targets.emplace_back(
+        lastId,
+        priority,
+        CylindricalToCartesian(Params.big_radar()->radius(), posAng, posH),
+        CylindricalToCartesian(speedAbs, speedAngVertical, speedHorizontal)
+    );
     ++lastId;
 }
 
@@ -125,8 +145,9 @@ std::vector<BigRadarData> Simulator::GetBigRadarTargets() const {
     std::vector<BigRadarData> res;
     for (const auto& target : Targets) {
         res.push_back(target.GetBigData());
-        // res.back().X += res.back().X * GetRandomFloat(-1, 1) * Params.big_radar()->error();
-        // res.back().Y += res.back().Y * GetRandomFloat(-1, 1) * Params.big_radar()->error();
+        // res.back().Rad += GetRandomDouble(-1, 1) * Params.big_radar()->rad_error();
+        // res.back().Ang += GetRandomDouble(-1, 1) * Params.big_radar()->ang_error();
+        // res.back().H   += GetRandomDouble(-1, 1) * Params.big_radar()->h_error();
     }
     return res;
 }
@@ -136,8 +157,9 @@ std::vector<SmallRadarData> Simulator::GetSmallRadarTargets() const {
     for (const auto target : Targets) {
         if (IsTargetInSector(target)) {
             res.emplace_back(target.GetSmallData());
-            // res.back().X += res.back().X * GetRandomFloat(-1, 1) * Params.small_radar()->error();
-            // res.back().Y += res.back().Y * GetRandomFloat(-1, 1) * Params.small_radar()->error();
+            // res.back().Rad += GetRandomDouble(-1, 1) * Params.small_radar()->rad_error();
+            // res.back().Ang += GetRandomDouble(-1, 1) * Params.small_radar()->ang_error();
+            // res.back().H   += GetRandomDouble(-1, 1) * Params.small_radar()->h_error();
         }
     }
     return res;

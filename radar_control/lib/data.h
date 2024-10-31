@@ -6,18 +6,20 @@
 
 struct SmallRadarData {
     unsigned int Id;
-    float Priority;
-    double X;
-    double Y;
+    double Priority;
+    double Rad;
+    double Ang;
+    double H;
 };
 
 struct BigRadarData : public SmallRadarData {
     double SpeedX;
     double SpeedY;
+    double SpeedZ;
 };
 
 struct Result {
-    float AngleDelta;
+    double AngleDelta;
     std::vector<unsigned int> AttackedTargets;
 };
 

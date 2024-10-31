@@ -1,20 +1,28 @@
 {
     "small_radar": {
-        "radius": 450,
+        "radius": 400,
         "view_angle": 1.0471,
         "frequency": 10,
-        "angle_speed": 5
+        "angle_speed": 5,
+        "rad_error": 0.6,
+        "ang_error": 0.002,
+        "h_error": 0.5
     },
     "big_radar": {
         "radius": 700,
         "error": 0.01,
-        "frequency": 5
+        "frequency": 5,
+        "rad_error": 3,
+        "ang_error": 0.01,
+        "h_error": 2
     },
     "simulator": {
         "targets_per_minute": 20,
         "min_speed": 0.02,
         "max_speed": 0.05,
-        "max_deviation_angle": 0.2617,
+        "max_deviation_angle_vertical": 0.1745,
+        "max_height": 250,
+        "probability_of_accurate_missile": 0.4,
         "random_seed": 45
     },
     "visualizer": {

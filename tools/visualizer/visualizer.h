@@ -17,7 +17,9 @@ public:
 
 private:
     void DrawTargets(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&);
+    void DrawTargetsSideView(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&);
     void DrawRadars(double);
+    void DrawRadarsSideView();
 
 private:
     const Flat::Parameters& Params;
@@ -26,6 +28,7 @@ private:
     raylib::Window Window;
 
     const raylib::Vector2 RadarPosition;
+    const raylib::Vector2 RadarPositionSideView;
 };
 
 

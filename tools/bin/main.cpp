@@ -15,13 +15,11 @@ int main() {
 
     const auto& params = *ParseParameters("../params/params.json", "../flat/params.fbs");
 
-    srand(params.simulator()->random_seed());
-
-    // if (params.simulator().has_random_seed()) {
-    //     srand(params.simulator().random_seed());
-    // } else {
-    //     srand(time(NULL));
-    // }
+    if (params.simulator()->random_seed() != -1) {
+        srand(params.simulator()->random_seed());
+    } else {
+        srand(time(NULL));
+    }
 
     RadarController radarController(params);
     Simulator simulator(params);
@@ -42,7 +40,6 @@ int main() {
         visualizer.DrawFrame(bigRadarTargets, smallRadarTargets, angle);
         simulator.SetRadarPosition(angle);
         simulator.UpdateTargets();
-        // visualizer.DrawFrame({}, {}, angle);
     }
 
     return 0;

@@ -9,7 +9,7 @@
 
 class Target {
 public:
-    Target(unsigned int id, float priority, PairDouble pos, PairDouble speed);
+    Target(unsigned int id, double priority, TripleDouble pos, TripleDouble speed);
 
     void UpdatePosition(unsigned int ms);
 
@@ -22,11 +22,15 @@ public:
 
 private:
     unsigned int Id;
-    float Priority;
-    double PosX;
-    double PosY;
+    double Priority;
+
+    double X;
+    double Y;
+    double Z;
+
     double SpeedX;
     double SpeedY;
+    double SpeedZ;
 };
 
 
