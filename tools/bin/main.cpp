@@ -28,11 +28,11 @@ int main() {
     double angle = M_PI_2;
 
     while (visualizer.IsWindowOpen()) {
-        auto bigRadarTargets = simulator.GetBigRadarTargets();
         auto smallRadarTargets = simulator.GetSmallRadarTargets();
+        auto bigRadarTargets = simulator.GetBigRadarTargets();
 
-        radarController.Process(bigRadarTargets);
         radarController.Process(smallRadarTargets);
+        radarController.Process(bigRadarTargets);
 
         auto res = radarController.GetDeltaAngleAndTargets();
         angle += res.AngleDelta;

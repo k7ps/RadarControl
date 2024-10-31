@@ -1,15 +1,15 @@
 #include "timer.h"
 
 
-Timer::Timer()
+SimpleTimer::SimpleTimer()
     : LastTime(Clock::now())
 {}
 
-void Timer::Restart() {
+void SimpleTimer::Restart() {
     LastTime = Clock::now();
 }
 
-unsigned int Timer::GetElapsedTimeAsMs() const {
+unsigned int SimpleTimer::GetElapsedTimeAsMs() const {
     auto now = Clock::now();
     return std::chrono::duration_cast<std::chrono::milliseconds>(now - LastTime).count();
 }

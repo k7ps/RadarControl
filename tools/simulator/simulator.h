@@ -9,16 +9,19 @@
 
 class Target {
 public:
-    Target(unsigned int id, double priority, TripleDouble pos, TripleDouble speed);
+    Target(unsigned int id, double priority, TripleDouble pos, TripleDouble speed, int bigPeriod);
 
-    void UpdatePosition(unsigned int ms);
+    void UpdatePosition(bool isInSector);
 
-    SmallRadarData GetSmallData() const;
-    BigRadarData GetBigData() const;
+    SmallRadarData GetNoisedSmallData(TripleDouble errors);
+    BigRadarData GetNoisedBigData(TripleDouble errors);
     unsigned int GetId() const;
 
     bool IsInSector(double rad, double angView, double angPos) const;
     bool IsOutOfView(double rad) const;
+
+private:
+    TripleDouble GetCurrentPosition() const;
 
 private:
     unsigned int Id;
@@ -31,6 +34,16 @@ private:
     double SpeedX;
     double SpeedY;
     double SpeedZ;
+
+    int BigRadarUpdatePeriodMs;
+
+    bool IsSmallDataUpdated = true;
+    bool IsBigDataUpdated = true;
+
+    SmallRadarData SmallData;
+    BigRadarData BigData;
+
+    SimpleTimer Timer;
 };
 
 
@@ -43,8 +56,8 @@ public:
 
     void RemoveTargets(std::vector<unsigned int> ids);
 
-    std::vector<BigRadarData> GetBigRadarTargets() const;
-    std::vector<SmallRadarData> GetSmallRadarTargets() const;
+    std::vector<BigRadarData> GetBigRadarTargets();
+    std::vector<SmallRadarData> GetSmallRadarTargets();
 
 private:
     void AddNewTarget();
@@ -55,13 +68,10 @@ private:
 
     std::vector<Target> Targets;
 
-    Timer SmallRadarTimer;
-    Timer BigRadarTimer;
-
-    const int BigRadarUpdatePeriod;
+    const int BigRadarUpdatePeriodMs;
     const float NewTargetProbability;
 
-    double SmallRadarPosition;
+    double SmallRadarAngPosition;
 };
 
 

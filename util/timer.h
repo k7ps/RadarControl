@@ -4,10 +4,10 @@
 #include <chrono>
 
 
-class Timer {
+class SimpleTimer {
     using Clock = std::chrono::high_resolution_clock;
 public:
-    Timer();
+    SimpleTimer();
 
     void Restart();
     unsigned int GetElapsedTimeAsMs() const;

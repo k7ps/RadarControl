@@ -11,7 +11,7 @@
     "big_radar": {
         "radius": 700,
         "error": 0.01,
-        "frequency": 5,
+        "frequency": 0.5,
         "rad_error": 3,
         "ang_error": 0.01,
         "h_error": 2
@@ -23,7 +23,7 @@
         "max_deviation_angle_vertical": 0.1745,
         "max_height": 250,
         "probability_of_accurate_missile": 0.4,
-        "random_seed": 45
+        "random_seed": 21
     },
     "visualizer": {
         "antialiasing_level": 4,
