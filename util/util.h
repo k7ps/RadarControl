@@ -1,17 +1,18 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include <array>
-
-using PairDouble = std::array<double, 3>;
-using TripleDouble = std::array<double, 3>;
+#include "points.h"
 
 
-PairDouble PolarToCartesian(double rad, double ang);
-PairDouble CartesianToPolar(double x, double y);
+Vector2d PolarToCartesian(double rad, double ang);
+Vector2d PolarToCartesian(const Vector2d& p);
+Vector2d CartesianToPolar(double x, double y);
+Vector2d CartesianToPolar(const Vector2d& p);
 
-TripleDouble CylindricalToCartesian(double rad, double ang, double h);
-TripleDouble CartesianToCylindrical(double x, double y, double z);
+Vector3d CylindricalToCartesian(double rad, double ang, double h);
+Vector3d CylindricalToCartesian(const Vector3d& p);
+Vector3d CartesianToCylindrical(double x, double y, double z);
+Vector3d CartesianToCylindrical(const Vector3d& p);
 
 bool GetRandomTrue(float probability);
 double GetRandomDouble(double min, double max);

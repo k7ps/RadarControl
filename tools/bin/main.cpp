@@ -1,9 +1,9 @@
+#include "defense/defense.h"
 #include "radar_control/lib/radar_controller.h"
 #include "simulator/simulator.h"
 #include "util/flat.h"
 #include "visualizer/visualizer.h"
 
-#include <math.h>
 #include <iostream>
 
 
@@ -13,7 +13,8 @@ int main() {
     });
     SetConfigFlags(FLAG_MSAA_4X_HINT);
 
-    const auto& params = *ParseParameters("../params/params.json", "../flat/params.fbs");
+    flatbuffers::Parser parser;
+    const auto& params = *ParseParameters(parser, "../params/params.json", "../flat/params.fbs");
 
     if (params.simulator()->random_seed() != -1) {
         srand(params.simulator()->random_seed());
@@ -23,9 +24,8 @@ int main() {
 
     RadarController radarController(params);
     Simulator simulator(params);
+    Defense defense(params);
     Visualizer visualizer(params);
-
-    double angle = M_PI_2;
 
     while (visualizer.IsWindowOpen()) {
         auto smallRadarTargets = simulator.GetSmallRadarTargets();
@@ -34,11 +34,14 @@ int main() {
         radarController.Process(smallRadarTargets);
         radarController.Process(bigRadarTargets);
 
-        auto res = radarController.GetDeltaAngleAndTargets();
-        angle += res.AngleDelta;
+        auto res = radarController.GetAngleAndMeetingPoints();
 
-        visualizer.DrawFrame(bigRadarTargets, smallRadarTargets, angle);
-        simulator.SetRadarPosition(angle);
+        defense.LaunchRockets(res.MeetingPointsAndTargetIds);
+
+        visualizer.DrawFrame(bigRadarTargets, smallRadarTargets, defense.GetRocketsPositions(), res.Angle);
+
+        simulator.RemoveTargets(defense.GetDestroyedTargetsId());
+        simulator.SetRadarPosition(res.Angle);
         simulator.UpdateTargets();
     }
 

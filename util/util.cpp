@@ -3,22 +3,38 @@
 #include <math.h>
 
 
-PairDouble PolarToCartesian(double rad, double ang) {
+Vector2d PolarToCartesian(double rad, double ang) {
     return {rad * std::cos(ang), rad * std::sin(ang)};
 }
 
-PairDouble CartesianToPolar(double x, double y) {
+Vector2d PolarToCartesian(const Vector2d& p) {
+    return PolarToCartesian(p.X, p.Y);
+}
+
+Vector2d CartesianToPolar(double x, double y) {
     return {std::sqrt(x*x + y*y), std::atan2(y, x)};
 }
 
-TripleDouble CylindricalToCartesian(double rad, double ang, double h) {
-    auto polar = PolarToCartesian(rad, ang);
-    return {polar[0], polar[1], h};
+Vector2d CartesianToPolar(const Vector2d& p) {
+    return CartesianToPolar(p.X, p.Y);
 }
 
-TripleDouble CartesianToCylindrical(double x, double y, double z) {
+Vector3d CylindricalToCartesian(double rad, double ang, double h) {
+    auto polar = PolarToCartesian(rad, ang);
+    return {polar.X, polar.Y, h};
+}
+
+Vector3d CylindricalToCartesian(const Vector3d& p) {
+    return CylindricalToCartesian(p.X, p.Y, p.Z);
+}
+
+Vector3d CartesianToCylindrical(double x, double y, double z) {
     auto cartesian = CartesianToPolar(x, y);
-    return {cartesian[0], cartesian[1], z};
+    return {cartesian.X, cartesian.Y, z};
+}
+
+Vector3d CartesianToCylindrical(const Vector3d& p) {
+    return CartesianToCylindrical(p.X, p.Y, p.Z);
 }
 
 bool GetRandomTrue(float probability) {

@@ -3,6 +3,7 @@ namespace Flat;
 table Parameters {
     small_radar: SmallRadar;
     big_radar: BigRadar;
+    defense: Defense;
     simulator: Simulator;
     visualizer: Visualizer;
 }
@@ -24,6 +25,11 @@ table BigRadar {
     rad_error: double;
     ang_error: double;
     h_error: double;
+}
+
+table Defense {
+    time_to_launch_rocket: double;
+    rocket_speed: double;
 }
 
 table Simulator {

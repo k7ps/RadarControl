@@ -15,7 +15,7 @@ namespace {
 
     void DrawTarget(const SmallRadarData& data, raylib::Vector2 radarPos, int targetRad) {
         auto targetPos = PolarToCartesian(data.Rad, data.Ang);
-        auto targetPosV = raylib::Vector2(targetPos[0], -targetPos[1]);
+        auto targetPosV = raylib::Vector2(targetPos.X, -targetPos.Y);
         DrawCircleV(radarPos + targetPosV, targetRad, GetTargetColor(data.Priority));
         DrawCircleLinesV(radarPos + targetPosV, targetRad, raylib::Color::Black());
     }
@@ -49,6 +49,7 @@ bool Visualizer::IsWindowOpen() const {
 void Visualizer::DrawFrame(
     const std::vector<BigRadarData>& bigDatas,
     const std::vector<SmallRadarData>& smallDatas,
+    const std::vector<Vector3d>& rockets,
     double radarPosAngle
 ) {
     BeginDrawing();
@@ -56,9 +57,11 @@ void Visualizer::DrawFrame(
         Window.ClearBackground(raylib::Color::RayWhite());
 
         DrawTargets(bigDatas, smallDatas);
+        DrawRockets(rockets);
         DrawRadars(radarPosAngle);
 
         DrawTargetsSideView(bigDatas, smallDatas);
+        DrawRocketsSideView(rockets);
         DrawRadarsSideView();
     }
     EndDrawing();
@@ -114,4 +117,19 @@ void Visualizer::DrawRadarsSideView() {
 
     DrawRectangleLines(RadarPositionSideView.x - width/2, RadarPositionSideView.y - height, width, height, raylib::Color::Black());
     DrawCircleV(RadarPositionSideView, 7, raylib::Color::Blue());
+}
+
+void Visualizer::DrawRockets(const std::vector<Vector3d>& rockets) {
+    for (const auto& rocketPos : rockets) {
+        auto targetPosV = RadarPosition + raylib::Vector2(rocketPos.X, - rocketPos.Y);
+        DrawPoly(targetPosV, 3, 7, 0, raylib::Color::Red());
+    }
+}
+
+void Visualizer::DrawRocketsSideView(const std::vector<Vector3d>& rockets) {
+    for (const auto& rocketPos : rockets) {
+        auto cylindPos = CartesianToCylindrical(rocketPos);
+        auto targetPosV = RadarPositionSideView + raylib::Vector2(cylindPos.X * std::cos(cylindPos.Y), -cylindPos.Z);
+        DrawPoly(targetPosV, 3, 7, 0, raylib::Color::Red());
+    }
 }

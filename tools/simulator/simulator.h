@@ -9,31 +9,28 @@
 
 class Target {
 public:
-    Target(unsigned int id, double priority, TripleDouble pos, TripleDouble speed, int bigPeriod);
+    Target(unsigned int id, double priority, Vector3d pos, Vector3d speed, int bigPeriod);
 
     void UpdatePosition(bool isInSector);
 
-    SmallRadarData GetNoisedSmallData(TripleDouble errors);
-    BigRadarData GetNoisedBigData(TripleDouble errors);
+    SmallRadarData GetNoisedSmallData(Vector3d errors);
+    BigRadarData GetNoisedBigData(Vector3d errors);
     unsigned int GetId() const;
 
     bool IsInSector(double rad, double angView, double angPos) const;
     bool IsOutOfView(double rad) const;
 
 private:
-    TripleDouble GetCurrentPosition() const;
+    Vector3d GetCurrentPosition() const;
 
 private:
     unsigned int Id;
     double Priority;
 
-    double X;
-    double Y;
-    double Z;
+    Vector3d Pos;
+    Vector3d Speed;
 
-    double SpeedX;
-    double SpeedY;
-    double SpeedZ;
+    SimpleTimer Timer;
 
     int BigRadarUpdatePeriodMs;
 
@@ -42,8 +39,6 @@ private:
 
     SmallRadarData SmallData;
     BigRadarData BigData;
-
-    SimpleTimer Timer;
 };
 
 

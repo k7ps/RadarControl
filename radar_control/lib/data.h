@@ -1,8 +1,6 @@
 #ifndef DATA_H
 #define DATA_H
 
-#include <vector>
-
 
 struct SmallRadarData {
     unsigned int Id;
@@ -16,11 +14,6 @@ struct BigRadarData : public SmallRadarData {
     double SpeedX;
     double SpeedY;
     double SpeedZ;
-};
-
-struct Result {
-    double AngleDelta;
-    std::vector<unsigned int> AttackedTargets;
 };
 
 

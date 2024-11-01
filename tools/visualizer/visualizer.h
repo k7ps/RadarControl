@@ -3,8 +3,9 @@
 
 #include "radar_control/lib/data.h"
 #include "flat/generated/params.h"
+#include "util/points.h"
 
-#include "raylib-cpp.hpp"
+#include <raylib-cpp.hpp>
 
 
 class Visualizer {
@@ -13,11 +14,20 @@ public:
 
     bool IsWindowOpen() const;
 
-    void DrawFrame(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&, double);
+    void DrawFrame(
+        const std::vector<BigRadarData>& bigDatas,
+        const std::vector<SmallRadarData>& smallDatas,
+        const std::vector<Vector3d>& rockets,
+        double radarPosAngle
+    );
 
 private:
     void DrawTargets(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&);
     void DrawTargetsSideView(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&);
+
+    void DrawRockets(const std::vector<Vector3d>&);
+    void DrawRocketsSideView(const std::vector<Vector3d>&);
+
     void DrawRadars(double);
     void DrawRadarsSideView();
 

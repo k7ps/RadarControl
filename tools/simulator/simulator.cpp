@@ -3,11 +3,8 @@
 #include <math.h>
 
 
-Target::Target(unsigned int id, double priority, TripleDouble pos, TripleDouble speed, int bigPeriod)
-    : Id(id), Priority(priority)
-    , X(pos[0]), Y(pos[1]), Z(pos[2])
-    , SpeedX(speed[0]), SpeedY(speed[1]), SpeedZ(speed[2])
-    , BigRadarUpdatePeriodMs(bigPeriod)
+Target::Target(unsigned int id, double priority, Vector3d pos, Vector3d speed, int bigPeriod)
+    : Id(id), Priority(priority), Pos(pos), Speed(speed), BigRadarUpdatePeriodMs(bigPeriod)
 {}
 
 void Target::UpdatePosition(bool isInSector) {
@@ -18,52 +15,45 @@ void Target::UpdatePosition(bool isInSector) {
 
     Timer.Restart();
 
-    X += SpeedX * ms;
-    Y += SpeedY * ms;
-    Z += SpeedZ * ms;
+    Pos += Speed * ms;
 
     IsSmallDataUpdated = true;
     IsBigDataUpdated   = true;
 }
 
-TripleDouble Target::GetCurrentPosition() const {
-    double ms = Timer.GetElapsedTimeAsMs();
-    return TripleDouble{
-        X + SpeedX * ms,
-        Y + SpeedY * ms,
-        Z + SpeedZ * ms
-    };
+Vector3d Target::GetCurrentPosition() const {
+    return Pos + Speed * Timer.GetElapsedTimeAsMs();
 }
 
-SmallRadarData Target::GetNoisedSmallData(TripleDouble errors) {
+SmallRadarData Target::GetNoisedSmallData(Vector3d errors) {
     if (IsSmallDataUpdated) {
-        auto cylindrPos = CartesianToCylindrical(X, Y, Z);
+        auto cylindrPos = CartesianToCylindrical(Pos);
         SmallData = SmallRadarData{
             .Id = Id,
             .Priority = Priority,
-            .Rad = cylindrPos[0] + GetRandomDouble(-1, 1) * errors[0],
-            .Ang = cylindrPos[1] + GetRandomDouble(-1, 1) * errors[1],
-            .H   = cylindrPos[2] + GetRandomDouble(-1, 1) * errors[2]
+            .Rad = cylindrPos.X + GetRandomDouble(-1, 1) * errors.X,
+            .Ang = cylindrPos.Y + GetRandomDouble(-1, 1) * errors.Y,
+            .H   = cylindrPos.Z + GetRandomDouble(-1, 1) * errors.Z
         };
         IsSmallDataUpdated = false;
     }
     return SmallData;
 }
 
-BigRadarData Target::GetNoisedBigData(TripleDouble errors) {
+BigRadarData Target::GetNoisedBigData(Vector3d errors) {
     if (IsBigDataUpdated) {
-        auto cylindrPos = CartesianToCylindrical(X, Y, Z);
+        auto cylindrPos = CartesianToCylindrical(Pos);
         BigData = BigRadarData{
             {
                 .Id = Id,
                 .Priority = Priority,
-                .Rad = cylindrPos[0] + GetRandomDouble(-1, 1) * errors[0],
-                .Ang = cylindrPos[1] + GetRandomDouble(-1, 1) * errors[1],
-                .H   = cylindrPos[2] + GetRandomDouble(-1, 1) * errors[2]
+                .Rad = cylindrPos.X + GetRandomDouble(-1, 1) * errors.X,
+                .Ang = cylindrPos.Y + GetRandomDouble(-1, 1) * errors.Y,
+                .H   = cylindrPos.Z + GetRandomDouble(-1, 1) * errors.Z
             },
-            .SpeedX = SpeedX,
-            .SpeedY = SpeedY,
-            .SpeedZ = SpeedZ
+            .SpeedX = Speed.X,
+            .SpeedY = Speed.Y,
+            .SpeedZ = Speed.Z
         };
         IsBigDataUpdated = false;
     }
@@ -77,15 +67,16 @@ unsigned int Target::GetId() const {
 bool Target::IsInSector(double rad, double angView, double angPos) const {
     double startAng = angPos - angView / 2;
     double endAng = angPos + angView / 2;
-    auto curPos = GetCurrentPosition();
-    auto polarPos = CartesianToPolar(curPos[0], curPos[1]);
-    return polarPos[0] <= rad && startAng <= polarPos[1] && polarPos[1] <= endAng;
+    auto polarPos = CartesianToCylindrical(GetCurrentPosition());
+    return polarPos.X <= rad && startAng <= polarPos.Y && polarPos.Y <= endAng;
 }
 
 bool Target::IsOutOfView(double rad) const {
     const float error = 1;
     auto curPos = GetCurrentPosition();
-    return curPos[1] < error || curPos[0]*curPos[0] + curPos[1]*curPos[1] > (rad + error) * (rad + error) || Z < error;
+    return curPos.Y < error
+        || curPos.X * curPos.X + curPos.Y * curPos.Y > (rad + error) * (rad + error)
+        || curPos.Z < error;
 }
 
 
@@ -164,11 +155,11 @@ void Simulator::RemoveTargets(std::vector<unsigned int> ids) {
 std::vector<BigRadarData> Simulator::GetBigRadarTargets() {
     std::vector<BigRadarData> res;
     for (auto& target : Targets) {
-        res.push_back(target.GetNoisedBigData(TripleDouble{
+        res.push_back(target.GetNoisedBigData(Vector3d(
             Params.big_radar()->rad_error(),
             Params.big_radar()->ang_error(),
             Params.big_radar()->h_error()
-        }));
+        )));
     }
     return res;
 }
@@ -177,11 +168,11 @@ std::vector<SmallRadarData> Simulator::GetSmallRadarTargets() {
     std::vector<SmallRadarData> res;
     for (auto& target : Targets) {
         if (IsTargetInSector(target)) {
-            res.emplace_back(target.GetNoisedSmallData(TripleDouble{
+            res.emplace_back(target.GetNoisedSmallData(Vector3d(
                 Params.small_radar()->rad_error(),
                 Params.small_radar()->ang_error(),
                 Params.small_radar()->h_error()
-            }));
+            )));
         }
     }
     return res;

@@ -16,6 +16,10 @@
         "ang_error": 0.01,
         "h_error": 2
     },
+    "defense": {
+        "time_to_launch_rocket": 3000,
+        "rocket_speed": 0.06
+    },
     "simulator": {
         "targets_per_minute": 20,
         "min_speed": 0.02,
