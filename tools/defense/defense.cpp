@@ -7,9 +7,7 @@ DefRocket::DefRocket(Vector3d meetingPoint, double speed, unsigned timeToLaunchM
     : Pos()
     , MeetingPoint(meetingPoint)
     , Speed(MeetingPoint * speed / GetSqrtOfSquareSum(meetingPoint)), TimeToLaunchMs(timeToLaunchMs)
-{
-    std::cout << "rocket cooking...\n";
-}
+{}
 
 void DefRocket::UpdatePosition() {
     double ms = Timer.GetElapsedTimeAsMs();
@@ -17,7 +15,6 @@ void DefRocket::UpdatePosition() {
         if (ms < TimeToLaunchMs || IsExplodedFlag) {
             return;
         } else {
-            std::cout << "rocket launched\n";
             ms -= TimeToLaunchMs;
             IsLaunchedFlag = true;
         }
@@ -27,7 +24,6 @@ void DefRocket::UpdatePosition() {
     Pos += Speed * ms;
 
     if (Pos.Z >= MeetingPoint.Z) {
-        std::cout << "rocket exploded\n";
         Pos = MeetingPoint;
         IsExplodedFlag = true;
     }
