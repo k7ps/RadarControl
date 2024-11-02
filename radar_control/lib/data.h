@@ -1,6 +1,8 @@
 #ifndef DATA_H
 #define DATA_H
 
+#include "util/points.h"
+
 
 struct SmallRadarData {
     unsigned int Id;
@@ -11,9 +13,7 @@ struct SmallRadarData {
 };
 
 struct BigRadarData : public SmallRadarData {
-    double SpeedX;
-    double SpeedY;
-    double SpeedZ;
+    Vector3d Speed;
 };
 
 

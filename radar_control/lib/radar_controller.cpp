@@ -11,7 +11,6 @@ RadarController::RadarController(const Flat::Parameters& params)
 
 void RadarController::Process(const std::vector<BigRadarData>& datas) {
     if (datas.size() > 0 && !isTested) {
-        std::cout << "target created\n";
         test = CylindricalToCartesian(datas[0].Rad, datas[0].Ang, datas[0].H);
     }
 }

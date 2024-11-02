@@ -51,9 +51,7 @@ BigRadarData Target::GetNoisedBigData(Vector3d errors) {
                 .Ang = cylindrPos.Y + GetRandomDouble(-1, 1) * errors.Y,
                 .H   = cylindrPos.Z + GetRandomDouble(-1, 1) * errors.Z
             },
-            .SpeedX = Speed.X,
-            .SpeedY = Speed.Y,
-            .SpeedZ = Speed.Z
+            .Speed = Speed
         };
         IsBigDataUpdated = false;
     }
