@@ -5,7 +5,7 @@
 
 
 struct SmallRadarData {
-    unsigned int Id;
+    int Id;
     double Priority;
     double Rad;
     double Ang;

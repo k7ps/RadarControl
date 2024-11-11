@@ -4,6 +4,30 @@
 #include "data.h"
 #include "flat/generated/params.h"
 #include "util/points.h"
+#include "util/timer.h"
+
+
+namespace RC {
+
+    class Target {
+    public:
+        Target();
+
+        void Update(Vector3d pos, Vector3d speed);
+
+        bool IsDead() const;
+
+    private:
+        int Id;
+        double Priority;
+
+        Vector3d Pos;
+        Vector3d Speed;
+
+        SimpleTimer DeathTimer;
+    };
+
+}
 
 
 class RadarController {
@@ -15,8 +39,7 @@ public:
 
     RadarController(const Flat::Parameters& params);
 
-    void Process(const std::vector<BigRadarData>&);
-    void Process(const std::vector<SmallRadarData>&);
+    void Process(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&);
 
     Result GetAngleAndMeetingPoints();
 
@@ -24,9 +47,12 @@ private:
     const Flat::Parameters& Params;
 
     double RadarAnglePos;
+    double RadarAngleTarget = -1;
 
-    Vector3d test = Vector3d(-1, 0, 0);
-    bool isTested = false;
+    std::vector<unsigned> FollowedTargetIds;
+    std::vector<std::pair<Vector3d, unsigned>> MeetingPointsAndTargetIds;
+
+    SimpleTimer Timer;
 };
 
 

@@ -3,7 +3,7 @@
         "radius": 400,
         "view_angle": 1.0471,
         "frequency": 10,
-        "angle_speed": 5,
+        "angle_speed": 0.1,
         "rad_error": 0.6,
         "ang_error": 0.002,
         "h_error": 0.5
@@ -16,21 +16,23 @@
         "ang_error": 0.01,
         "h_error": 2
     },
+    "general": {
+        "death_time": 3000
+    },
     "defense": {
         "time_to_launch_rocket": 3000,
         "rocket_speed": 0.06
     },
     "simulator": {
-        "targets_per_minute": 20,
-        "min_speed": 0.02,
-        "max_speed": 0.05,
+        "targets_per_minute": 5,
+        "min_speed": 0.005,
+        "max_speed": 0.01,
         "max_deviation_angle_vertical": 0.1745,
         "max_height": 250,
         "probability_of_accurate_missile": 0.4,
-        "random_seed": 21
+        "random_seed": 35
     },
     "visualizer": {
-        "antialiasing_level": 4,
         "radars_outline_thickness": 1,
         "target_radius": 5
     }

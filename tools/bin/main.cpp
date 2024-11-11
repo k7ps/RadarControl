@@ -28,11 +28,11 @@ int main() {
     Visualizer visualizer(params);
 
     while (visualizer.IsWindowOpen()) {
-        auto smallRadarTargets = simulator.GetSmallRadarTargets();
-        auto bigRadarTargets = simulator.GetBigRadarTargets();
+        const auto& smallRadarTargets = simulator.GetSmallRadarTargets();
+        const auto& bigRadarTargets = simulator.GetBigRadarTargets();
+        const auto& updatedTargets = simulator.GetOnlyUpdatedTargets();
 
-        radarController.Process(smallRadarTargets);
-        radarController.Process(bigRadarTargets);
+        radarController.Process(updatedTargets, smallRadarTargets);
 
         auto res = radarController.GetAngleAndMeetingPoints();
 

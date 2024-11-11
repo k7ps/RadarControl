@@ -52,6 +52,7 @@ void Visualizer::DrawFrame(
     const std::vector<Vector3d>& rockets,
     double radarPosAngle
 ) {
+    // std::cout << radarPosAngle << '\n';
     BeginDrawing();
     {
         Window.ClearBackground(raylib::Color::RayWhite());
@@ -95,6 +96,7 @@ void Visualizer::DrawTargetsSideView(const std::vector<BigRadarData>& bigDatas, 
 
 void Visualizer::DrawRadars(double radarPosAngle) {
     float radarPosAngleDeg = RadToDeg(radarPosAngle);
+    // std::cout << radarPosAngle << ' ' << radarPosAngleDeg << '\n';
     float radarViewAngleDeg = RadToDeg(Params.small_radar()->view_angle());
     float radarStartAngle = radarPosAngleDeg - radarViewAngleDeg / 2;
     float radarEndAngle   = radarPosAngleDeg + radarViewAngleDeg / 2;

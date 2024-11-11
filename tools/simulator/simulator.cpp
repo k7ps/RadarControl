@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+using namespace SIM;
+
 
 Target::Target(unsigned int id, double priority, Vector3d pos, Vector3d speed, int bigPeriod)
     : Id(id), Priority(priority), Pos(pos), Speed(speed), BigRadarUpdatePeriodMs(bigPeriod)
@@ -19,6 +21,7 @@ void Target::UpdatePosition(bool isInSector) {
 
     IsSmallDataUpdated = true;
     IsBigDataUpdated   = true;
+    WasUpdatedFlag = true;
 }
 
 Vector3d Target::GetCurrentPosition() const {
@@ -75,6 +78,14 @@ bool Target::IsOutOfView(double rad) const {
     return curPos.Y < error
         || curPos.X * curPos.X + curPos.Y * curPos.Y > (rad + error) * (rad + error)
         || curPos.Z < error;
+}
+
+bool Target::WasUpdated() const {
+    return WasUpdatedFlag;
+}
+
+void Target::SetWasUpdated(bool flag) {
+    WasUpdatedFlag = flag;
 }
 
 
@@ -171,6 +182,21 @@ std::vector<SmallRadarData> Simulator::GetSmallRadarTargets() {
                 Params.small_radar()->ang_error(),
                 Params.small_radar()->h_error()
             )));
+        }
+    }
+    return res;
+}
+
+std::vector<BigRadarData> Simulator::GetOnlyUpdatedTargets() {
+    std::vector<BigRadarData> res;
+    for (auto& target : Targets) {
+        if (target.WasUpdated()) {
+            res.push_back(target.GetNoisedBigData(Vector3d(
+                Params.big_radar()->rad_error(),
+                Params.big_radar()->ang_error(),
+                Params.big_radar()->h_error()
+            )));
+            target.SetWasUpdated(false);
         }
     }
     return res;

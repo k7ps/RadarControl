@@ -3,6 +3,7 @@ namespace Flat;
 table Parameters {
     small_radar: SmallRadar;
     big_radar: BigRadar;
+    general: General;
     defense: Defense;
     simulator: Simulator;
     visualizer: Visualizer;
@@ -12,7 +13,7 @@ table SmallRadar {
     radius: double;
     view_angle: double; // radians
     frequency: double;
-    angle_speed: double; // degrees per second
+    angle_speed: double; // radians per second
     rad_error: double;
     ang_error: double;
     h_error: double;
@@ -25,6 +26,10 @@ table BigRadar {
     rad_error: double;
     ang_error: double;
     h_error: double;
+}
+
+table General {
+    death_time: double; // milliseconds
 }
 
 table Defense {
@@ -43,7 +48,6 @@ table Simulator {
 }
 
 table Visualizer {
-    antialiasing_level: int32;
     radars_outline_thickness: int32;
     target_radius: int32;
 }

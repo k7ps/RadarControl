@@ -6,40 +6,48 @@
 #include "util/timer.h"
 #include "util/util.h"
 
+namespace SIM {
 
-class Target {
-public:
-    Target(unsigned int id, double priority, Vector3d pos, Vector3d speed, int bigPeriod);
+    class Target {
+    public:
+        Target(unsigned int id, double priority, Vector3d pos, Vector3d speed, int bigPeriod);
 
-    void UpdatePosition(bool isInSector);
+        void UpdatePosition(bool isInSector);
 
-    SmallRadarData GetNoisedSmallData(Vector3d errors);
-    BigRadarData GetNoisedBigData(Vector3d errors);
-    unsigned int GetId() const;
+        SmallRadarData GetNoisedSmallData(Vector3d errors);
+        BigRadarData GetNoisedBigData(Vector3d errors);
+        unsigned int GetId() const;
 
-    bool IsInSector(double rad, double angView, double angPos) const;
-    bool IsOutOfView(double rad) const;
+        bool IsInSector(double rad, double angView, double angPos) const;
+        bool IsOutOfView(double rad) const;
 
-private:
-    Vector3d GetCurrentPosition() const;
+        bool WasUpdated() const;
+        void SetWasUpdated(bool flag);
 
-private:
-    unsigned int Id;
-    double Priority;
+    private:
+        Vector3d GetCurrentPosition() const;
 
-    Vector3d Pos;
-    Vector3d Speed;
+    private:
+        int Id;
+        double Priority;
 
-    SimpleTimer Timer;
+        Vector3d Pos;
+        Vector3d Speed;
 
-    int BigRadarUpdatePeriodMs;
+        SimpleTimer Timer;
 
-    bool IsSmallDataUpdated = true;
-    bool IsBigDataUpdated = true;
+        int BigRadarUpdatePeriodMs;
 
-    SmallRadarData SmallData;
-    BigRadarData BigData;
-};
+        bool IsSmallDataUpdated = true;
+        bool IsBigDataUpdated = true;
+
+        SmallRadarData SmallData;
+        BigRadarData BigData;
+
+        bool WasUpdatedFlag = true;
+    };
+
+}
 
 
 class Simulator {
@@ -54,6 +62,8 @@ public:
     std::vector<BigRadarData> GetBigRadarTargets();
     std::vector<SmallRadarData> GetSmallRadarTargets();
 
+    std::vector<BigRadarData> GetOnlyUpdatedTargets();
+
 private:
     void AddNewTarget();
     bool IsTargetInSector(const Target& target) const;
@@ -61,7 +71,7 @@ private:
 private:
     const Flat::Parameters& Params;
 
-    std::vector<Target> Targets;
+    std::vector<SIM::Target> Targets;
 
     const int BigRadarUpdatePeriodMs;
     const float NewTargetProbability;
