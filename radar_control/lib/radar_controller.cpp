@@ -34,33 +34,64 @@ namespace {
 }
 
 
+Target::Target(double deathTime)
+    : DeathTime(deathTime)
+{}
+
+void Target::Update(Vector3d pos, Vector3d speed) {
+    if (Pos == pos && Speed == speed) {
+        return;
+    }
+
+    DeathTimer.Restart();
+    Pos = pos;
+    Speed = speed;
+}
+
+bool Target::IsDead() const {
+    return (double) DeathTimer.GetElapsedTimeAsMs() >= DeathTime;
+}
+
+void Target::SetFollowed(bool f) {
+    IsFollowedFlag = f;
+}
+
+bool Target::IsFollowed() const {
+    return IsFollowedFlag;
+}
+
+
 RadarController::RadarController(const Flat::Parameters& params)
     : Params(params)
     , RadarAnglePos(M_PI_2)
 {}
 
-void RadarController::Process(const std::vector<BigRadarData>& bigDatas, const std::vector<SmallRadarData>& smallDatas) {
-    if (!bigDatas.empty() && FollowedTargetIds.empty()) {
-        FollowedTargetIds.push_back(bigDatas.front().Id);
-    }
-    if (!FollowedTargetIds.empty()) {
-        int id = FollowedTargetIds.front();
-        auto bigData = GetTargetDataById(bigDatas, id);
-        if (bigData.Id == -1) return;
+void RadarController::Process(
+    const std::vector<BigRadarData>& bigDatas,
+    const std::vector<SmallRadarData>& smallDatas
+) {
 
-        RadarAngleTarget = bigData.Ang;
+    // if (!bigDatas.empty() && FollowedTargetIds.empty()) {
+    //     FollowedTargetIds.push_back(bigDatas.front().Id);
+    // }
+    // if (!FollowedTargetIds.empty()) {
+    //     int id = FollowedTargetIds.front();
+    //     auto bigData = GetTargetDataById(bigDatas, id);
+    //     if (bigData.Id == -1) return;
 
-        auto smallData = GetTargetDataById(smallDatas, id);
-        if (smallData.Id == -1) return;
+    //     RadarAngleTarget = bigData.Ang;
 
-        RadarAngleTarget = smallData.Ang;
+    //     auto smallData = GetTargetDataById(smallDatas, id);
+    //     if (smallData.Id == -1) return;
 
-        // static int frameCount = 0;
-        // ++frameCount;
-        // if (frameCount >= 5) {
-        //     MeetingPointsAndTargetIds
-        // }
-    }
+    //     RadarAngleTarget = smallData.Ang;
+
+    //     // static int frameCount = 0;
+    //     // ++frameCount;
+    //     // if (frameCount >= 5) {
+    //     //     MeetingPointsAndTargetIds
+    //     // }
+    // }
 }
 
 RadarController::Result RadarController::GetAngleAndMeetingPoints() {

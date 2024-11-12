@@ -7,10 +7,17 @@
 class SimpleTimer {
     using Clock = std::chrono::high_resolution_clock;
 public:
-    SimpleTimer();
+    SimpleTimer()
+        : LastTime(Clock::now())
+    {}
 
-    void Restart();
-    unsigned int GetElapsedTimeAsMs() const;
+    inline void Restart() {
+        LastTime = Clock::now();
+    }
+
+    inline unsigned int GetElapsedTimeAsMs() const {
+        return std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - LastTime).count();
+    }
 
 private:
     Clock::time_point LastTime;

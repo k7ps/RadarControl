@@ -11,11 +11,14 @@ namespace RC {
 
     class Target {
     public:
-        Target();
+        Target(double deathTime);
 
         void Update(Vector3d pos, Vector3d speed);
 
         bool IsDead() const;
+
+        void SetFollowed(bool f);
+        bool IsFollowed() const;
 
     private:
         int Id;
@@ -25,6 +28,9 @@ namespace RC {
         Vector3d Speed;
 
         SimpleTimer DeathTimer;
+        double DeathTime;
+
+        bool IsFollowedFlag;
     };
 
 }

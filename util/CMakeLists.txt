@@ -7,7 +7,6 @@ set(UTIL_HEADERS
 
 set(UTIL_SOURCES
     flat.cpp
-    timer.cpp
     points.cpp
     util.cpp
 )

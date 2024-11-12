@@ -66,7 +66,7 @@ public:
 
 private:
     void AddNewTarget();
-    bool IsTargetInSector(const Target& target) const;
+    bool IsTargetInSector(const SIM::Target& target) const;
 
 private:
     const Flat::Parameters& Params;

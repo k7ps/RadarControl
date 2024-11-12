@@ -29,6 +29,7 @@ Vector3d operator*(const Vector3d& p1, double p2);
 Vector3d& operator*=(Vector3d& p1, const Vector3d& p2);
 Vector3d operator/(const Vector3d& p1, double p2);
 Vector3d& operator/=(Vector3d& p1, const Vector3d& p2);
+bool operator==(const Vector3d& p1, const Vector3d& p2);
 
 double GetSqrtOfSquareSum(const Vector3d& v);
 
