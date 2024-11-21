@@ -1,5 +1,5 @@
 #include "defense/defense.h"
-#include "radar_control/lib/radar_controller.h"
+#include "radar_control/radar_controller/radar_controller.h"
 #include "simulator/simulator.h"
 #include "util/flat.h"
 #include "visualizer/visualizer.h"
@@ -30,9 +30,9 @@ int main() {
     while (visualizer.IsWindowOpen()) {
         const auto& smallRadarTargets = simulator.GetSmallRadarTargets();
         const auto& bigRadarTargets = simulator.GetBigRadarTargets();
-        const auto& updatedTargets = simulator.GetOnlyUpdatedTargets();
+        // const auto& updatedTargets = simulator.GetOnlyUpdatedTargets();
 
-        radarController.Process(updatedTargets, smallRadarTargets);
+        radarController.Process(bigRadarTargets, smallRadarTargets);
 
         auto res = radarController.GetAngleAndMeetingPoints();
 

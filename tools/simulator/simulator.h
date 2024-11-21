@@ -4,7 +4,7 @@
 #include "radar_control/lib/data.h"
 #include "flat/generated/params.h"
 #include "util/timer.h"
-#include "util/util.h"
+
 
 namespace SIM {
 

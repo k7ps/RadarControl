@@ -6,7 +6,7 @@
         "angle_speed": 0.1,
         "rad_error": 0.6,
         "ang_error": 0.002,
-        "h_error": 0.5
+        "h_error": 0.2
     },
     "big_radar": {
         "radius": 700,

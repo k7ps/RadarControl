@@ -1,13 +1,22 @@
 #include "simulator.h"
 
+#include "util/util.h"
+
+#include <iomanip>
 #include <math.h>
+#include <iostream>
 
 using namespace SIM;
 
 
 Target::Target(unsigned int id, double priority, Vector3d pos, Vector3d speed, int bigPeriod)
     : Id(id), Priority(priority), Pos(pos), Speed(speed), BigRadarUpdatePeriodMs(bigPeriod)
-{}
+{
+    if (id == 0) {
+        std::cout << std::fixed << std::setprecision(6);
+        std::cout << speed.DebugString() << '\n';
+    }
+}
 
 void Target::UpdatePosition(bool isInSector) {
     double ms = Timer.GetElapsedTimeAsMs();
@@ -177,11 +186,12 @@ std::vector<SmallRadarData> Simulator::GetSmallRadarTargets() {
     std::vector<SmallRadarData> res;
     for (auto& target : Targets) {
         if (IsTargetInSector(target)) {
-            res.emplace_back(target.GetNoisedSmallData(Vector3d(
-                Params.small_radar()->rad_error(),
-                Params.small_radar()->ang_error(),
-                Params.small_radar()->h_error()
-            )));
+            // res.emplace_back(target.GetNoisedSmallData(Vector3d(
+            //     Params.small_radar()->rad_error(),
+            //     Params.small_radar()->ang_error(),
+            //     Params.small_radar()->h_error()
+            // )));
+            res.emplace_back(target.GetNoisedSmallData(Vector3d(0,0,0)));
         }
     }
     return res;

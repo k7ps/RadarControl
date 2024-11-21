@@ -1,10 +1,10 @@
 set(RC_LIB_HEADERS
     data.h
-    radar_controller.h
+    calculations.h
 )
 
 set(RC_LIB_SOURCES
-    radar_controller.cpp
+    calculations.cpp
 )
 
 add_library(radar_control_lib STATIC ${RC_LIB_HEADERS} ${RC_LIB_SOURCES})
