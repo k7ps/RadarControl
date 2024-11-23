@@ -18,6 +18,7 @@ namespace RC {
         void Update(Vector3d pos, Vector3d speed);
 
         int GetId() const;
+        double GetPriority() const;
         Vector3d GetPosition() const;
 
         bool HavePreciseSpeed() const;
@@ -54,6 +55,7 @@ class RadarController {
 public:
     struct Result {
         double Angle;
+        std::vector<unsigned> FollowedTargetIds;
         std::vector<std::pair<Vector3d, unsigned>> MeetingPointsAndTargetIds;
     };
 
@@ -65,6 +67,8 @@ public:
 
 private:
     RC::Target& GetTargetById(int id);
+    void SelectTargetToFollow();
+    void RemoveDeadTargets();
 
 private:
     const Flat::Parameters& Params;

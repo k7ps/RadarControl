@@ -50,7 +50,7 @@ Vector3d& operator/=(Vector3d& p1, double p2) {
 }
 
 bool operator==(const Vector3d& p1, const Vector3d& p2) {
-    const double error = 1e-6;
+    const double error = 1e-8;
     return std::abs(p1.X - p2.X) < error
         && std::abs(p1.Y - p2.Y) < error
         && std::abs(p1.Z - p2.Z) < error;

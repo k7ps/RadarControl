@@ -41,6 +41,7 @@ int main() {
         visualizer.DrawFrame(
             bigRadarTargets,
             smallRadarTargets,
+            res.FollowedTargetIds,
             defense.GetRocketsPositions(),
             defense.GetMeetingPoints(),
             res.Angle

@@ -55,6 +55,10 @@ int Target::GetId() const {
     return Id;
 }
 
+double Target::GetPriority() const {
+    return Priority;
+}
+
 Vector3d Target::GetPosition() const {
     return Pos;
 }
@@ -119,9 +123,10 @@ void RadarController::Process(
             Targets.push_back(Target(data, Params.general()->death_time()));
         }
     }
+    RemoveDeadTargets();
 
-    if (!bigDatas.empty() && FollowedTargetIds.empty()) {
-        FollowedTargetIds.push_back(bigDatas.front().Id);
+    if (FollowedTargetIds.empty()) {
+        SelectTargetToFollow();
     }
     if (!FollowedTargetIds.empty()) {
         int id = FollowedTargetIds.front();
@@ -143,6 +148,34 @@ void RadarController::Process(
         }
     }
 }
+
+void RadarController::SelectTargetToFollow() {
+    if (Targets.empty()) {
+        return;
+    }
+    double targetId = -1;
+    double maxPriority = 0;
+    for (const auto& target : Targets) {
+        if (target.GetPriority() > maxPriority) {
+            maxPriority = target.GetPriority();
+            targetId = target.GetId();
+        }
+    }
+    FollowedTargetIds.push_back(targetId);
+}
+
+void RadarController::RemoveDeadTargets() {
+    for (int i=0; i<Targets.size(); ++i) {
+        if (Targets[i].IsDead()) {
+            if (!FollowedTargetIds.empty() && FollowedTargetIds.front() == Targets[i].GetId()) {
+                FollowedTargetIds.clear();
+            }
+            Targets.erase(Targets.begin() + i);
+            --i;
+        }
+    }
+}
+
 
 Target& RadarController::GetTargetById(int id) {
     if (Targets.size() > id && Targets[id].GetId() == id) {
@@ -176,6 +209,7 @@ RadarController::Result RadarController::GetAngleAndMeetingPoints() {
 
     auto res = RadarController::Result{
         .Angle = RadarAnglePos,
+        .FollowedTargetIds = FollowedTargetIds,
         .MeetingPointsAndTargetIds = MeetingPointsAndTargetIds
     };
     MeetingPointsAndTargetIds.clear();

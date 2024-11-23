@@ -1,7 +1,10 @@
 #include "visualizer.h"
+#include "Color.hpp"
 #include "util/util.h"
 
+#include <Vector2.hpp>
 #include <iostream>
+#include <raylib.h>
 #include <set>
 
 
@@ -9,7 +12,17 @@ namespace {
     raylib::Color GetTargetColor(float priority) {
         const float start = 0; // red
         const float end = 120; // green
-        return raylib::Color::FromHSV(start + priority * (end - start), 1.f, 1.f);
+        return raylib::Color::FromHSV(start + (1 - priority) * (end - start), 1.f, 1.f);
+    }
+
+    void DrawCircleDashedLines(raylib::Vector2 pos, float rad, raylib::Color col, int segmentsCnt = 6) {
+        float dashProportion = 0.7f;
+        float segmentAng = 360.f / segmentsCnt;
+        for (int i = 0; i < segmentsCnt; ++i) {
+            float startAng = i * segmentAng;
+            float endAng = startAng + segmentAng * dashProportion;
+            DrawRingLines(pos, rad, rad, startAng, endAng, 10, col);
+        }
     }
 }
 
@@ -34,6 +47,7 @@ bool Visualizer::IsWindowOpen() const {
 void Visualizer::DrawFrame(
     const std::vector<BigRadarData>& bigDatas,
     const std::vector<SmallRadarData>& smallDatas,
+    const std::vector<unsigned>& followedTargetIds,
     const std::vector<Vector3d>& rockets,
     const std::vector<Vector3d>& meetingPoints,
     double radarPosAngle
@@ -43,7 +57,7 @@ void Visualizer::DrawFrame(
         Window.ClearBackground(raylib::Color::RayWhite());
 
         for (auto view : {View::STRAIGHT, View::SIDE}) {
-            DrawTargets(bigDatas, smallDatas, view);
+            DrawTargets(bigDatas, smallDatas, followedTargetIds, view);
             DrawRockets(rockets, view);
             DrawMeetingPoints(meetingPoints, view);
             DrawRadars(radarPosAngle, view);
@@ -63,25 +77,30 @@ raylib::Vector2 Visualizer::ToWindowCoords(const Vector3d& pos, View view) const
     }
 }
 
-void Visualizer::DrawTarget(const SmallRadarData& data, View view) {
+void Visualizer::DrawTarget(const SmallRadarData& data, bool isFollowed, View view) {
     auto targetPos = ToWindowCoords(CylindricalToCartesian(data.Rad, data.Ang, data.H), view);
     DrawCircleV(targetPos, Params.visualizer()->target_radius(), GetTargetColor(data.Priority));
     DrawCircleLinesV(targetPos, Params.visualizer()->target_radius(), raylib::Color::Black());
+    if (isFollowed) {
+        DrawCircleDashedLines(targetPos, Params.visualizer()->target_radius() + 5, raylib::Color::Black());
+    }
 }
 
 void Visualizer::DrawTargets(
     const std::vector<BigRadarData>& bigDatas,
     const std::vector<SmallRadarData>& smallDatas,
+    const std::vector<unsigned>& followedTargetIds,
     View view
 ) {
     std::set<uint32_t> drawnTargets;
+    std::set<unsigned> followed(followedTargetIds.begin(), followedTargetIds.end());
     for (const auto& data : smallDatas) {
         drawnTargets.insert(data.Id);
-        DrawTarget(data, view);
+        DrawTarget(data, followed.count(data.Id), view);
     }
     for (const auto& data : bigDatas) {
         if (!drawnTargets.count(data.Id)) {
-            DrawTarget(data, view);
+            DrawTarget(data, followed.count(data.Id), view);
         }
     }
 }

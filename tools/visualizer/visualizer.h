@@ -22,19 +22,25 @@ public:
     void DrawFrame(
         const std::vector<BigRadarData>& bigDatas,
         const std::vector<SmallRadarData>& smallDatas,
+        const std::vector<unsigned>& followedTargetIds,
         const std::vector<Vector3d>& rockets,
         const std::vector<Vector3d>& meetingPoints,
         double radarPosAngle
     );
 
 private:
-    raylib::Vector2 ToWindowCoords(const Vector3d&, View) const;
+    raylib::Vector2 ToWindowCoords(const Vector3d& p, View view) const;
 
-    void DrawTarget(const SmallRadarData&, View);
-    void DrawTargets(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&, View);
-    void DrawRockets(const std::vector<Vector3d>&, View);
-    void DrawMeetingPoints(const std::vector<Vector3d>&, View);
-    void DrawRadars(double, View);
+    void DrawTarget(const SmallRadarData& data, bool isFollowed, View view);
+    void DrawTargets(
+        const std::vector<BigRadarData>& bigDatas,
+        const std::vector<SmallRadarData>& smallDatas,
+        const std::vector<unsigned>& followedTargetIds,
+        View view
+    );
+    void DrawRockets(const std::vector<Vector3d>& rockets, View view);
+    void DrawMeetingPoints(const std::vector<Vector3d>& meetingPoints, View view);
+    void DrawRadars(double radarPosAngle, View view);
 
 private:
     const Flat::Parameters& Params;
