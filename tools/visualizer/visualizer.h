@@ -10,6 +10,11 @@
 
 class Visualizer {
 public:
+    enum View {
+        STRAIGHT,
+        SIDE,
+    };
+
     Visualizer(const Flat::Parameters& params);
 
     bool IsWindowOpen() const;
@@ -18,18 +23,18 @@ public:
         const std::vector<BigRadarData>& bigDatas,
         const std::vector<SmallRadarData>& smallDatas,
         const std::vector<Vector3d>& rockets,
+        const std::vector<Vector3d>& meetingPoints,
         double radarPosAngle
     );
 
 private:
-    void DrawTargets(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&);
-    void DrawTargetsSideView(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&);
+    raylib::Vector2 ToWindowCoords(const Vector3d&, View) const;
 
-    void DrawRockets(const std::vector<Vector3d>&);
-    void DrawRocketsSideView(const std::vector<Vector3d>&);
-
-    void DrawRadars(double);
-    void DrawRadarsSideView();
+    void DrawTarget(const SmallRadarData&, View);
+    void DrawTargets(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&, View);
+    void DrawRockets(const std::vector<Vector3d>&, View);
+    void DrawMeetingPoints(const std::vector<Vector3d>&, View);
+    void DrawRadars(double, View);
 
 private:
     const Flat::Parameters& Params;
@@ -37,8 +42,8 @@ private:
     raylib::Vector2 WindowSize;
     raylib::Window Window;
 
-    const raylib::Vector2 RadarPosition;
-    const raylib::Vector2 RadarPositionSideView;
+    const raylib::Vector2 RadarPositionStraight;
+    const raylib::Vector2 RadarPositionSide;
 };
 
 

@@ -9,33 +9,6 @@
 using namespace RC;
 
 
-// namespace {
-//     BigRadarData GetTargetDataById(const std::vector<BigRadarData>& datas, unsigned id) {
-//         for (const auto& data : datas) {
-//             if (data.Id == id) {
-//                 return data;
-//             }
-//         }
-//         return BigRadarData{
-//             {
-//                 .Id = -1
-//             }
-//         };
-//     }
-
-//     SmallRadarData GetTargetDataById(const std::vector<SmallRadarData>& datas, unsigned id) {
-//         for (const auto& data : datas) {
-//             if (data.Id == id) {
-//                 return data;
-//             }
-//         }
-//         return SmallRadarData{
-//             .Id = -1
-//         };
-//     }
-// }
-
-
 Target::Target(int id, double priority, double deathTime)
     : Id(id), Priority(priority), DeathTime(deathTime)
 {}
@@ -54,14 +27,16 @@ void Target::Update(Vector3d pos) {
     int ms = Timer.GetElapsedTimeAsMs();
     Timer.Restart();
 
-    Positions.push_back(pos);
+    Pos = pos;
+
+    Positions.push_back(Pos);
     if (Positions.size() == 1) {
         DeltaTimes.push_back(0);
         return;
     }
     DeltaTimes.push_back(ms);
     Speed = CalculateSpeed(Positions, DeltaTimes);
-    if (Positions.size() >= 100) {
+    if (Positions.size() >= 40) {
         HavePreciseSpeedFlag = true;
     }
 }
@@ -158,7 +133,7 @@ void RadarController::Process(
 
         if (!target.IsRocketLaunched() && target.HavePreciseSpeed()) {
             auto meetingPoint = CalculateMeetingPoint(
-                targetPos,
+                targetPos + target.GetSpeed() * Params.defense()->time_to_launch_rocket(),
                 target.GetSpeed(),
                 Vector3d(),
                 Params.defense()->rocket_speed()

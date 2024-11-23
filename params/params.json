@@ -10,7 +10,6 @@
     },
     "big_radar": {
         "radius": 700,
-        "error": 0.01,
         "frequency": 0.5,
         "rad_error": 3,
         "ang_error": 0.01,

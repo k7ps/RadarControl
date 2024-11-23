@@ -2,9 +2,8 @@
 #define DEFENCE_H
 
 #include "flat/generated/params.h"
-#include "radar_control/lib/data.h"
+#include "util/points.h"
 #include "util/timer.h"
-#include "util/util.h"
 
 
 class DefRocket {
@@ -14,6 +13,7 @@ public:
     void UpdatePosition();
 
     Vector3d GetPosition() const;
+    Vector3d GetMeetingPoint() const;
     bool IsLaunched() const;
     bool IsExploded() const;
 
@@ -23,6 +23,7 @@ private:
     Vector3d Speed;
 
     SimpleTimer Timer;
+    SimpleTimer TestTimer;
 
     bool IsLaunchedFlag = false;
     bool IsExplodedFlag = false;
@@ -38,6 +39,7 @@ public:
 
     std::vector<unsigned> GetDestroyedTargetsId();
     std::vector<Vector3d> GetRocketsPositions();
+    std::vector<Vector3d> GetMeetingPoints();
 
 private:
     const Flat::Parameters& Params;

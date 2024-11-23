@@ -4,11 +4,11 @@
 
 
 std::string Vector2d::DebugString() const {
-    return "X = " + std::to_string(X) + ", Y = " + std::to_string(Y) + ";";
+    return "X = " + std::to_string(X) + ", Y = " + std::to_string(Y);
 }
 
 std::string Vector3d::DebugString() const {
-    return "X = " + std::to_string(X) + ", Y = " + std::to_string(Y) + ", Z = " + std::to_string(Z) + ";";
+    return "X = " + std::to_string(X) + ", Y = " + std::to_string(Y) + ", Z = " + std::to_string(Z);
 }
 
 
@@ -57,9 +57,16 @@ bool operator==(const Vector3d& p1, const Vector3d& p2) {
 }
 
 double GetSqrtOfSquareSum(const Vector3d& v) {
-    return std::sqrt(v.X*v.X + v.Y*v.Y + v.Z*v.Z);
+    return std::sqrt(v.X * v.X + v.Y * v.Y + v.Z * v.Z);
 }
 
 double Distance(const Vector3d& p1, const Vector3d& p2) {
     return GetSqrtOfSquareSum(p2 - p1);
+}
+
+bool IsSignsEqual(const Vector3d& p1, const Vector3d& p2) {
+    auto isSignEqual = [](double p1, double p2) {
+        return (p1 > 0 && p2 >0) || (p1 < 0 && p2 < 0);
+    };
+    return isSignEqual(p1.X, p2.X) && isSignEqual(p1.Y, p2.Y) && isSignEqual(p1.Z, p2.Z);
 }

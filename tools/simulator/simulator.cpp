@@ -2,34 +2,28 @@
 
 #include "util/util.h"
 
-#include <iomanip>
-#include <math.h>
 #include <iostream>
+#include <math.h>
 
 using namespace SIM;
 
 
 Target::Target(unsigned int id, double priority, Vector3d pos, Vector3d speed, int bigPeriod)
     : Id(id), Priority(priority), Pos(pos), Speed(speed), BigRadarUpdatePeriodMs(bigPeriod)
-{
-    if (id == 0) {
-        std::cout << std::fixed << std::setprecision(6);
-        std::cout << speed.DebugString() << '\n';
-    }
-}
+{}
 
 void Target::UpdatePosition(bool isInSector) {
-    double ms = Timer.GetElapsedTimeAsMs();
-    if (!isInSector && ms < BigRadarUpdatePeriodMs) {
+    if (!isInSector && Timer.GetElapsedTimeAsMs() < BigRadarUpdatePeriodMs) {
         return;
     }
 
+    double ms = Timer.GetElapsedTimeAsMs();
     Timer.Restart();
 
     Pos += Speed * ms;
 
     IsSmallDataUpdated = true;
-    IsBigDataUpdated   = true;
+    IsBigDataUpdated = true;
     WasUpdatedFlag = true;
 }
 
@@ -186,27 +180,11 @@ std::vector<SmallRadarData> Simulator::GetSmallRadarTargets() {
     std::vector<SmallRadarData> res;
     for (auto& target : Targets) {
         if (IsTargetInSector(target)) {
-            // res.emplace_back(target.GetNoisedSmallData(Vector3d(
-            //     Params.small_radar()->rad_error(),
-            //     Params.small_radar()->ang_error(),
-            //     Params.small_radar()->h_error()
-            // )));
-            res.emplace_back(target.GetNoisedSmallData(Vector3d(0,0,0)));
-        }
-    }
-    return res;
-}
-
-std::vector<BigRadarData> Simulator::GetOnlyUpdatedTargets() {
-    std::vector<BigRadarData> res;
-    for (auto& target : Targets) {
-        if (target.WasUpdated()) {
-            res.push_back(target.GetNoisedBigData(Vector3d(
-                Params.big_radar()->rad_error(),
-                Params.big_radar()->ang_error(),
-                Params.big_radar()->h_error()
+            res.emplace_back(target.GetNoisedSmallData(Vector3d(
+                Params.small_radar()->rad_error(),
+                Params.small_radar()->ang_error(),
+                Params.small_radar()->h_error()
             )));
-            target.SetWasUpdated(false);
         }
     }
     return res;

@@ -1,4 +1,5 @@
 #include "defense.h"
+#include "util/points.h"
 
 #include <iostream>
 
@@ -7,10 +8,7 @@ DefRocket::DefRocket(Vector3d meetingPoint, double speed, unsigned timeToLaunchM
     : Pos()
     , MeetingPoint(meetingPoint)
     , Speed(MeetingPoint * speed / GetSqrtOfSquareSum(meetingPoint)), TimeToLaunchMs(timeToLaunchMs)
-{
-    std::cout << "Rocket Speed: " << Speed.DebugString() << '\n';
-    std::cout << "Rocket to: " << MeetingPoint.DebugString() << '\n';
-}
+{}
 
 void DefRocket::UpdatePosition() {
     double ms = Timer.GetElapsedTimeAsMs();
@@ -19,6 +17,7 @@ void DefRocket::UpdatePosition() {
             return;
         } else {
             ms -= TimeToLaunchMs;
+            TestTimer.Restart();
             IsLaunchedFlag = true;
         }
     }
@@ -26,9 +25,7 @@ void DefRocket::UpdatePosition() {
 
     Pos += Speed * ms;
 
-    // if (Pos.Z > MeetingPoint.Z) {
-    if (Pos.Z >= MeetingPoint.Z || Pos.Y >= MeetingPoint.Y || std::abs(Pos.X) >= std::abs(MeetingPoint.X)) {
-        std::cout << "Rocket flown to " << Pos.DebugString() << '\n';
+    if (IsSignsEqual(Pos - MeetingPoint, Speed)) {
         Pos = MeetingPoint;
         IsExplodedFlag = true;
     }
@@ -38,13 +35,16 @@ Vector3d DefRocket::GetPosition() const {
     return Pos;
 }
 
+Vector3d DefRocket::GetMeetingPoint() const {
+    return MeetingPoint;
+}
+
 bool DefRocket::IsLaunched() const {
     return IsLaunchedFlag;
 }
 
 bool DefRocket::IsExploded() const {
-    auto curr = Pos + Speed * Timer.GetElapsedTimeAsMs();
-    return curr.Z >= MeetingPoint.Z || curr.Y >= MeetingPoint.Y || std::abs(curr.X) >= std::abs(MeetingPoint.X);
+    return IsExplodedFlag;
 }
 
 
@@ -64,9 +64,10 @@ void Defense::LaunchRockets(const std::vector<std::pair<Vector3d, unsigned>>& me
 std::vector<unsigned> Defense::GetDestroyedTargetsId() {
     std::vector<unsigned> res;
     for (int i = 0; i < Rockets.size(); i++) {
-        Rockets[i].first.UpdatePosition();
+        auto& rocket = Rockets[i].first;
+        rocket.UpdatePosition();
 
-        if (Rockets[i].first.IsExploded()) {
+        if (rocket.IsExploded()) {
             res.push_back(Rockets[i].second);
             Rockets.erase(Rockets.begin() + i);
             i--;
@@ -81,6 +82,16 @@ std::vector<Vector3d> Defense::GetRocketsPositions() {
         if (rocket.IsLaunched() && !rocket.IsExploded()) {
             rocket.UpdatePosition();
             res.push_back(rocket.GetPosition());
+        }
+    }
+    return res;
+}
+
+std::vector<Vector3d> Defense::GetMeetingPoints() {
+    std::vector<Vector3d> res;
+    for (auto& [rocket, _] : Rockets) {
+        if (!rocket.IsExploded()) {
+            res.push_back(rocket.GetMeetingPoint());
         }
     }
     return res;

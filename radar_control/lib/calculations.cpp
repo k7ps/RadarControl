@@ -57,39 +57,19 @@ Vector3d CalculateMeetingPoint(
     const Vector3d& rocketPos,
     double rocketSpeed
 ) {
-    // std::cout << "CalculateMeetingPoint(): started" << std::endl;
-    std::cout << targetSpeed.DebugString() << "\n";
-    std::cout << "Pos: " << targetPos.DebugString() << "\n";
-    // std::cout << "RocketSpeed = " << rocketSpeed << "\n";
-    // auto targetSpeed = Vector3d(-0.008202, -0.003823, -0.000134);
-
     auto check = [&targetPos, &targetSpeed, &rocketPos, &rocketSpeed](double time) {
         auto targetNewPos = targetPos + targetSpeed * time;
         auto dist = Distance(targetNewPos, rocketPos);
-        // std::cout << "Time  = " << time << '\n';
-        // std::cout << "\tTargetPos  = " << targetNewPos.DebugString() << '\n';
-        // std::cout << "\tDistance   = " << dist << '\n';
-        // std::cout << "\tRocketDist = " << rocketSpeed * time << '\n';
-        // std::cout << "\tReturn     = " << int(rocketSpeed * time >= dist) << '\n';
         return rocketSpeed * time >= dist;
     };
-
     double timeL = 0, timeR = 1e5;
-    int i=0;
-    while (timeR - timeL > 1e-6) {
+    while (timeR - timeL > 1e-7) {
         double t = (timeL + timeR) * 0.5;
         if (check(t)) {
             timeR = t;
         } else {
             timeL = t;
         }
-        // std::cout << timeL << ' ' << timeR << ' ' << timeR - timeL << '\n';
-        // i++;
-        // if (i > 50) break;
     }
-    // std::cout << timeL << ' ' << timeR << ' ' << timeR - timeR << '\n';
-    auto res = targetPos + targetSpeed * timeR;
-    std::cout << targetPos.DebugString() << '\n';
-    std::cout << res.DebugString() << '\n';
     return targetPos + targetSpeed * timeR;
 }

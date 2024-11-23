@@ -62,8 +62,6 @@ public:
     std::vector<BigRadarData> GetBigRadarTargets();
     std::vector<SmallRadarData> GetSmallRadarTargets();
 
-    std::vector<BigRadarData> GetOnlyUpdatedTargets();
-
 private:
     void AddNewTarget();
     bool IsTargetInSector(const SIM::Target& target) const;

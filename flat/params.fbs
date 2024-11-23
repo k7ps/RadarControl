@@ -21,7 +21,6 @@ table SmallRadar {
 
 table BigRadar {
     radius: double;
-    error: double;
     frequency: double;
     rad_error: double;
     ang_error: double;

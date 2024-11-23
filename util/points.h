@@ -40,6 +40,7 @@ std::string Vector3dAsStr(const Vector3d& p);
 
 double GetSqrtOfSquareSum(const Vector3d& v);
 double Distance(const Vector3d& p1, const Vector3d& p2);
+bool IsSignsEqual(const Vector3d& p1, const Vector3d& p2);
 
 
 #endif // POINTS_H

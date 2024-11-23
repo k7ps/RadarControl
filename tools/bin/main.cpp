@@ -8,6 +8,7 @@
 
 
 int main() {
+    std::cout << std::fixed << std::setprecision(6);
     SetTraceLogCallback([](int, const char*, va_list) {
         std::cout << '\0';
     });
@@ -30,7 +31,6 @@ int main() {
     while (visualizer.IsWindowOpen()) {
         const auto& smallRadarTargets = simulator.GetSmallRadarTargets();
         const auto& bigRadarTargets = simulator.GetBigRadarTargets();
-        // const auto& updatedTargets = simulator.GetOnlyUpdatedTargets();
 
         radarController.Process(bigRadarTargets, smallRadarTargets);
 
@@ -38,7 +38,13 @@ int main() {
 
         defense.LaunchRockets(res.MeetingPointsAndTargetIds);
 
-        visualizer.DrawFrame(bigRadarTargets, smallRadarTargets, defense.GetRocketsPositions(), res.Angle);
+        visualizer.DrawFrame(
+            bigRadarTargets,
+            smallRadarTargets,
+            defense.GetRocketsPositions(),
+            defense.GetMeetingPoints(),
+            res.Angle
+        );
 
         simulator.RemoveTargets(defense.GetDestroyedTargetsId());
         simulator.SetRadarPosition(res.Angle);
