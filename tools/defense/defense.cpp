@@ -48,14 +48,14 @@ bool DefRocket::IsExploded() const {
 }
 
 
-Defense::Defense(const Flat::Parameters& params)
+Defense::Defense(const Proto::Parameters& params)
     : Params(params)
 {}
 
 void Defense::LaunchRockets(const std::vector<std::pair<Vector3d, unsigned>>& meetingPointsAndTargetIds) {
     for (const auto& [point, targetId] : meetingPointsAndTargetIds) {
         Rockets.emplace_back(
-            DefRocket(point, Params.defense()->rocket_speed(), Params.defense()->time_to_launch_rocket()),
+            DefRocket(point, Params.defense().rocket_speed(), Params.defense().time_to_launch_rocket()),
             targetId
         );
     }

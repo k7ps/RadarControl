@@ -2,7 +2,7 @@
 #define RADAR_CONTROLLER_H
 
 #include "lib/data.h"
-#include "flat/generated/params.h"
+#include "proto/generated/params.pb.h"
 #include "util/points.h"
 #include "util/timer.h"
 
@@ -59,7 +59,7 @@ public:
         std::vector<std::pair<Vector3d, unsigned>> MeetingPointsAndTargetIds;
     };
 
-    RadarController(const Flat::Parameters& params);
+    RadarController(const Proto::Parameters& params);
 
     void Process(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&);
 
@@ -71,7 +71,7 @@ private:
     void RemoveDeadTargets();
 
 private:
-    const Flat::Parameters& Params;
+    const Proto::Parameters& Params;
 
     double RadarAnglePos;
     double RadarAngleTarget = -1;

@@ -1,0 +1,54 @@
+syntax = "proto2";
+
+package Proto;
+
+message Parameters {
+    message SmallRadar {
+        required double radius = 1;
+        required double view_angle = 2;
+        required double frequency = 3;
+        required double angle_speed = 4;
+        required double rad_error = 5;
+        required double ang_error = 6;
+        required double h_error = 7;
+    }
+
+    message BigRadar {
+        required double radius = 1;
+        required double frequency = 2;
+        required double rad_error = 3;
+        required double ang_error = 4;
+        required double h_error = 5;
+    }
+
+    message General {
+        optional double death_time = 1 [default = 5000];
+    }
+
+    message Defense {
+        optional double time_to_launch_rocket = 1 [default = 3000];
+        optional double rocket_speed = 2 [default = 0.06];
+    }
+
+    message Simulator {
+        optional uint32 targets_per_minute = 1 [default = 3];
+        optional double min_target_speed = 2 [default = 0.005];
+        optional double max_target_speed = 3 [default = 0.01];
+        required double max_height = 4;
+        optional double max_deviation_angle_vertical = 5 [default = 15];
+        optional double probability_of_accurate_missile = 6 [default = 0.4];
+        optional uint32 random_seed = 7; // random if not set
+    }
+
+    message Visualizer {
+        optional uint32 radars_outline_thickness = 1 [default = 1];
+        optional uint32 target_radius = 2 [default = 5];
+    }
+
+    required SmallRadar small_radar = 1;
+    required BigRadar big_radar = 2;
+    required General general = 3;
+    required Defense defense = 4;
+    required Simulator simulator = 5;
+    required Visualizer visualizer = 6;
+}

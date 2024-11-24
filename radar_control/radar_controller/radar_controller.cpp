@@ -92,7 +92,7 @@ bool Target::IsRocketLaunched() const {
 }
 
 
-RadarController::RadarController(const Flat::Parameters& params)
+RadarController::RadarController(const Proto::Parameters& params)
     : Params(params)
     , RadarAnglePos(M_PI_2)
 {}
@@ -120,7 +120,7 @@ void RadarController::Process(
             break;
         }
         if (!updatedTargets.count(data.Id)) {
-            Targets.push_back(Target(data, Params.general()->death_time()));
+            Targets.push_back(Target(data, Params.general().death_time()));
         }
     }
     RemoveDeadTargets();
@@ -138,10 +138,10 @@ void RadarController::Process(
 
         if (!target.IsRocketLaunched() && target.HavePreciseSpeed()) {
             auto meetingPoint = CalculateMeetingPoint(
-                targetPos + target.GetSpeed() * Params.defense()->time_to_launch_rocket(),
+                targetPos + target.GetSpeed() * Params.defense().time_to_launch_rocket(),
                 target.GetSpeed(),
                 Vector3d(),
-                Params.defense()->rocket_speed()
+                Params.defense().rocket_speed()
             );
             MeetingPointsAndTargetIds.emplace_back(meetingPoint, id);
             target.SetIsRocketLaunched(true);
@@ -194,7 +194,7 @@ RadarController::Result RadarController::GetAngleAndMeetingPoints() {
     Timer.Restart();
 
     if (RadarAngleTarget != -1) {
-        double maxDelta = Params.small_radar()->angle_speed() * ms / 1000;
+        double maxDelta = Params.small_radar().angle_speed() * ms / 1000;
 
         if (std::abs(RadarAnglePos - RadarAngleTarget) <= maxDelta) {
             RadarAnglePos = RadarAngleTarget;

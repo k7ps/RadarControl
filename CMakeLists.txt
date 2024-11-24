@@ -1,9 +1,13 @@
 cmake_minimum_required(VERSION 3.15)
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+set(BUILD_SHARED_LIBS OFF)
+set(CMAKE_EXE_LINKER_FLAGS "-static")
+
 project(RadarControl)
 
-add_subdirectory(flat)
+add_subdirectory(proto)
 add_subdirectory(radar_control/bin)
 add_subdirectory(radar_control/lib)
 add_subdirectory(radar_control/radar_controller)

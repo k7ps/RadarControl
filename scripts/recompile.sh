@@ -1,7 +1,7 @@
 #!/bin/bash
 cd ~/VSCodeProjects/RadarControl
 rm -r build
-rm -r flat/generated
+rm -r proto/generated
 mkdir build
 cd build
 cmake ..

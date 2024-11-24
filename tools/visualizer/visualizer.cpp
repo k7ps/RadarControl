@@ -27,17 +27,17 @@ namespace {
 }
 
 
-Visualizer::Visualizer(const Flat::Parameters& params)
+Visualizer::Visualizer(const Proto::Parameters& params)
     : Params(params)
     , WindowSize(
-        2 * Params.big_radar()->radius() + 100,
-        Params.big_radar()->radius() + 5 + Params.simulator()->max_height() + 30
+        2 * Params.big_radar().radius() + 100,
+        Params.big_radar().radius() + 5 + Params.simulator().max_height() + 30
     )
     , Window(WindowSize.x, WindowSize.y + 5, "RadarControl")
-    , RadarPositionStraight(WindowSize.x / 2, WindowSize.y - Params.simulator()->max_height() - 30)
+    , RadarPositionStraight(WindowSize.x / 2, WindowSize.y - Params.simulator().max_height() - 30)
     , RadarPositionSide(WindowSize.x / 2, WindowSize.y)
 {
-    SetTargetFPS(Params.small_radar()->frequency());
+    SetTargetFPS(Params.small_radar().frequency());
 }
 
 bool Visualizer::IsWindowOpen() const {
@@ -79,10 +79,10 @@ raylib::Vector2 Visualizer::ToWindowCoords(const Vector3d& pos, View view) const
 
 void Visualizer::DrawTarget(const SmallRadarData& data, bool isFollowed, View view) {
     auto targetPos = ToWindowCoords(CylindricalToCartesian(data.Rad, data.Ang, data.H), view);
-    DrawCircleV(targetPos, Params.visualizer()->target_radius(), GetTargetColor(data.Priority));
-    DrawCircleLinesV(targetPos, Params.visualizer()->target_radius(), raylib::Color::Black());
+    DrawCircleV(targetPos, Params.visualizer().target_radius(), GetTargetColor(data.Priority));
+    DrawCircleLinesV(targetPos, Params.visualizer().target_radius(), raylib::Color::Black());
     if (isFollowed) {
-        DrawCircleDashedLines(targetPos, Params.visualizer()->target_radius() + 5, raylib::Color::Black());
+        DrawCircleDashedLines(targetPos, Params.visualizer().target_radius() + 5, raylib::Color::Black());
     }
 }
 
@@ -109,13 +109,13 @@ void Visualizer::DrawRadars(double radarPosAngle, View view) {
     switch (view) {
         case STRAIGHT: {
             float radarPosAngleDeg = RadToDeg(radarPosAngle);
-            float radarViewAngleDeg = RadToDeg(Params.small_radar()->view_angle());
+            float radarViewAngleDeg = RadToDeg(Params.small_radar().view_angle());
             float radarStartAngle = std::max(0.f, radarPosAngleDeg - radarViewAngleDeg / 2);
             float radarEndAngle   = std::min(180.f, radarPosAngleDeg + radarViewAngleDeg / 2);
 
             DrawCircleSectorLines(
                 RadarPositionStraight,
-                Params.small_radar()->radius(),
+                Params.small_radar().radius(),
                 -radarStartAngle,
                 -radarEndAngle,
                 30,
@@ -123,7 +123,7 @@ void Visualizer::DrawRadars(double radarPosAngle, View view) {
             );
             DrawCircleSectorLines(
                 RadarPositionStraight,
-                Params.big_radar()->radius(),
+                Params.big_radar().radius(),
                 0,
                 -180,
                 50,
@@ -133,8 +133,8 @@ void Visualizer::DrawRadars(double radarPosAngle, View view) {
             break;
         }
         case SIDE: {
-            float width = 2 * Params.big_radar()->radius();
-            float height = Params.simulator()->max_height();
+            float width = 2 * Params.big_radar().radius();
+            float height = Params.simulator().max_height();
 
             DrawRectangleLines(
                 RadarPositionSide.x - width/2,
@@ -159,7 +159,7 @@ void Visualizer::DrawMeetingPoints(const std::vector<Vector3d>& meetingPoints, V
     for (const auto& meetingPoint : meetingPoints) {
         DrawCircleLinesV(
             ToWindowCoords(meetingPoint, view),
-            Params.visualizer()->target_radius(),
+            Params.visualizer().target_radius(),
             raylib::Color::Gray()
         );
     }

@@ -1,9 +1,11 @@
 #include "defense/defense.h"
+#include "proto/generated/params.pb.h"
 #include "radar_control/radar_controller/radar_controller.h"
 #include "simulator/simulator.h"
-#include "util/flat.h"
+#include "util/proto.h"
 #include "visualizer/visualizer.h"
 
+#include <iomanip>
 #include <iostream>
 
 
@@ -14,11 +16,10 @@ int main() {
     });
     SetConfigFlags(FLAG_MSAA_4X_HINT);
 
-    flatbuffers::Parser parser;
-    const auto& params = *ParseParameters(parser, "../params/params.json", "../flat/params.fbs");
+    const auto params = ParseProtoFromFile<Proto::Parameters>("../params/params.pbtxt");
 
-    if (params.simulator()->random_seed() != -1) {
-        srand(params.simulator()->random_seed());
+    if (params.simulator().has_random_seed()) {
+        srand(params.simulator().random_seed());
     } else {
         srand(time(NULL));
     }

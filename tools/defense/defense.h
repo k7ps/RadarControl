@@ -1,7 +1,7 @@
 #ifndef DEFENCE_H
 #define DEFENCE_H
 
-#include "flat/generated/params.h"
+#include "proto/generated/params.pb.h"
 #include "util/points.h"
 #include "util/timer.h"
 
@@ -33,7 +33,7 @@ private:
 
 class Defense {
 public:
-    Defense(const Flat::Parameters& params);
+    Defense(const Proto::Parameters& params);
 
     void LaunchRockets(const std::vector<std::pair<Vector3d, unsigned>>& meetingPointsAndTargetIds);
 
@@ -42,7 +42,7 @@ public:
     std::vector<Vector3d> GetMeetingPoints();
 
 private:
-    const Flat::Parameters& Params;
+    const Proto::Parameters& Params;
 
     std::vector<std::pair<DefRocket, unsigned>> Rockets;
 };

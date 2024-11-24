@@ -2,7 +2,7 @@
 #define SIMULATOR_H
 
 #include "radar_control/lib/data.h"
-#include "flat/generated/params.h"
+#include "proto/generated/params.pb.h"
 #include "util/timer.h"
 
 
@@ -52,7 +52,7 @@ namespace SIM {
 
 class Simulator {
 public:
-    Simulator(const Flat::Parameters& params);
+    Simulator(const Proto::Parameters& params);
 
     void UpdateTargets();
     void SetRadarPosition(double angPos);
@@ -67,7 +67,7 @@ private:
     bool IsTargetInSector(const SIM::Target& target) const;
 
 private:
-    const Flat::Parameters& Params;
+    const Proto::Parameters& Params;
 
     std::vector<SIM::Target> Targets;
 

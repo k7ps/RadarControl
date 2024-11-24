@@ -92,15 +92,15 @@ void Target::SetWasUpdated(bool flag) {
 }
 
 
-Simulator::Simulator(const Flat::Parameters& params)
+Simulator::Simulator(const Proto::Parameters& params)
     : Params(params)
-    , BigRadarUpdatePeriodMs(1000. / Params.big_radar()->frequency())
-    , NewTargetProbability((float) Params.simulator()->targets_per_minute() / Params.small_radar()->frequency() / 60)
+    , BigRadarUpdatePeriodMs(1000. / Params.big_radar().frequency())
+    , NewTargetProbability((float) Params.simulator().targets_per_minute() / Params.small_radar().frequency() / 60)
     , SmallRadarAngPosition(1.57079)
 {}
 
 bool Simulator::IsTargetInSector(const Target& target) const {
-    return target.IsInSector(Params.small_radar()->radius(), Params.small_radar()->view_angle(), SmallRadarAngPosition);
+    return target.IsInSector(Params.small_radar().radius(), Params.small_radar().view_angle(), SmallRadarAngPosition);
 }
 
 void Simulator::UpdateTargets() {
@@ -114,7 +114,7 @@ void Simulator::UpdateTargets() {
 
     std::vector<unsigned int> FlownAwayTargetIds;
     for (const auto& target : Targets) {
-        if (target.IsOutOfView(Params.big_radar()->radius())) {
+        if (target.IsOutOfView(Params.big_radar().radius())) {
             FlownAwayTargetIds.push_back(target.GetId());
         }
     }
@@ -130,23 +130,23 @@ void Simulator::AddNewTarget() {
 
     auto priority = GetRandomDouble(0, 1);
     auto posAng = GetRandomDouble(0, M_PI);
-    auto posH = GetRandomDouble(0, Params.simulator()->max_height());
+    auto posH = GetRandomDouble(0, Params.simulator().max_height());
 
-    auto speedAbs = GetRandomDouble(Params.simulator()->min_speed(), Params.simulator()->max_speed());
+    auto speedAbs = GetRandomDouble(Params.simulator().min_target_speed(), Params.simulator().max_target_speed());
     double speedAngVertical, speedHorizontal;
-    if (GetRandomTrue(Params.simulator()->probability_of_accurate_missile())) {
+    if (GetRandomTrue(Params.simulator().probability_of_accurate_missile())) {
         speedAngVertical = posAng - M_PI;
-        speedHorizontal = - speedAbs * posH / Params.big_radar()->radius();
+        speedHorizontal = - speedAbs * posH / Params.big_radar().radius();
     } else {
-        auto deviationAngVertical = GetRandomDouble(0, 2 * Params.simulator()->max_deviation_angle_vertical());
-        speedAngVertical = posAng - M_PI + Params.simulator()->max_deviation_angle_vertical() - deviationAngVertical;
-        speedHorizontal = - speedAbs * posH / Params.big_radar()->radius() * GetRandomDouble(0.7, 1.2);
+        auto deviationAngVertical = GetRandomDouble(0, 2 * Params.simulator().max_deviation_angle_vertical());
+        speedAngVertical = posAng - M_PI + Params.simulator().max_deviation_angle_vertical() - deviationAngVertical;
+        speedHorizontal = - speedAbs * posH / Params.big_radar().radius() * GetRandomDouble(0.7, 1.2);
     }
 
     Targets.emplace_back(
         lastId,
         priority,
-        CylindricalToCartesian(Params.big_radar()->radius(), posAng, posH),
+        CylindricalToCartesian(Params.big_radar().radius(), posAng, posH),
         CylindricalToCartesian(speedAbs, speedAngVertical, speedHorizontal),
         BigRadarUpdatePeriodMs
     );
@@ -168,9 +168,9 @@ std::vector<BigRadarData> Simulator::GetBigRadarTargets() {
     std::vector<BigRadarData> res;
     for (auto& target : Targets) {
         res.push_back(target.GetNoisedBigData(Vector3d(
-            Params.big_radar()->rad_error(),
-            Params.big_radar()->ang_error(),
-            Params.big_radar()->h_error()
+            Params.big_radar().rad_error(),
+            Params.big_radar().ang_error(),
+            Params.big_radar().h_error()
         )));
     }
     return res;
@@ -181,9 +181,9 @@ std::vector<SmallRadarData> Simulator::GetSmallRadarTargets() {
     for (auto& target : Targets) {
         if (IsTargetInSector(target)) {
             res.emplace_back(target.GetNoisedSmallData(Vector3d(
-                Params.small_radar()->rad_error(),
-                Params.small_radar()->ang_error(),
-                Params.small_radar()->h_error()
+                Params.small_radar().rad_error(),
+                Params.small_radar().ang_error(),
+                Params.small_radar().h_error()
             )));
         }
     }

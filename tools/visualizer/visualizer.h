@@ -2,7 +2,7 @@
 #define VISUALIZER_H
 
 #include "radar_control/lib/data.h"
-#include "flat/generated/params.h"
+#include "proto/generated/params.pb.h"
 #include "util/points.h"
 
 #include <raylib-cpp.hpp>
@@ -15,7 +15,7 @@ public:
         SIDE,
     };
 
-    Visualizer(const Flat::Parameters& params);
+    Visualizer(const Proto::Parameters& params);
 
     bool IsWindowOpen() const;
 
@@ -43,7 +43,7 @@ private:
     void DrawRadars(double radarPosAngle, View view);
 
 private:
-    const Flat::Parameters& Params;
+    const Proto::Parameters& Params;
 
     raylib::Vector2 WindowSize;
     raylib::Window Window;
