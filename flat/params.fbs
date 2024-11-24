@@ -47,8 +47,8 @@ table Simulator {
 }
 
 table Visualizer {
-    radars_outline_thickness: int32;
-    target_radius: int32;
+    radars_outline_thickness: uint32;
+    target_radius: uint32;
 }
 
 root_type Parameters;
