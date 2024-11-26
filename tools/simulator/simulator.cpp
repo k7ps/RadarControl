@@ -95,7 +95,7 @@ void Target::SetWasUpdated(bool flag) {
 Simulator::Simulator(const Proto::Parameters& params)
     : Params(params)
     , BigRadarUpdatePeriodMs(1000. / Params.big_radar().frequency())
-    , NewTargetProbability((float) Params.simulator().targets_per_minute() / Params.small_radar().frequency() / 60)
+    , NewTargetProbability((double) Params.simulator().targets_per_minute() / Params.small_radar().frequency() / 60)
     , SmallRadarAngPosition(1.57079)
 {}
 
