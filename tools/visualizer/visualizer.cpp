@@ -78,7 +78,7 @@ raylib::Vector2 Visualizer::ToWindowCoords(const Vector3d& pos, View view) const
 }
 
 void Visualizer::DrawTarget(const SmallRadarData& data, bool isFollowed, View view) {
-    auto targetPos = ToWindowCoords(CylindricalToCartesian(data.Rad, data.Ang, data.H), view);
+    auto targetPos = ToWindowCoords(data.Pos, view);
     DrawCircleV(targetPos, Params.visualizer().target_radius(), GetTargetColor(data.Priority));
     DrawCircleLinesV(targetPos, Params.visualizer().target_radius(), raylib::Color::Black());
     if (isFollowed) {

@@ -33,13 +33,10 @@ Vector3d Target::GetCurrentPosition() const {
 
 SmallRadarData Target::GetNoisedSmallData(Vector3d errors) {
     if (IsSmallDataUpdated) {
-        auto cylindrPos = CartesianToCylindrical(Pos);
         SmallData = SmallRadarData{
             .Id = Id,
             .Priority = Priority,
-            .Rad = cylindrPos.X + GetRandomDouble(-1, 1) * errors.X,
-            .Ang = cylindrPos.Y + GetRandomDouble(-1, 1) * errors.Y,
-            .H   = cylindrPos.Z + GetRandomDouble(-1, 1) * errors.Z
+            .Pos = CylindricalToCartesian(CartesianToCylindrical(Pos) + GetRandomVector3d(-1, 1) * errors)
         };
         IsSmallDataUpdated = false;
     }
@@ -48,14 +45,11 @@ SmallRadarData Target::GetNoisedSmallData(Vector3d errors) {
 
 BigRadarData Target::GetNoisedBigData(Vector3d errors) {
     if (IsBigDataUpdated) {
-        auto cylindrPos = CartesianToCylindrical(Pos);
         BigData = BigRadarData{
             {
                 .Id = Id,
                 .Priority = Priority,
-                .Rad = cylindrPos.X + GetRandomDouble(-1, 1) * errors.X,
-                .Ang = cylindrPos.Y + GetRandomDouble(-1, 1) * errors.Y,
-                .H   = cylindrPos.Z + GetRandomDouble(-1, 1) * errors.Z
+                .Pos = CylindricalToCartesian(CartesianToCylindrical(Pos) + GetRandomVector3d(-1, 1) * errors)
             },
             .Speed = Speed
         };

@@ -1,4 +1,5 @@
 #include "util.h"
+#include "util/points.h"
 
 #include <math.h>
 
@@ -44,6 +45,14 @@ bool GetRandomTrue(float probability) {
 
 double GetRandomDouble(double min, double max) {
     return min + (double) rand() / RAND_MAX * (max - min);
+}
+
+Vector3d GetRandomVector3d(double min, double max) {
+    return Vector3d(
+        GetRandomDouble(min, max),
+        GetRandomDouble(min, max),
+        GetRandomDouble(min, max)
+    );
 }
 
 double RadToDeg(double angle) {

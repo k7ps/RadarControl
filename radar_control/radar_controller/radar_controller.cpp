@@ -3,6 +3,7 @@
 #include "util/util.h"
 #include "lib/calculations.h"
 
+#include <cmath>
 #include <iostream>
 #include <math.h>
 
@@ -16,7 +17,7 @@ Target::Target(int id, double priority, double deathTime)
 Target::Target(const BigRadarData& data, double deatTime)
     : Target(data.Id, data.Priority, deatTime)
 {
-    Update(CylindricalToCartesian(data.Rad, data.Ang, data.H), data.Speed);
+    Update(data.Pos, data.Speed);
 }
 
 void Target::Update(Vector3d pos) {
@@ -106,7 +107,7 @@ void RadarController::Process(
         for (auto& target : Targets) {
             if (target.GetId() != data.Id) continue;
 
-            target.Update(CylindricalToCartesian(data.Rad, data.Ang, data.H));
+            target.Update(data.Pos);
             updatedTargets.insert(data.Id);
             break;
         }
@@ -115,7 +116,7 @@ void RadarController::Process(
         for (auto& target : Targets) {
             if (target.GetId() != data.Id || updatedTargets.count(data.Id)) continue;
 
-            target.Update(CylindricalToCartesian(data.Rad, data.Ang, data.H), data.Speed);
+            target.Update(data.Pos, data.Speed);
             updatedTargets.insert(data.Id);
             break;
         }
@@ -206,6 +207,9 @@ RadarController::Result RadarController::GetAngleAndMeetingPoints() {
             }
         }
     }
+    const auto minAngle = Params.small_radar().view_angle() / 2;
+    const auto maxAngle = M_PI - Params.small_radar().view_angle() / 2;
+    RadarAnglePos = std::max(minAngle, std::min(maxAngle, RadarAnglePos));
 
     auto res = RadarController::Result{
         .Angle = RadarAnglePos,

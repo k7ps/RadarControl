@@ -16,6 +16,7 @@ Vector3d CartesianToCylindrical(const Vector3d& p);
 
 bool GetRandomTrue(float probability);
 double GetRandomDouble(double min, double max);
+Vector3d GetRandomVector3d(double min, double max);
 
 double RadToDeg(double angle);
 float RadToDeg(float angle);

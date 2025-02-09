@@ -2,5 +2,8 @@ build
 .vscode
 .cache
 
-# flatbuffers generated files
+# protobuf generated files
 generated
+
+# dynamic libs
+lib

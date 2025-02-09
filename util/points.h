@@ -3,6 +3,7 @@
 
 #include <string>
 
+
 struct Vector2d {
     Vector2d() = default;
     Vector2d(double x, double y)
@@ -31,6 +32,8 @@ Vector3d& operator+=(Vector3d& p1, const Vector3d& p2);
 Vector3d operator-(const Vector3d& p1, const Vector3d& p2);
 Vector3d& operator-=(Vector3d& p1, const Vector3d& p2);
 Vector3d operator*(const Vector3d& p1, double p2);
+Vector3d& operator*=(Vector3d& p1, double p2);
+Vector3d operator*(const Vector3d& p1, const Vector3d& p2);
 Vector3d& operator*=(Vector3d& p1, const Vector3d& p2);
 Vector3d operator/(const Vector3d& p1, double p2);
 Vector3d& operator/=(Vector3d& p1, const Vector3d& p2);

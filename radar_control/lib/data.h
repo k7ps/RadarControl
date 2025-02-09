@@ -7,9 +7,7 @@
 struct SmallRadarData {
     int Id;
     double Priority;
-    double Rad;
-    double Ang;
-    double H;
+    Vector3d Pos;
 };
 
 struct BigRadarData : public SmallRadarData {
