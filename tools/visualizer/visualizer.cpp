@@ -15,14 +15,51 @@ namespace {
         return raylib::Color::FromHSV(start + (1 - priority) * (end - start), 1.f, 1.f);
     }
 
-    void DrawCircleDashedLines(raylib::Vector2 pos, float rad, raylib::Color col, int segmentsCnt = 6) {
-        float dashProportion = 0.7f;
+    void DrawCircleDashedLines(
+        raylib::Vector2 pos,
+        float rad,
+        raylib::Color col,
+        int segmentsCnt = 6,
+        float dashProportion = 0.7f
+    ) {
         float segmentAng = 360.f / segmentsCnt;
         for (int i = 0; i < segmentsCnt; ++i) {
             float startAng = i * segmentAng;
             float endAng = startAng + segmentAng * dashProportion;
             DrawRingLines(pos, rad, rad, startAng, endAng, 10, col);
         }
+    }
+
+    void DrawDashedLine(
+        raylib::Vector2 start,
+        raylib::Vector2 end,
+        raylib::Color col,
+        float dashLength = 15,
+        float dashProportion = 0.4
+    ) {
+        auto direction = (end - start).Normalize();
+        auto length = (end - start).Length();
+        auto period = dashLength / dashProportion;
+        auto segmentCount = std::ceil(length / period);
+
+        for (int i = 0; i < segmentCount; ++i) {
+            auto dashStart = start + direction * period * i;
+            auto dashEnd = dashStart + direction * dashLength;
+            if (i * period + dashLength > length) {
+                dashEnd = end;
+            }
+            DrawLineEx(dashStart, dashEnd, 2, col);
+        }
+    }
+
+    auto DrawDashedRadius(
+        raylib::Vector2 center,
+        float radius,
+        float ang,
+        raylib::Color col
+    ) {
+        auto end = center + raylib::Vector2(radius * std::cos(ang), - radius * std::sin(ang));
+        DrawDashedLine(center, end, col);
     }
 }
 
@@ -57,10 +94,10 @@ void Visualizer::DrawFrame(
         Window.ClearBackground(raylib::Color::RayWhite());
 
         for (auto view : {View::STRAIGHT, View::SIDE}) {
+            DrawRadars(radarPosAngle, view);
             DrawTargets(bigDatas, smallDatas, followedTargetIds, view);
             DrawRockets(rockets, view);
             DrawMeetingPoints(meetingPoints, view);
-            DrawRadars(radarPosAngle, view);
         }
     }
     EndDrawing();
@@ -112,6 +149,27 @@ void Visualizer::DrawRadars(double radarPosAngle, View view) {
             float radarViewAngleDeg = RadToDeg(Params.small_radar().view_angle());
             float radarStartAngle = std::max(0.f, radarPosAngleDeg - radarViewAngleDeg / 2);
             float radarEndAngle   = std::min(180.f, radarPosAngleDeg + radarViewAngleDeg / 2);
+
+            DrawDashedRadius(
+                RadarPositionStraight,
+                Params.big_radar().radius(),
+                Params.small_radar().responsible_sector_start(),
+                raylib::Color::Gray()
+            );
+            DrawDashedRadius(
+                RadarPositionStraight,
+                Params.big_radar().radius(),
+                Params.small_radar().responsible_sector_end(),
+                raylib::Color::Gray()
+            );
+            DrawCircleSector(
+                RadarPositionStraight,
+                Params.big_radar().radius(),
+                -Params.small_radar().responsible_sector_start() * 180 / M_PI,
+                -Params.small_radar().responsible_sector_end() * 180 / M_PI,
+                30,
+                raylib::Color(0, 0, 0, 15)
+            );
 
             DrawCircleSectorLines(
                 RadarPositionStraight,

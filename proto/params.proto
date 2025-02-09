@@ -12,6 +12,8 @@ message Parameters {
         required double rad_error = 5;
         required double ang_error = 6;
         required double h_error = 7;
+        required double responsible_sector_start = 8;
+        required double responsible_sector_end = 9;
     }
 
     message BigRadar {

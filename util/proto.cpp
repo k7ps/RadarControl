@@ -7,10 +7,10 @@ void PrepareParams(Proto::Parameters& params) {
     params.mutable_small_radar()->set_view_angle(params.small_radar().view_angle() * M_PI / 180);
     params.mutable_small_radar()->set_ang_error(params.small_radar().ang_error() * M_PI / 180);
     params.mutable_small_radar()->set_angle_speed(params.small_radar().angle_speed() * M_PI / 180);
+    params.mutable_small_radar()->set_responsible_sector_start(params.small_radar().responsible_sector_start() * M_PI / 180);
+    params.mutable_small_radar()->set_responsible_sector_end(params.small_radar().responsible_sector_end() * M_PI / 180);
     params.mutable_big_radar()->set_ang_error(params.big_radar().ang_error() * M_PI / 180);
-    params.mutable_simulator()->set_max_deviation_angle_vertical(
-        params.simulator().max_deviation_angle_vertical() * M_PI / 180
-    );
+    params.mutable_simulator()->set_max_deviation_angle_vertical(params.simulator().max_deviation_angle_vertical() * M_PI / 180);
 
     const auto play_speed = params.general().play_speed();
     params.mutable_small_radar()->set_angle_speed(params.small_radar().angle_speed() * play_speed);

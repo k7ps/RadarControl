@@ -6,6 +6,8 @@ small_radar {
     rad_error: 0.6
     ang_error: 0.1
     h_error: 0.2
+    responsible_sector_start: 45
+    responsible_sector_end: 135
 }
 
 big_radar {
