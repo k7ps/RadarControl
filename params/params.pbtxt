@@ -2,7 +2,7 @@ small_radar {
     radius: 400
     view_angle: 60
     frequency: 20
-    angle_speed: 0.1
+    angle_speed: 5
     rad_error: 0.6
     ang_error: 0.1
     h_error: 0.2
