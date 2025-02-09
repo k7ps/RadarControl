@@ -2,6 +2,7 @@ syntax = "proto2";
 
 package Proto;
 
+
 message Parameters {
     message SmallRadar {
         required double radius = 1;
@@ -23,6 +24,7 @@ message Parameters {
 
     message General {
         optional double death_time = 1 [default = 5000];
+        optional double play_speed = 2 [default = 1.0];
     }
 
     message Defense {

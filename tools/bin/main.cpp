@@ -16,13 +16,16 @@ int main() {
     });
     SetConfigFlags(FLAG_MSAA_4X_HINT);
 
-    const auto params = ParseProtoFromFile<Proto::Parameters>("../params/params.pbtxt");
+
+    auto params = ParseProtoFromFile<Proto::Parameters>("../params/params.pbtxt");
+    PrepareParams(params);
 
     if (params.simulator().has_random_seed()) {
         srand(params.simulator().random_seed());
     } else {
         srand(time(NULL));
     }
+
 
     RadarController radarController(params);
     Simulator simulator(params);

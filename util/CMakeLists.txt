@@ -1,12 +1,13 @@
 set(UTIL_HEADERS
+    points.h
     proto.h
     timer.h
-    points.h
     util.h
 )
 
 set(UTIL_SOURCES
     points.cpp
+    proto.cpp
     util.cpp
 )
 
