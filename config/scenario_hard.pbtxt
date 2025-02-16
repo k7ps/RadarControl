@@ -1,0 +1,44 @@
+launches {
+    time: 5
+    angle_pos: 15
+    priority: 0
+    is_accurate: True
+}
+
+launches {
+    time: 10
+    angle_pos: 45
+    priority: 0.2
+    is_accurate: True
+}
+
+launches {
+    time: 15
+    angle_pos: 75
+    priority: 0.4
+    is_accurate: True
+}
+
+launches {
+    time: 20
+    angle_pos: 105
+    priority: 0.6
+    is_accurate: True
+}
+
+launches {
+    time: 25
+    angle_pos: 135
+    priority: 0.8
+    is_accurate: True
+}
+
+launches {
+    time: 30
+    angle_pos: 165
+    priority: 1
+    is_accurate: True
+}
+
+# proto-file: proto/scenario.proto
+# proto-message: Proto::TargetScenario
