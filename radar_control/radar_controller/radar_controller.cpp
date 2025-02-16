@@ -121,7 +121,7 @@ void RadarController::Process(
             break;
         }
         if (!updatedTargets.count(data.Id)) {
-            Targets.push_back(Target(data, Params.general().death_time()));
+            Targets.emplace_back(data, Params.general().death_time());
         }
     }
     RemoveDeadTargets();
@@ -154,8 +154,8 @@ void RadarController::SelectTargetToFollow() {
     if (Targets.empty()) {
         return;
     }
-    double targetId = -1;
-    double maxPriority = 0;
+    int targetId = -1;
+    double maxPriority = -1;
     for (const auto& target : Targets) {
         if (target.GetPriority() > maxPriority) {
             maxPriority = target.GetPriority();
