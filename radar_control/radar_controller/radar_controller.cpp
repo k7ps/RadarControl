@@ -6,6 +6,8 @@
 #include <cmath>
 #include <iostream>
 #include <math.h>
+#include <stdexcept>
+#include <string>
 
 using namespace RC;
 
@@ -187,6 +189,7 @@ Target& RadarController::GetTargetById(int id) {
             return target;
         }
     }
+    throw std::out_of_range("Target with id " + std::to_string(id) + " not found\n");
 }
 
 
