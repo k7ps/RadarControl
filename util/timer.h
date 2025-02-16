@@ -7,9 +7,9 @@
 class SimpleTimer {
     using Clock = std::chrono::high_resolution_clock;
 public:
-    SimpleTimer()
-        : LastTime(Clock::now())
-    {}
+    SimpleTimer() {
+        Restart();
+    }
 
     inline void Restart() {
         LastTime = Clock::now();

@@ -3,6 +3,7 @@
 
 #include "radar_control/lib/data.h"
 #include "proto/generated/params.pb.h"
+#include "proto/generated/scenario.pb.h"
 #include "util/timer.h"
 
 
@@ -10,7 +11,7 @@ namespace SIM {
 
     class Target {
     public:
-        Target(unsigned int id, double priority, Vector3d pos, Vector3d speed, int bigPeriod);
+        Target(unsigned int id, double priority, Vector3d pos, Vector3d speed, int bigPeriod, double msFromStart = 0);
 
         void UpdatePosition(bool isInSector);
 
@@ -50,9 +51,22 @@ namespace SIM {
 }
 
 
+struct LaunchParams {
+    double AngPos;
+    double HeightPos;
+    double Priority;
+    double SpeedAbs;
+    double AngDeviation;
+    double HSpeedCoef;
+    double MsFromStart;
+};
+
+LaunchParams GetRandomLaunchParams(const Proto::Parameters& params, bool isAccurate);
+
+
 class Simulator {
 public:
-    Simulator(const Proto::Parameters& params);
+    Simulator(const Proto::Parameters& params, bool isUsingScenario);
 
     void UpdateTargets();
     void SetRadarPosition(double angPos);
@@ -62,8 +76,10 @@ public:
     std::vector<BigRadarData> GetBigRadarTargets();
     std::vector<SmallRadarData> GetSmallRadarTargets();
 
+    void LaunchTarget(LaunchParams launchParams);
+    void LaunchRandomTarget();
+
 private:
-    void AddNewTarget();
     bool IsTargetInSector(const SIM::Target& target) const;
 
 private:
@@ -73,8 +89,25 @@ private:
 
     const int BigRadarUpdatePeriodMs;
     const float NewTargetProbability;
+    const bool IsUsingScenario;
 
     double SmallRadarAngPosition;
+};
+
+
+class TargetScheduler {
+public:
+    TargetScheduler(const Proto::Parameters& params);
+
+    void SetScenario(const std::string& filename, double playSpeed);
+
+    void LaunchTargets(Simulator& simulator);
+
+private:
+    const Proto::Parameters& Params;
+
+    std::vector<Proto::TargetScenario::Launch> TargetLaunches;
+    SimpleTimer Timer;
 };
 
 

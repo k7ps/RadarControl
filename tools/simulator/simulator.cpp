@@ -1,16 +1,21 @@
 #include "simulator.h"
 
+#include "proto/generated/scenario.pb.h"
+#include "util/proto.h"
 #include "util/util.h"
 
+#include <algorithm>
 #include <iostream>
 #include <math.h>
 
 using namespace SIM;
 
 
-Target::Target(unsigned int id, double priority, Vector3d pos, Vector3d speed, int bigPeriod)
+Target::Target(unsigned int id, double priority, Vector3d pos, Vector3d speed, int bigPeriod, double msFromStart)
     : Id(id), Priority(priority), Pos(pos), Speed(speed), BigRadarUpdatePeriodMs(bigPeriod)
-{}
+{
+    Pos += Speed * msFromStart;
+}
 
 void Target::UpdatePosition(bool isInSector) {
     if (!isInSector && Timer.GetElapsedTimeAsMs() < BigRadarUpdatePeriodMs) {
@@ -86,10 +91,32 @@ void Target::SetWasUpdated(bool flag) {
 }
 
 
-Simulator::Simulator(const Proto::Parameters& params)
+LaunchParams GetRandomLaunchParams(const Proto::Parameters& params, bool isAccurate) {
+    double angDeviation = 0;
+    double hSpeedCoef = 1;
+    if (!isAccurate) {
+        angDeviation = GetRandomDouble(
+            -params.simulator().max_deviation_angle_vertical(),
+            params.simulator().max_deviation_angle_vertical()
+        );
+        hSpeedCoef = GetRandomDouble(0.7, 1.2);
+    }
+    return LaunchParams{
+        .AngPos = GetRandomDouble(0, M_PI),
+        .HeightPos = GetRandomDouble(0, params.simulator().max_height()),
+        .Priority = GetRandomDouble(0, 1),
+        .SpeedAbs = GetRandomDouble(params.simulator().min_target_speed(), params.simulator().max_target_speed()),
+        .AngDeviation = angDeviation,
+        .HSpeedCoef = hSpeedCoef
+    };
+}
+
+
+Simulator::Simulator(const Proto::Parameters& params, bool isUsingScenario)
     : Params(params)
     , BigRadarUpdatePeriodMs(1000. / Params.big_radar().frequency())
     , NewTargetProbability((double) Params.simulator().targets_per_minute() / Params.small_radar().frequency() / 60)
+    , IsUsingScenario(isUsingScenario)
     , SmallRadarAngPosition(1.57079)
 {}
 
@@ -102,8 +129,8 @@ void Simulator::UpdateTargets() {
         target.UpdatePosition(IsTargetInSector(target));
     }
 
-    if (GetRandomTrue(NewTargetProbability)) {
-        AddNewTarget();
+    if (!IsUsingScenario && GetRandomTrue(NewTargetProbability)) {
+        LaunchRandomTarget();
     }
 
     std::vector<unsigned int> FlownAwayTargetIds;
@@ -117,34 +144,6 @@ void Simulator::UpdateTargets() {
 
 void Simulator::SetRadarPosition(double angPos) {
     SmallRadarAngPosition = angPos;
-}
-
-void Simulator::AddNewTarget() {
-    static int lastId = 0;
-
-    auto priority = GetRandomDouble(0, 1);
-    auto posAng = GetRandomDouble(0, M_PI);
-    auto posH = GetRandomDouble(0, Params.simulator().max_height());
-
-    auto speedAbs = GetRandomDouble(Params.simulator().min_target_speed(), Params.simulator().max_target_speed());
-    double speedAngVertical, speedHorizontal;
-    if (GetRandomTrue(Params.simulator().probability_of_accurate_missile())) {
-        speedAngVertical = posAng - M_PI;
-        speedHorizontal = - speedAbs * posH / Params.big_radar().radius();
-    } else {
-        auto deviationAngVertical = GetRandomDouble(0, 2 * Params.simulator().max_deviation_angle_vertical());
-        speedAngVertical = posAng - M_PI + Params.simulator().max_deviation_angle_vertical() - deviationAngVertical;
-        speedHorizontal = - speedAbs * posH / Params.big_radar().radius() * GetRandomDouble(0.7, 1.2);
-    }
-
-    Targets.emplace_back(
-        lastId,
-        priority,
-        CylindricalToCartesian(Params.big_radar().radius(), posAng, posH),
-        CylindricalToCartesian(speedAbs, speedAngVertical, speedHorizontal),
-        BigRadarUpdatePeriodMs
-    );
-    ++lastId;
 }
 
 void Simulator::RemoveTargets(std::vector<unsigned int> ids) {
@@ -182,4 +181,95 @@ std::vector<SmallRadarData> Simulator::GetSmallRadarTargets() {
         }
     }
     return res;
+}
+
+void Simulator::LaunchTarget(LaunchParams launchParams) {
+    static int lastId = 0;
+
+    double speedAngVertical = launchParams.AngPos - M_PI - launchParams.AngDeviation;
+    double speedHorizontal = - launchParams.SpeedAbs * launchParams.HeightPos
+                            / Params.big_radar().radius() * launchParams.HSpeedCoef;
+
+    Targets.emplace_back(
+        lastId,
+        launchParams.Priority,
+        CylindricalToCartesian(Params.big_radar().radius(), launchParams.AngPos, launchParams.HeightPos),
+        CylindricalToCartesian(launchParams.SpeedAbs, speedAngVertical, speedHorizontal),
+        BigRadarUpdatePeriodMs,
+        launchParams.MsFromStart
+    );
+    ++lastId;
+}
+
+void Simulator::LaunchRandomTarget() {
+    LaunchTarget(GetRandomLaunchParams(Params, GetRandomTrue(Params.simulator().probability_of_accurate_missile())));
+}
+
+
+TargetScheduler::TargetScheduler(const Proto::Parameters& params)
+    : Params(params)
+{}
+
+void TargetScheduler::SetScenario(const std::string& filename, double playSpeed) {
+    const auto scenario = ParseProtoFromFile<Proto::TargetScenario>(filename);
+    for (const auto& launch : scenario.launches()) {
+        Proto::TargetScenario::Launch correctLaunch(launch);
+        correctLaunch.set_time(correctLaunch.time() * 1000. / playSpeed);
+        correctLaunch.set_angle_pos(correctLaunch.angle_pos() * M_PI / 180);
+        if (launch.has_angle_deviation()) {
+            correctLaunch.set_angle_deviation(correctLaunch.angle_deviation() * M_PI / 180);
+        }
+        if (launch.has_abs_speed()) {
+            correctLaunch.set_abs_speed(correctLaunch.abs_speed() * playSpeed);
+        }
+
+        TargetLaunches.push_back(correctLaunch);
+    }
+
+    std::sort(
+        TargetLaunches.begin(),
+        TargetLaunches.end(),
+        [](const Proto::TargetScenario::Launch& l, const Proto::TargetScenario::Launch& r) {
+            return l.time() < r.time();
+        }
+    );
+}
+
+void TargetScheduler::LaunchTargets(Simulator& simulator) {
+    static int unlaunched = 0;
+    auto currTime = Timer.GetElapsedTimeAsMs();
+
+    for (; unlaunched < TargetLaunches.size(); ++unlaunched) {
+        const auto& protoLaunchParams = TargetLaunches[unlaunched];
+        if (protoLaunchParams.time() <= currTime) {
+            LaunchParams launchParams;
+            if (protoLaunchParams.has_is_accurate()) {
+                launchParams = GetRandomLaunchParams(Params, protoLaunchParams.is_accurate());
+            } else {
+                launchParams = GetRandomLaunchParams(
+                    Params,
+                    GetRandomTrue(Params.simulator().probability_of_accurate_missile())
+                );
+            }
+
+            launchParams.MsFromStart = currTime - protoLaunchParams.time();
+            launchParams.AngPos = protoLaunchParams.angle_pos();
+            if (protoLaunchParams.has_priority()) {
+                launchParams.Priority = protoLaunchParams.priority();
+            }
+            if (protoLaunchParams.has_height()) {
+                launchParams.HeightPos = protoLaunchParams.height();
+            }
+            if (protoLaunchParams.has_abs_speed()) {
+                launchParams.SpeedAbs = protoLaunchParams.abs_speed();
+            }
+            if (protoLaunchParams.has_angle_deviation()) {
+                launchParams.AngDeviation = protoLaunchParams.angle_deviation();
+            }
+
+            simulator.LaunchTarget(launchParams);
+        } else {
+            break;
+        }
+    }
 }

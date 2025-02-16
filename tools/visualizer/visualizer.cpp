@@ -52,12 +52,7 @@ namespace {
         }
     }
 
-    auto DrawDashedRadius(
-        raylib::Vector2 center,
-        float radius,
-        float ang,
-        raylib::Color col
-    ) {
+    auto DrawDashedRadius(raylib::Vector2 center, float radius, float ang, raylib::Color col) {
         auto end = center + raylib::Vector2(radius * std::cos(ang), - radius * std::sin(ang));
         DrawDashedLine(center, end, col);
     }

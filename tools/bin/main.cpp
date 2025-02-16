@@ -17,7 +17,7 @@ int main() {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
 
 
-    auto params = ParseProtoFromFile<Proto::Parameters>("../params/params.pbtxt");
+    auto params = ParseProtoFromFile<Proto::Parameters>("../config/params.pbtxt");
     PrepareParams(params);
 
     if (params.simulator().has_random_seed()) {
@@ -28,11 +28,17 @@ int main() {
 
 
     RadarController radarController(params);
-    Simulator simulator(params);
+    Simulator simulator(params, true);
+    TargetScheduler targetScheduler(params);
     Defense defense(params);
     Visualizer visualizer(params);
 
+    targetScheduler.SetScenario("../config/scenario_simple.pbtxt", params.general().play_speed());
+
+
     while (visualizer.IsWindowOpen()) {
+        targetScheduler.LaunchTargets(simulator);
+
         const auto& smallRadarTargets = simulator.GetSmallRadarTargets();
         const auto& bigRadarTargets = simulator.GetBigRadarTargets();
 

@@ -4,6 +4,7 @@ find_package(absl REQUIRED)
 set(GENERATED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/generated)
 set(SCHEMA_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/params.proto
+    ${CMAKE_CURRENT_SOURCE_DIR}/scenario.proto
 )
 file(MAKE_DIRECTORY ${GENERATED_DIR})
 
