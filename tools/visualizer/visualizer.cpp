@@ -1,7 +1,7 @@
 #include "visualizer.h"
-#include "Color.hpp"
 #include "util/util.h"
 
+#include "Color.hpp"
 #include <Vector2.hpp>
 #include <iostream>
 #include <raylib.h>

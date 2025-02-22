@@ -5,9 +5,7 @@
 
 #include <cmath>
 #include <iostream>
-#include <math.h>
 #include <stdexcept>
-#include <string>
 
 using namespace RC;
 

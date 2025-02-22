@@ -2,6 +2,7 @@
 #define CALCULATIONS_H
 
 #include "util/points.h"
+
 #include <vector>
 
 
