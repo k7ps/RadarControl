@@ -1,6 +1,9 @@
 #include "simulator.h"
 
 #include "proto/generated/scenario.pb.h"
+#include "radar_control/lib/calculations.h"
+#include "radar_control/lib/data.h"
+#include "util/points.h"
 #include "util/proto.h"
 #include "util/util.h"
 
@@ -11,56 +14,80 @@
 using namespace SIM;
 
 
-Target::Target(unsigned int id, double priority, Vector3d pos, Vector3d speed, int bigPeriod, double msFromStart)
-    : Id(id), Priority(priority), Pos(pos), Speed(speed), BigRadarUpdatePeriodMs(bigPeriod)
+Target::Target(
+    const Proto::Parameters& params,
+    unsigned int id,
+    double priority,
+    Vector3d pos,
+    Vector3d speed,
+    double msFromStart
+)
+    : Params(params)
+    , Id(id)
+    , Priority(priority)
+    , RealPos(pos)
+    , RealSpeed(speed)
+    , BigRadarUpdatePeriodMs(1000. / Params.big_radar().frequency())
 {
-    Pos += Speed * msFromStart;
+    RealPos += RealSpeed * msFromStart;
+    FilteredPos = RealPos;
 }
 
 void Target::UpdatePosition(bool isInSector) {
     if (!isInSector && Timer.GetElapsedTimeAsMs() < BigRadarUpdatePeriodMs) {
         return;
     }
+    Vector3d errors;
+    if (isInSector) {
+        errors = Vector3d(
+            Params.small_radar().rad_error(),
+            Params.small_radar().ang_error(),
+            Params.small_radar().h_error()
+        );
+    } else {
+        errors = Vector3d(
+            Params.big_radar().rad_error(),
+            Params.big_radar().ang_error(),
+            Params.big_radar().h_error()
+        );
+    }
 
-    double ms = Timer.GetElapsedTimeAsMs();
+    double dt = Timer.GetElapsedTimeAsMs();
     Timer.Restart();
 
-    Pos += Speed * ms;
+    RealPos += RealSpeed * dt;
 
-    IsSmallDataUpdated = true;
-    IsBigDataUpdated = true;
+    NoisedPos = CylindricalToCartesian(CartesianToCylindrical(RealPos) + GetRandomVector3d(-1, 1) * errors);
+
+    auto filtered = ABFilter(NoisedPos, FilteredPos, FilteredSpeed, dt, MeasureCount);
+    FilteredPos = filtered.first;
+    FilteredSpeed = filtered.second;
+
     WasUpdatedFlag = true;
+    ++MeasureCount;
 }
 
-Vector3d Target::GetCurrentPosition() const {
-    return Pos + Speed * Timer.GetElapsedTimeAsMs();
+Vector3d Target::GetCurrentRealPosition() const {
+    return RealPos + RealSpeed * Timer.GetElapsedTimeAsMs();
 }
 
-SmallRadarData Target::GetNoisedSmallData(Vector3d errors) {
-    if (IsSmallDataUpdated) {
-        SmallData = SmallRadarData{
+SmallRadarData Target::GetSmallRadarData() const {
+    return SmallRadarData{
+        .Id = Id,
+        .Priority = Priority,
+        .Pos = NoisedPos
+    };
+}
+
+BigRadarData Target::GetBigRadarData() const {
+    return BigRadarData{
+        SmallRadarData{
             .Id = Id,
             .Priority = Priority,
-            .Pos = CylindricalToCartesian(CartesianToCylindrical(Pos) + GetRandomVector3d(-1, 1) * errors)
-        };
-        IsSmallDataUpdated = false;
-    }
-    return SmallData;
-}
-
-BigRadarData Target::GetNoisedBigData(Vector3d errors) {
-    if (IsBigDataUpdated) {
-        BigData = BigRadarData{
-            {
-                .Id = Id,
-                .Priority = Priority,
-                .Pos = CylindricalToCartesian(CartesianToCylindrical(Pos) + GetRandomVector3d(-1, 1) * errors)
-            },
-            .Speed = Speed
-        };
-        IsBigDataUpdated = false;
-    }
-    return BigData;
+            .Pos = FilteredPos
+        },
+        .Speed = FilteredSpeed
+    };
 }
 
 unsigned int Target::GetId() const {
@@ -70,13 +97,13 @@ unsigned int Target::GetId() const {
 bool Target::IsInSector(double rad, double angView, double angPos) const {
     double startAng = angPos - angView / 2;
     double endAng = angPos + angView / 2;
-    auto polarPos = CartesianToCylindrical(GetCurrentPosition());
+    auto polarPos = CartesianToCylindrical(GetCurrentRealPosition());
     return polarPos.X <= rad && startAng <= polarPos.Y && polarPos.Y <= endAng;
 }
 
 bool Target::IsOutOfView(double rad) const {
     const float error = 1;
-    auto curPos = GetCurrentPosition();
+    auto curPos = GetCurrentRealPosition();
     return curPos.Y < error
         || curPos.X * curPos.X + curPos.Y * curPos.Y > (rad + error) * (rad + error)
         || curPos.Z < error;
@@ -114,7 +141,6 @@ LaunchParams GetRandomLaunchParams(const Proto::Parameters& params, bool isAccur
 
 Simulator::Simulator(const Proto::Parameters& params, bool isUsingScenario)
     : Params(params)
-    , BigRadarUpdatePeriodMs(1000. / Params.big_radar().frequency())
     , NewTargetProbability((double) Params.simulator().targets_per_minute() / Params.small_radar().frequency() / 60)
     , IsUsingScenario(isUsingScenario)
     , SmallRadarAngPosition(1.57079)
@@ -125,8 +151,8 @@ bool Simulator::IsTargetInSector(const Target& target) const {
 }
 
 void Simulator::UpdateTargets() {
-    for (auto& target : Targets) {
-        target.UpdatePosition(IsTargetInSector(target));
+    for (auto* target : Targets) {
+        target->UpdatePosition(IsTargetInSector(*target));
     }
 
     if (!IsUsingScenario && GetRandomTrue(NewTargetProbability)) {
@@ -134,9 +160,9 @@ void Simulator::UpdateTargets() {
     }
 
     std::vector<unsigned int> FlownAwayTargetIds;
-    for (const auto& target : Targets) {
-        if (target.IsOutOfView(Params.big_radar().radius())) {
-            FlownAwayTargetIds.push_back(target.GetId());
+    for (const auto* target : Targets) {
+        if (target->IsOutOfView(Params.big_radar().radius())) {
+            FlownAwayTargetIds.push_back(target->GetId());
         }
     }
     RemoveTargets(FlownAwayTargetIds);
@@ -149,7 +175,8 @@ void Simulator::SetRadarPosition(double angPos) {
 void Simulator::RemoveTargets(std::vector<unsigned int> ids) {
     for (auto id : ids) {
         for (int i = 0; i < Targets.size(); ++i) {
-            if (Targets[i].GetId() == id) {
+            if (Targets[i]->GetId() == id) {
+                delete Targets[id];
                 Targets.erase(Targets.begin() + i);
                 break;
             }
@@ -159,25 +186,17 @@ void Simulator::RemoveTargets(std::vector<unsigned int> ids) {
 
 std::vector<BigRadarData> Simulator::GetBigRadarTargets() {
     std::vector<BigRadarData> res;
-    for (auto& target : Targets) {
-        res.push_back(target.GetNoisedBigData(Vector3d(
-            Params.big_radar().rad_error(),
-            Params.big_radar().ang_error(),
-            Params.big_radar().h_error()
-        )));
+    for (const auto* target : Targets) {
+        res.push_back(target->GetBigRadarData());
     }
     return res;
 }
 
 std::vector<SmallRadarData> Simulator::GetSmallRadarTargets() {
     std::vector<SmallRadarData> res;
-    for (auto& target : Targets) {
-        if (IsTargetInSector(target)) {
-            res.emplace_back(target.GetNoisedSmallData(Vector3d(
-                Params.small_radar().rad_error(),
-                Params.small_radar().ang_error(),
-                Params.small_radar().h_error()
-            )));
+    for (const auto* target : Targets) {
+        if (IsTargetInSector(*target)) {
+            res.emplace_back(target->GetSmallRadarData());
         }
     }
     return res;
@@ -190,14 +209,16 @@ void Simulator::LaunchTarget(LaunchParams launchParams) {
     double speedHorizontal = - launchParams.SpeedAbs * launchParams.HeightPos
                             / Params.big_radar().radius() * launchParams.HSpeedCoef;
 
-    Targets.emplace_back(
+    auto* targetPtr = new Target(
+        Params,
         lastId,
         launchParams.Priority,
         CylindricalToCartesian(Params.big_radar().radius(), launchParams.AngPos, launchParams.HeightPos),
         CylindricalToCartesian(launchParams.SpeedAbs, speedAngVertical, speedHorizontal),
-        BigRadarUpdatePeriodMs,
         launchParams.MsFromStart
     );
+
+    Targets.push_back(targetPtr);
     ++lastId;
 }
 

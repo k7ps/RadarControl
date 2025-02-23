@@ -28,6 +28,26 @@ namespace {
         return (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
     }
 
+    std::pair<double, double> ABFilter1d(double measuredX, double prevX, double prevSpeed, double dt, int measureCount) {
+        if (measureCount == 0) {
+            return {measuredX, 0.};
+        }
+        if (measureCount == 1) {
+            return {measuredX, (measuredX - prevX) / dt};
+        }
+
+        double alpha = 2. * (2. * measureCount - 1.) / (measureCount * (measureCount + 1.));
+        double beta = 6. / (measureCount * (measureCount + 1.));
+
+        double predictedX = prevX + prevSpeed * dt;
+        double predictedSpeed = prevSpeed;
+
+        double filteredX = predictedX + (alpha * (measuredX - predictedX));
+        double filteredSpeed = predictedSpeed + (beta / dt * (measuredX - filteredX));
+
+        return {filteredX, filteredSpeed};
+    }
+
 }
 
 
@@ -49,6 +69,17 @@ Vector3d CalculateSpeed(std::vector<Vector3d> positions, std::vector<int> times)
         LeastSquaresSlope(t, y),
         LeastSquaresSlope(t, z)
     );
+}
+
+std::pair<Vector3d, Vector3d> ABFilter(Vector3d measuredX, Vector3d prevX, Vector3d prevSpeed, double dt, int measureCount) {
+    auto x = ABFilter1d(measuredX.X, prevX.X, prevSpeed.X, dt, measureCount);
+    auto y = ABFilter1d(measuredX.Y, prevX.Y, prevSpeed.Y, dt, measureCount);
+    auto z = ABFilter1d(measuredX.Z, prevX.Z, prevSpeed.Z, dt, measureCount);
+
+    return {
+        Vector3d(x.first, y.first, z.first),
+        Vector3d(x.second, y.second, z.second)
+    };
 }
 
 Vector3d CalculateMeetingPoint(

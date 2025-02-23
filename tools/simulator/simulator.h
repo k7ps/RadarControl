@@ -4,6 +4,7 @@
 #include "radar_control/lib/data.h"
 #include "proto/generated/params.pb.h"
 #include "proto/generated/scenario.pb.h"
+#include "util/points.h"
 #include "util/timer.h"
 
 
@@ -11,12 +12,19 @@ namespace SIM {
 
     class Target {
     public:
-        Target(unsigned int id, double priority, Vector3d pos, Vector3d speed, int bigPeriod, double msFromStart = 0);
+        Target(
+            const Proto::Parameters& params,
+            unsigned int id,
+            double priority,
+            Vector3d pos,
+            Vector3d speed,
+            double msFromStart = 0
+        );
 
         void UpdatePosition(bool isInSector);
 
-        SmallRadarData GetNoisedSmallData(Vector3d errors);
-        BigRadarData GetNoisedBigData(Vector3d errors);
+        SmallRadarData GetSmallRadarData() const;
+        BigRadarData GetBigRadarData() const;
         unsigned int GetId() const;
 
         bool IsInSector(double rad, double angView, double angPos) const;
@@ -26,26 +34,27 @@ namespace SIM {
         void SetWasUpdated(bool flag);
 
     private:
-        Vector3d GetCurrentPosition() const;
+        Vector3d GetCurrentRealPosition() const;
 
     private:
+        const Proto::Parameters& Params;
+
         int Id;
         double Priority;
 
-        Vector3d Pos;
-        Vector3d Speed;
+        Vector3d RealPos;
+        Vector3d NoisedPos;
+        Vector3d FilteredPos;
+
+        Vector3d RealSpeed;
+        Vector3d FilteredSpeed;
 
         SimpleTimer Timer;
 
         int BigRadarUpdatePeriodMs;
 
-        bool IsSmallDataUpdated = true;
-        bool IsBigDataUpdated = true;
-
-        SmallRadarData SmallData;
-        BigRadarData BigData;
-
         bool WasUpdatedFlag = true;
+        int MeasureCount = 1;
     };
 
 }
@@ -85,9 +94,8 @@ private:
 private:
     const Proto::Parameters& Params;
 
-    std::vector<SIM::Target> Targets;
+    std::vector<SIM::Target*> Targets;
 
-    const int BigRadarUpdatePeriodMs;
     const float NewTargetProbability;
     const bool IsUsingScenario;
 

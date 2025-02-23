@@ -20,7 +20,7 @@ big_radar {
 
 general {
     death_time: 2500
-    play_speed: 5.0
+    play_speed: 1.0
 }
 
 defense {

@@ -10,6 +10,30 @@
 using namespace RC;
 
 
+namespace {
+    std::pair<double, double> ABFilter1d(double x, double prevX, double prevSpeed, double dt, int measureCount) {
+        dt /= 1000.;
+        if (measureCount == 0) {
+            return {x, 0.};
+        }
+        if (measureCount == 1) {
+            return {x, (x - prevX) / dt};
+        }
+
+        double alpha = 2. * (2. * measureCount - 1.) / (measureCount * (measureCount + 1.));
+        double beta = 6. / (measureCount * (measureCount + 1.));
+
+        double predictedX = prevX + prevSpeed * dt;
+        double predictedSpeed = prevSpeed;
+
+        double filteredX = predictedX + (alpha * (x - predictedX));
+        double filteredSpeed = predictedSpeed + (beta / dt * (x - filteredX));
+
+        return {filteredX, filteredSpeed};
+    }
+}
+
+
 Target::Target(int id, double priority, double deathTime)
     : Id(id), Priority(priority), DeathTime(deathTime)
 {}
@@ -17,39 +41,37 @@ Target::Target(int id, double priority, double deathTime)
 Target::Target(const BigRadarData& data, double deatTime)
     : Target(data.Id, data.Priority, deatTime)
 {
-    Update(data.Pos, data.Speed);
+    BigRadarUpdate(data.Pos, data.Speed);
 }
 
-void Target::Update(Vector3d pos) {
+void Target::BigRadarUpdate(Vector3d pos, Vector3d speed) {
+    Timer.Restart();
+
+    FilteredPos = pos;
+    FilteredSpeed = speed;
+}
+
+void Target::SmallRadarUpdate(Vector3d pos) {
     if (Pos == pos) {
         return;
     }
 
-    int ms = Timer.GetElapsedTimeAsMs();
+    int dt = Timer.GetElapsedTimeAsMs();
     Timer.Restart();
 
     Pos = pos;
-
-    Positions.push_back(Pos);
-    if (Positions.size() == 1) {
-        DeltaTimes.push_back(0);
-        return;
-    }
-    DeltaTimes.push_back(ms);
-    Speed = CalculateSpeed(Positions, DeltaTimes);
-    if (Positions.size() >= 40) {
-        HavePreciseSpeedFlag = true;
-    }
+    ABFilterIterate(dt);
 }
 
-void Target::Update(Vector3d pos, Vector3d speed) {
-    if (Pos == pos) {
-        return;
-    }
+void Target::ABFilterIterate(double dt) {
+    auto prevPos = FilteredPos;
+    auto prevSpeed = FilteredSpeed;
 
-    Timer.Restart();
-    Pos = pos;
-    Speed = speed;
+    auto filtered = ABFilter(Pos, prevPos, prevSpeed, dt, MeasureCount);
+    FilteredPos = filtered.first;
+    FilteredSpeed = filtered.second;
+
+    ++MeasureCount;
 }
 
 int Target::GetId() const {
@@ -64,12 +86,16 @@ Vector3d Target::GetPosition() const {
     return Pos;
 }
 
-Vector3d Target::GetSpeed() const {
-    return Speed;
+Vector3d Target::GetFilteredPosition() const {
+    return FilteredPos;
+}
+
+Vector3d Target::GetFilteredSpeed() const {
+    return FilteredSpeed;
 }
 
 bool Target::HavePreciseSpeed() const {
-    return HavePreciseSpeedFlag;
+    return MeasureCount > 200;
 }
 
 bool Target::IsDead() const {
@@ -107,7 +133,7 @@ void RadarController::Process(
         for (auto& target : Targets) {
             if (target.GetId() != data.Id) continue;
 
-            target.Update(data.Pos);
+            target.SmallRadarUpdate(data.Pos);
             updatedTargets.insert(data.Id);
             break;
         }
@@ -116,7 +142,7 @@ void RadarController::Process(
         for (auto& target : Targets) {
             if (target.GetId() != data.Id || updatedTargets.count(data.Id)) continue;
 
-            target.Update(data.Pos, data.Speed);
+            target.BigRadarUpdate(data.Pos, data.Speed);
             updatedTargets.insert(data.Id);
             break;
         }
@@ -132,15 +158,15 @@ void RadarController::Process(
     if (!FollowedTargetIds.empty()) {
         int id = FollowedTargetIds.front();
         auto& target = GetTargetById(id);
-        auto targetPos = target.GetPosition();
-        auto cylindricalPos = CartesianToCylindrical(target.GetPosition());
+        auto targetPos = target.GetFilteredPosition();
+        auto cylindricalPos = CartesianToCylindrical(targetPos);
 
         RadarAngleTarget = cylindricalPos.Y;
 
         if (!target.IsRocketLaunched() && target.HavePreciseSpeed()) {
             auto meetingPoint = CalculateMeetingPoint(
-                targetPos + target.GetSpeed() * Params.defense().time_to_launch_rocket(),
-                target.GetSpeed(),
+                targetPos + target.GetFilteredSpeed() * Params.defense().time_to_launch_rocket(),
+                target.GetFilteredSpeed(),
                 Vector3d(),
                 Params.defense().rocket_speed()
             );
