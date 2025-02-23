@@ -39,9 +39,6 @@ namespace RC {
         int Id;
         double Priority;
 
-        // std::vector<Vector3d> Positions;
-        // std::vector<int> DeltaTimes;
-
         Vector3d Pos;
         Vector3d FilteredPos;
         Vector3d FilteredSpeed;
@@ -51,7 +48,6 @@ namespace RC {
 
         bool IsFollowedFlag = false;
         bool IsRocketLaunchedFlag = false;
-        // bool HavePreciseSpeedFlag = false;
     };
 
 }
