@@ -18,6 +18,10 @@ bool GetRandomTrue(float probability);
 double GetRandomDouble(double min, double max);
 Vector3d GetRandomVector3d(double min, double max);
 
+double GetRandomNormal(double mean, double std);
+Vector3d GetRandomNormalVector3d(double mean, double std);
+Vector3d GetRandomNormalVector3d(Vector3d mean, Vector3d std);
+
 double RadToDeg(double angle);
 float RadToDeg(float angle);
 

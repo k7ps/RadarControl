@@ -2,7 +2,7 @@
 #include "util/points.h"
 
 #include <math.h>
-
+#include <random>
 
 Vector2d PolarToCartesian(double rad, double ang) {
     return {rad * std::cos(ang), rad * std::sin(ang)};
@@ -54,6 +54,31 @@ Vector3d GetRandomVector3d(double min, double max) {
         GetRandomDouble(min, max)
     );
 }
+
+double GetRandomNormal(double mean, double std) {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+
+    std::normal_distribution d(mean, std);
+    return d(gen);
+}
+
+Vector3d GetRandomNormalVector3d(double mean, double std) {
+    return Vector3d(
+        GetRandomNormal(mean, std),
+        GetRandomNormal(mean, std),
+        GetRandomNormal(mean, std)
+    );
+}
+
+Vector3d GetRandomNormalVector3d(Vector3d mean, Vector3d std) {
+    return Vector3d(
+        GetRandomNormal(mean.X, std.X),
+        GetRandomNormal(mean.Y, std.Y),
+        GetRandomNormal(mean.Z, std.Z)
+    );
+}
+
 
 double RadToDeg(double angle) {
     return angle * 180 / M_PI;

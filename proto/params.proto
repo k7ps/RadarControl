@@ -9,9 +9,9 @@ message Parameters {
         required double view_angle = 2;
         required double frequency = 3;
         required double angle_speed = 4;
-        required double rad_error = 5;
-        required double ang_error = 6;
-        required double h_error = 7;
+        required double rad_stddev = 5;
+        required double ang_stddev = 6;
+        required double h_stddev = 7;
         required double responsible_sector_start = 8;
         required double responsible_sector_end = 9;
     }
@@ -19,9 +19,9 @@ message Parameters {
     message BigRadar {
         required double radius = 1;
         required double frequency = 2;
-        required double rad_error = 3;
-        required double ang_error = 4;
-        required double h_error = 5;
+        required double rad_stddev = 3;
+        required double ang_stddev = 4;
+        required double h_stddev = 5;
     }
 
     message General {

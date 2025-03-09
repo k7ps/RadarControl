@@ -3,9 +3,9 @@ small_radar {
     view_angle: 60
     frequency: 20
     angle_speed: 5
-    rad_error: 0.6
-    ang_error: 0.1
-    h_error: 0.2
+    rad_stddev: 0.2
+    ang_stddev: 0.04
+    h_stddev: 0.1
     responsible_sector_start: 45
     responsible_sector_end: 135
 }
@@ -13,14 +13,14 @@ small_radar {
 big_radar {
     radius: 700
     frequency: 0.5
-    rad_error: 3
-    ang_error: 0.6
-    h_error: 2
+    rad_stddev: 1
+    ang_stddev: 0.2
+    h_stddev: 0.5
 }
 
 general {
     death_time: 2500
-    play_speed: 1.0
+    play_speed: 5.0
 }
 
 defense {
@@ -30,8 +30,8 @@ defense {
 
 simulator {
     targets_per_minute: 2
-    min_target_speed: 0.005
-    max_target_speed: 0.01
+    min_target_speed: 1
+    max_target_speed: 2
     max_deviation_angle_vertical: 10
     max_height: 250
     probability_of_accurate_missile: 0.4

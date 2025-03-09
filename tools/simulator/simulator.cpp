@@ -37,18 +37,18 @@ void Target::UpdatePosition(bool isInSector) {
     if (!isInSector && Timer.GetElapsedTimeAsMs() < BigRadarUpdatePeriodMs) {
         return;
     }
-    Vector3d errors;
+    Vector3d stddev;
     if (isInSector) {
-        errors = Vector3d(
-            Params.small_radar().rad_error(),
-            Params.small_radar().ang_error(),
-            Params.small_radar().h_error()
+        stddev = Vector3d(
+            Params.small_radar().rad_stddev(),
+            Params.small_radar().ang_stddev(),
+            Params.small_radar().h_stddev()
         );
     } else {
-        errors = Vector3d(
-            Params.big_radar().rad_error(),
-            Params.big_radar().ang_error(),
-            Params.big_radar().h_error()
+        stddev = Vector3d(
+            Params.big_radar().rad_stddev(),
+            Params.big_radar().ang_stddev(),
+            Params.big_radar().h_stddev()
         );
     }
 
@@ -57,7 +57,10 @@ void Target::UpdatePosition(bool isInSector) {
 
     RealPos += RealSpeed * dt;
 
-    NoisedPos = CylindricalToCartesian(CartesianToCylindrical(RealPos) + GetRandomVector3d(-1, 1) * errors);
+    // NoisedPos = CylindricalToCartesian(CartesianToCylindrical(RealPos) + GetRandomVector3d(-1, 1) * errors);
+    NoisedPos = CylindricalToCartesian(
+        CartesianToCylindrical(RealPos) + GetRandomNormalVector3d(Vector3d::Zero(), stddev)
+    );
 
     auto filtered = ABFilter(NoisedPos, FilteredPos, FilteredSpeed, dt, MeasureCount);
     FilteredPos = filtered.first;
@@ -241,7 +244,7 @@ void TargetScheduler::SetScenario(const std::string& filename, double playSpeed)
             correctLaunch.set_angle_deviation(correctLaunch.angle_deviation() * M_PI / 180);
         }
         if (launch.has_abs_speed()) {
-            correctLaunch.set_abs_speed(correctLaunch.abs_speed() * playSpeed);
+            correctLaunch.set_abs_speed(correctLaunch.abs_speed() * playSpeed / 1000);
         }
 
         TargetLaunches.push_back(correctLaunch);

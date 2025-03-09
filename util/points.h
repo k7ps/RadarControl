@@ -10,6 +10,9 @@ struct Vector2d {
         : X(x), Y(y) {}
 
     std::string DebugString() const;
+    static Vector2d Zero() {
+        return Vector2d(0, 0);
+    };
 
     double X;
     double Y;
@@ -21,6 +24,9 @@ struct Vector3d {
         : X(x), Y(y), Z(z) {}
 
     std::string DebugString() const;
+    static Vector3d Zero() {
+        return Vector3d(0, 0, 0);
+    };
 
     double X;
     double Y;
