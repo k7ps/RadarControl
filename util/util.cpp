@@ -3,6 +3,11 @@
 
 #include <math.h>
 #include <random>
+#include <iostream>
+#include <iomanip>
+#include <chrono>
+#include <ctime>
+
 
 Vector2d PolarToCartesian(double rad, double ang) {
     return {rad * std::cos(ang), rad * std::sin(ang)};
@@ -94,4 +99,13 @@ double DegToRad(double angle) {
 
 float DegToRad(float angle) {
     return angle * M_PI / 180;
+}
+
+
+void PrintCurrentTime() {
+    auto now = std::chrono::system_clock::now();
+    auto time_t = std::chrono::system_clock::to_time_t(now);
+    auto tm = *std::localtime(&time_t);
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
+    std::cout << std::put_time(&tm, "%H:%M:%S") << '.' << std::setfill('0') << std::setw(3) << ms.count() << std::endl;
 }

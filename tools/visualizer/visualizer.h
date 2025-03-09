@@ -25,11 +25,14 @@ public:
         const std::vector<unsigned>& followedTargetIds,
         const std::vector<Vector3d>& rockets,
         const std::vector<Vector3d>& meetingPoints,
+        const std::vector<Vector3d>& entryPoints,
+        const std::vector<Vector3d>& approximateMeetingPoints,
         double radarPosAngle
     );
 
 private:
     raylib::Vector2 ToWindowCoords(const Vector3d& p, View view) const;
+    void DrawPoints(const std::vector<Vector3d>& points, View view, raylib::Color color);
 
     void DrawTarget(const SmallRadarData& data, bool isFollowed, View view);
     void DrawTargets(
@@ -40,6 +43,8 @@ private:
     );
     void DrawRockets(const std::vector<Vector3d>& rockets, View view);
     void DrawMeetingPoints(const std::vector<Vector3d>& meetingPoints, View view);
+    void DrawEntryPoints(const std::vector<Vector3d>& entryPoints, View view);
+    void DrawApproximateMeetingPoints(const std::vector<Vector3d>& approximateMeetingPoints, View view);
     void DrawRadars(double radarPosAngle, View view);
 
 private:

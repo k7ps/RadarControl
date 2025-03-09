@@ -13,5 +13,12 @@ Vector3d CalculateMeetingPoint(
     double rocketSpeed
 );
 
+Vector3d CalculateEntryPoint(
+    const Vector3d& targetPos,
+    const Vector3d& targetSpeed,
+    const Vector3d& radarPos,
+    double radius
+);
+
 
 #endif // CALCULATIONS_H

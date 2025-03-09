@@ -1,4 +1,5 @@
 #include "visualizer.h"
+#include "util/points.h"
 #include "util/util.h"
 
 #include "Color.hpp"
@@ -6,6 +7,8 @@
 #include <iostream>
 #include <raylib.h>
 #include <set>
+#include <string>
+#include <vector>
 
 
 namespace {
@@ -82,6 +85,8 @@ void Visualizer::DrawFrame(
     const std::vector<unsigned>& followedTargetIds,
     const std::vector<Vector3d>& rockets,
     const std::vector<Vector3d>& meetingPoints,
+    const std::vector<Vector3d>& entryPoints,
+    const std::vector<Vector3d>& approximateMeetingPoints,
     double radarPosAngle
 ) {
     BeginDrawing();
@@ -93,6 +98,8 @@ void Visualizer::DrawFrame(
             DrawTargets(bigDatas, smallDatas, followedTargetIds, view);
             DrawRockets(rockets, view);
             DrawMeetingPoints(meetingPoints, view);
+            DrawEntryPoints(entryPoints, view);
+            DrawApproximateMeetingPoints(approximateMeetingPoints, view);
         }
     }
     EndDrawing();
@@ -106,6 +113,8 @@ raylib::Vector2 Visualizer::ToWindowCoords(const Vector3d& pos, View view) const
             auto cylindPos = CartesianToCylindrical(pos);
             return RadarPositionSide + raylib::Vector2(cylindPos.X * std::cos(cylindPos.Y), -cylindPos.Z);
         }
+        default:
+            throw "Visualizer::ToWindowCoords() not implemented for view = " + std::to_string(view);
     }
 }
 
@@ -208,12 +217,24 @@ void Visualizer::DrawRockets(const std::vector<Vector3d>& rockets, View view) {
     }
 }
 
-void Visualizer::DrawMeetingPoints(const std::vector<Vector3d>& meetingPoints, View view) {
-    for (const auto& meetingPoint : meetingPoints) {
+void Visualizer::DrawPoints(const std::vector<Vector3d>& points, View view, raylib::Color color) {
+    for (const auto& point : points) {
         DrawCircleLinesV(
-            ToWindowCoords(meetingPoint, view),
+            ToWindowCoords(point, view),
             Params.visualizer().target_radius(),
-            raylib::Color::Gray()
+            color
         );
     }
+}
+
+void Visualizer::DrawMeetingPoints(const std::vector<Vector3d>& meetingPoints, View view) {
+    DrawPoints(meetingPoints, view, raylib::Color::Gray());
+}
+
+void Visualizer::DrawEntryPoints(const std::vector<Vector3d>& entryPoints, View view) {
+    DrawPoints(entryPoints, view, raylib::Color::Blue());
+}
+
+void Visualizer::DrawApproximateMeetingPoints(const std::vector<Vector3d>& approximateMeetingPoints, View view) {
+    DrawPoints(approximateMeetingPoints, view, raylib::Color::DarkGray());
 }

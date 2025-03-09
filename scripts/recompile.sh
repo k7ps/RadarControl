@@ -1,8 +1,8 @@
 #!/bin/bash
 cd ~/VSCodeProjects/RadarControl
-rm -r build
+sudo rm -r build
 rm -r proto/generated
 mkdir build
 cd build
-cmake ..
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 make

@@ -4,6 +4,8 @@
 #include <string>
 
 
+const double EPS = 1e-6;
+
 struct Vector2d {
     Vector2d() = default;
     Vector2d(double x, double y)
@@ -22,6 +24,8 @@ struct Vector3d {
     Vector3d() = default;
     Vector3d(double x, double y, double z)
         : X(x), Y(y), Z(z) {}
+    Vector3d(double x, double y)
+        : X(x), Y(y), Z(0) {}
 
     std::string DebugString() const;
     static Vector3d Zero() {
@@ -44,6 +48,7 @@ Vector3d& operator*=(Vector3d& p1, const Vector3d& p2);
 Vector3d operator/(const Vector3d& p1, double p2);
 Vector3d& operator/=(Vector3d& p1, const Vector3d& p2);
 bool operator==(const Vector3d& p1, const Vector3d& p2);
+bool operator!=(const Vector3d& p1, const Vector3d& p2);
 
 std::string Vector3dAsStr(const Vector3d& p);
 

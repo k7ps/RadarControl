@@ -59,11 +59,15 @@ Vector3d& operator/=(Vector3d& p1, double p2) {
 }
 
 bool operator==(const Vector3d& p1, const Vector3d& p2) {
-    const double error = 1e-8;
-    return std::abs(p1.X - p2.X) < error
-        && std::abs(p1.Y - p2.Y) < error
-        && std::abs(p1.Z - p2.Z) < error;
+    return std::abs(p1.X - p2.X) < EPS
+        && std::abs(p1.Y - p2.Y) < EPS
+        && std::abs(p1.Z - p2.Z) < EPS;
 }
+
+bool operator!=(const Vector3d& p1, const Vector3d& p2) {
+    return !(p1 == p2);
+}
+
 
 double GetSqrtOfSquareSum(const Vector3d& v) {
     return std::sqrt(v.X * v.X + v.Y * v.Y + v.Z * v.Z);

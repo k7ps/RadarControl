@@ -5,14 +5,15 @@
 #include "proto/generated/params.pb.h"
 #include "util/points.h"
 #include "util/timer.h"
+#include <vector>
 
 
 namespace RC {
 
     class Target {
     public:
-        Target(int id, double priority, double deathTime);
-        Target(const BigRadarData& data, double deatTime);
+        Target(int id, double priority, double deathTime, const Proto::Parameters& params);
+        Target(const BigRadarData& data, double deatTime, const Proto::Parameters& params);
 
         void SmallRadarUpdate(Vector3d pos);
         void BigRadarUpdate(Vector3d pos, Vector3d speed);
@@ -31,9 +32,20 @@ namespace RC {
         void SetIsRocketLaunched(bool f);
         bool IsRocketLaunched() const;
 
+        void SetEntryPoint(Vector3d p);
+        Vector3d GetEntryPoint() const;
+
+        void SetApproximateMeetingPoint(Vector3d p);
+        Vector3d GetApproximateMeetingPoint() const;
+
+        bool NeedToUpdateEntryPoint() const;
+        void SetNeedToUpdateEntryPoint(bool f);
+
+        bool NeedToUpdateMeetingPoint() const;
+        void SetNeedToUpdateMeetingPoint(bool f);
+
     private:
         void ABFilterIterate(double dt);
-        double MeasureCount = 0;
 
     private:
         int Id;
@@ -43,11 +55,21 @@ namespace RC {
         Vector3d FilteredPos;
         Vector3d FilteredSpeed;
 
+        Vector3d EntryPoint;
+        Vector3d ApproximateMeetingPoint;
+
         SimpleTimer Timer;
         double DeathTime;
 
         bool IsFollowedFlag = false;
         bool IsRocketLaunchedFlag = false;
+        bool NeedToUpdateEntryPointFlag = false;
+        bool NeedToUpdateMeetingPointFlag= false;
+
+        int CurrBigRadarMeasureCount = 0;
+        int BigRadarMeasureCount;
+        int CurrSmallRadarMeasureCount = 0;
+        int SmallRadarMeasureCount;
     };
 
 }
@@ -66,6 +88,8 @@ public:
     void Process(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&);
 
     Result GetAngleAndMeetingPoints();
+    std::vector<Vector3d> GetEntryPoints() const;
+    std::vector<Vector3d> GetApproximateMeetingPoints() const;
 
 private:
     RC::Target& GetTargetById(int id);

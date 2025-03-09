@@ -28,5 +28,7 @@ float RadToDeg(float angle);
 double DegToRad(double angle);
 float DegToRad(float angle);
 
+void PrintCurrentTime();
+
 
 #endif // UTIL_H

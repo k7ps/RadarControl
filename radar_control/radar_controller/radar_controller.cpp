@@ -1,4 +1,5 @@
 #include "radar_controller.h"
+#include "proto/generated/params.pb.h"
 #include "util/points.h"
 #include "util/util.h"
 #include "lib/calculations.h"
@@ -10,45 +11,34 @@
 using namespace RC;
 
 
-namespace {
-    std::pair<double, double> ABFilter1d(double x, double prevX, double prevSpeed, double dt, int measureCount) {
-        dt /= 1000.;
-        if (measureCount == 0) {
-            return {x, 0.};
-        }
-        if (measureCount == 1) {
-            return {x, (x - prevX) / dt};
-        }
-
-        double alpha = 2. * (2. * measureCount - 1.) / (measureCount * (measureCount + 1.));
-        double beta = 6. / (measureCount * (measureCount + 1.));
-
-        double predictedX = prevX + prevSpeed * dt;
-        double predictedSpeed = prevSpeed;
-
-        double filteredX = predictedX + (alpha * (x - predictedX));
-        double filteredSpeed = predictedSpeed + (beta / dt * (x - filteredX));
-
-        return {filteredX, filteredSpeed};
-    }
-}
-
-
-Target::Target(int id, double priority, double deathTime)
-    : Id(id), Priority(priority), DeathTime(deathTime)
+Target::Target(int id, double priority, double deathTime, const Proto::Parameters& params)
+    : Id(id)
+    , Priority(priority)
+    , DeathTime(deathTime)
+    , BigRadarMeasureCount(params.general().big_radar_measure_cnt())
+    , SmallRadarMeasureCount(params.general().small_radar_measure_cnt())
 {}
 
-Target::Target(const BigRadarData& data, double deatTime)
-    : Target(data.Id, data.Priority, deatTime)
+Target::Target(const BigRadarData& data, double deatTime, const Proto::Parameters& params)
+    : Target(data.Id, data.Priority, deatTime, params)
 {
     BigRadarUpdate(data.Pos, data.Speed);
 }
 
 void Target::BigRadarUpdate(Vector3d pos, Vector3d speed) {
     Timer.Restart();
+    if (FilteredPos == pos) {
+        return;
+    }
 
     FilteredPos = pos;
     FilteredSpeed = speed;
+    ++CurrBigRadarMeasureCount;
+
+    if (CurrBigRadarMeasureCount >= BigRadarMeasureCount) {
+        NeedToUpdateEntryPointFlag = true;
+        NeedToUpdateMeetingPointFlag = true;
+    }
 }
 
 void Target::SmallRadarUpdate(Vector3d pos) {
@@ -61,17 +51,19 @@ void Target::SmallRadarUpdate(Vector3d pos) {
 
     Pos = pos;
     ABFilterIterate(dt);
+
+    NeedToUpdateMeetingPointFlag = true;
 }
 
 void Target::ABFilterIterate(double dt) {
     auto prevPos = FilteredPos;
     auto prevSpeed = FilteredSpeed;
 
-    auto filtered = ABFilter(Pos, prevPos, prevSpeed, dt, MeasureCount);
+    auto filtered = ABFilter(Pos, prevPos, prevSpeed, dt, CurrSmallRadarMeasureCount);
     FilteredPos = filtered.first;
     FilteredSpeed = filtered.second;
 
-    ++MeasureCount;
+    ++CurrSmallRadarMeasureCount;
 }
 
 int Target::GetId() const {
@@ -95,7 +87,7 @@ Vector3d Target::GetFilteredSpeed() const {
 }
 
 bool Target::HavePreciseSpeed() const {
-    return MeasureCount > 200;
+    return CurrSmallRadarMeasureCount >= SmallRadarMeasureCount;
 }
 
 bool Target::IsDead() const {
@@ -118,6 +110,38 @@ bool Target::IsRocketLaunched() const {
     return IsRocketLaunchedFlag;
 }
 
+void Target::SetEntryPoint(Vector3d p) {
+    EntryPoint = p;
+}
+
+Vector3d Target::GetEntryPoint() const {
+    return EntryPoint;
+}
+
+void Target::SetApproximateMeetingPoint(Vector3d p) {
+    ApproximateMeetingPoint = p;
+}
+
+Vector3d Target::GetApproximateMeetingPoint() const {
+    return ApproximateMeetingPoint;
+}
+
+bool Target::NeedToUpdateEntryPoint() const {
+    return NeedToUpdateEntryPointFlag;
+}
+
+void Target::SetNeedToUpdateEntryPoint(bool f) {
+    NeedToUpdateEntryPointFlag = f;
+}
+
+bool Target::NeedToUpdateMeetingPoint() const {
+    return NeedToUpdateMeetingPointFlag;
+}
+
+void Target::SetNeedToUpdateMeetingPoint(bool f) {
+    NeedToUpdateMeetingPointFlag = f;
+}
+
 
 RadarController::RadarController(const Proto::Parameters& params)
     : Params(params)
@@ -128,6 +152,7 @@ void RadarController::Process(
     const std::vector<BigRadarData>& bigDatas,
     const std::vector<SmallRadarData>& smallDatas
 ) {
+    // update from radars
     std::set<int> updatedTargets;
     for (const auto& data : smallDatas) {
         for (auto& target : Targets) {
@@ -147,11 +172,42 @@ void RadarController::Process(
             break;
         }
         if (!updatedTargets.count(data.Id)) {
-            Targets.emplace_back(data, Params.general().death_time());
+            Targets.emplace_back(data, Params.general().death_time(), Params);
+        }
+    }
+
+    // calculate entry and meeting points
+    static const double timeToCalculatePrecizeSpeed =
+        Params.general().small_radar_measure_cnt() / Params.small_radar().frequency() * 1000;
+
+    for (auto& target : Targets) {
+        if (target.NeedToUpdateEntryPoint()) {
+            target.SetEntryPoint(
+                CalculateEntryPoint(
+                    target.GetFilteredPosition(),
+                    target.GetFilteredSpeed(),
+                    Vector3d::Zero(),
+                    Params.small_radar().radius()
+                )
+            );
+            target.SetNeedToUpdateEntryPoint(false);
+        }
+        if (target.NeedToUpdateMeetingPoint()) {
+            target.SetApproximateMeetingPoint(
+                CalculateMeetingPoint(
+                    target.GetEntryPoint() + target.GetFilteredSpeed()
+                        * (timeToCalculatePrecizeSpeed + Params.defense().time_to_launch_rocket()),
+                    target.GetFilteredSpeed(),
+                    Vector3d::Zero(),
+                    Params.defense().rocket_speed()
+                )
+            );
+            target.SetNeedToUpdateMeetingPoint(false);
         }
     }
     RemoveDeadTargets();
 
+    // follow target
     if (FollowedTargetIds.empty()) {
         SelectTargetToFollow();
     }
@@ -167,7 +223,7 @@ void RadarController::Process(
             auto meetingPoint = CalculateMeetingPoint(
                 targetPos + target.GetFilteredSpeed() * Params.defense().time_to_launch_rocket(),
                 target.GetFilteredSpeed(),
-                Vector3d(),
+                Vector3d::Zero(),
                 Params.defense().rocket_speed()
             );
             MeetingPointsAndTargetIds.emplace_back(meetingPoint, id);
@@ -244,5 +300,27 @@ RadarController::Result RadarController::GetAngleAndMeetingPoints() {
         .MeetingPointsAndTargetIds = MeetingPointsAndTargetIds
     };
     MeetingPointsAndTargetIds.clear();
+    return res;
+}
+
+std::vector<Vector3d> RadarController::GetEntryPoints() const {
+    std::vector<Vector3d> res;
+    for (const auto& target : Targets) {
+        auto p = target.GetEntryPoint();
+        if (p != Vector3d::Zero()) {
+            res.push_back(p);
+        }
+    }
+    return res;
+}
+
+std::vector<Vector3d> RadarController::GetApproximateMeetingPoints() const {
+    std::vector<Vector3d> res;
+    for (const auto& target : Targets) {
+        auto p = target.GetApproximateMeetingPoint();
+        if (p != Vector3d::Zero()) {
+            res.push_back(p);
+        }
+    }
     return res;
 }
