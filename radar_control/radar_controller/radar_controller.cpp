@@ -19,8 +19,8 @@ Target::Target(int id, double priority, double deathTime, const Proto::Parameter
     , SmallRadarMeasureCount(params.general().small_radar_measure_cnt())
 {}
 
-Target::Target(const BigRadarData& data, double deatTime, const Proto::Parameters& params)
-    : Target(data.Id, data.Priority, deatTime, params)
+Target::Target(const BigRadarData& data, double deathTime, const Proto::Parameters& params)
+    : Target(data.Id, data.Priority, deathTime, params)
 {
     BigRadarUpdate(data.Pos, data.Speed);
 }

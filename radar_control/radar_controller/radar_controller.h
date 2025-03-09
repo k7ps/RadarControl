@@ -13,7 +13,7 @@ namespace RC {
     class Target {
     public:
         Target(int id, double priority, double deathTime, const Proto::Parameters& params);
-        Target(const BigRadarData& data, double deatTime, const Proto::Parameters& params);
+        Target(const BigRadarData& data, double deathTime, const Proto::Parameters& params);
 
         void SmallRadarUpdate(Vector3d pos);
         void BigRadarUpdate(Vector3d pos, Vector3d speed);

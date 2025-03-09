@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
             smallRadarTargets,
             res.FollowedTargetIds,
             defense.GetRocketsPositions(),
-            defense.GetMeetingPoints(),
+            // defense.GetMeetingPoints(),
             radarController.GetEntryPoints(),
             radarController.GetApproximateMeetingPoints(),
             res.Angle
