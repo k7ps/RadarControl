@@ -7,7 +7,8 @@
 const double EPS = 1e-6;
 
 struct Vector2d {
-    Vector2d() = default;
+    Vector2d()
+        : X(0), Y(0) {}
     Vector2d(double x, double y)
         : X(x), Y(y) {}
 
@@ -21,7 +22,8 @@ struct Vector2d {
 };
 
 struct Vector3d {
-    Vector3d() = default;
+    Vector3d()
+        : X(0), Y(0), Z(0) {}
     Vector3d(double x, double y, double z)
         : X(x), Y(y), Z(z) {}
     Vector3d(double x, double y)

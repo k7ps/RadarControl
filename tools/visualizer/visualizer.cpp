@@ -232,9 +232,9 @@ void Visualizer::DrawPoints(const std::vector<Vector3d>& points, View view, rayl
 // }
 
 void Visualizer::DrawEntryPoints(const std::vector<Vector3d>& entryPoints, View view) {
-    DrawPoints(entryPoints, view, raylib::Color::Blue());
+    DrawPoints(entryPoints, view, raylib::Color::Gray());
 }
 
 void Visualizer::DrawApproximateMeetingPoints(const std::vector<Vector3d>& approximateMeetingPoints, View view) {
-    DrawPoints(approximateMeetingPoints, view, raylib::Color::Gray());
+    DrawPoints(approximateMeetingPoints, view, raylib::Color::Red());
 }

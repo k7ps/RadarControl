@@ -48,6 +48,8 @@ namespace RC {
             return EntryPoint != Vector3d::Zero() && ApproximateMeetingPoint != Vector3d::Zero();
         }
 
+        std::string DebugString() const;
+
     private:
         void ABFilterIterate(double dt);
 
@@ -105,6 +107,7 @@ private:
 
     double RadarAnglePos;
     double RadarAngleTarget = -1;
+    bool IsRadarAngleTargetSet = false;
 
     std::vector<RC::Target> Targets;
 

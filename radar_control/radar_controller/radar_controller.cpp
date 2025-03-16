@@ -7,6 +7,7 @@
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
+#include <string>
 
 using namespace RC;
 
@@ -64,6 +65,19 @@ void Target::ABFilterIterate(double dt) {
     FilteredSpeed = filtered.second;
 
     ++CurrSmallRadarMeasureCount;
+}
+
+std::string Target::DebugString() const {
+    return std::string("TargetInfo:")
+        + "\n  ID: " + std::to_string(Id)
+        + "\n  Priority: " + std::to_string(Priority)
+        + "\n  Pos: " + Pos.DebugString()
+        + "\n  IsFollowed: " + std::to_string(IsFollowedFlag)
+        + "\n  IsRocketLaunchedFlag: " + std::to_string(IsFollowedFlag)
+        + "\n  CanBeFollowed: " + std::to_string(CanBeFollowed())
+        + "\n  CurrBigRadarMeasureCount: " + std::to_string(CurrBigRadarMeasureCount)
+        + "\n  CurrSmallRadarMeasureCount: " + std::to_string(CurrSmallRadarMeasureCount)
+    ;
 }
 
 
@@ -140,13 +154,16 @@ void RadarController::Process(
         auto& target = GetTargetById(id);
         auto targetPos = target.GetFilteredPosition();
 
-        RadarAngleTarget = CalculateRadarAngle1Target(
-            RadarAnglePos,
-            GetPhi(target.GetEntryPoint()),
-            GetPhi(target.GetApproximateMeetingPoint()),
-            Params.small_radar().view_angle(),
-            Params.general().margin_angle()
-        );
+        if (!IsRadarAngleTargetSet) {
+            RadarAngleTarget = CalculateRadarAngle1Target(
+                RadarAnglePos,
+                GetPhi(target.GetEntryPoint()),
+                GetPhi(target.GetApproximateMeetingPoint()),
+                Params.small_radar().view_angle(),
+                Params.general().margin_angle()
+            );
+            IsRadarAngleTargetSet = true;
+        }
 
         if (!target.IsRocketLaunched() && target.HavePreciseSpeed()) {
             auto meetingPoint = CalculateMeetingPoint(
@@ -175,6 +192,7 @@ void RadarController::TrySelectTargetToFollow() {
     }
     if (targetId != -1) {
         FollowedTargetIds.push_back(targetId);
+        IsRadarAngleTargetSet = false;
     }
 }
 

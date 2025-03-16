@@ -57,7 +57,6 @@ void Target::UpdatePosition(bool isInSector) {
 
     RealPos += RealSpeed * dt;
 
-    // NoisedPos = CylindricalToCartesian(CartesianToCylindrical(RealPos) + GetRandomVector3d(-1, 1) * errors);
     NoisedPos = CylindricalToCartesian(
         CartesianToCylindrical(RealPos) + GetRandomNormalVector3d(Vector3d::Zero(), stddev)
     );
@@ -179,7 +178,7 @@ void Simulator::RemoveTargets(std::vector<unsigned int> ids) {
     for (auto id : ids) {
         for (int i = 0; i < Targets.size(); ++i) {
             if (Targets[i]->GetId() == id) {
-                delete Targets[id];
+                delete Targets[i];
                 Targets.erase(Targets.begin() + i);
                 break;
             }

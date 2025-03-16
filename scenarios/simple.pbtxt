@@ -6,9 +6,23 @@ launches {
 }
 
 launches {
-    time: 20
+    time: 30
     angle_pos: 135
     priority: 0.7
+    is_accurate: true
+}
+
+launches {
+    time: 60
+    angle_pos: 90
+    priority: 0.4
+    is_accurate: true
+}
+
+launches {
+    time: 90
+    angle_pos: 170
+    priority: 0.6
     is_accurate: true
 }
 
