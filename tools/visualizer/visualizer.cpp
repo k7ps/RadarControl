@@ -13,6 +13,10 @@
 
 namespace {
     raylib::Color GetTargetColor(float priority) {
+        if (priority == -1) {
+            return raylib::Color::Gray();
+        }
+
         const float start = 0; // red
         const float end = 120; // green
         return raylib::Color::FromHSV(start + (1 - priority) * (end - start), 1.f, 1.f);
@@ -82,6 +86,7 @@ bool Visualizer::IsWindowOpen() const {
 void Visualizer::DrawFrame(
     const std::vector<BigRadarData>& bigDatas,
     const std::vector<SmallRadarData>& smallDatas,
+    const std::map<int, double>& priorities,
     const std::vector<unsigned>& followedTargetIds,
     const std::vector<Vector3d>& rockets,
     // const std::vector<Vector3d>& meetingPoints,
@@ -95,7 +100,7 @@ void Visualizer::DrawFrame(
 
         for (auto view : {View::STRAIGHT, View::SIDE}) {
             DrawRadars(radarPosAngle, view);
-            DrawTargets(bigDatas, smallDatas, followedTargetIds, view);
+            DrawTargets(bigDatas, smallDatas, priorities, followedTargetIds, view);
             DrawRockets(rockets, view);
             // DrawMeetingPoints(meetingPoints, view);
             DrawEntryPoints(entryPoints, view);
@@ -118,9 +123,9 @@ raylib::Vector2 Visualizer::ToWindowCoords(const Vector3d& pos, View view) const
     }
 }
 
-void Visualizer::DrawTarget(const SmallRadarData& data, bool isFollowed, View view) {
+void Visualizer::DrawTarget(const SmallRadarData& data, double priority, bool isFollowed, View view) {
     auto targetPos = ToWindowCoords(data.Pos, view);
-    DrawCircleV(targetPos, Params.visualizer().target_radius(), GetTargetColor(data.Priority));
+    DrawCircleV(targetPos, Params.visualizer().target_radius(), GetTargetColor(priority));
     DrawCircleLinesV(targetPos, Params.visualizer().target_radius(), raylib::Color::Black());
     if (isFollowed) {
         DrawCircleDashedLines(targetPos, Params.visualizer().target_radius() + 5, raylib::Color::Black());
@@ -130,6 +135,7 @@ void Visualizer::DrawTarget(const SmallRadarData& data, bool isFollowed, View vi
 void Visualizer::DrawTargets(
     const std::vector<BigRadarData>& bigDatas,
     const std::vector<SmallRadarData>& smallDatas,
+    const std::map<int, double>& priorities,
     const std::vector<unsigned>& followedTargetIds,
     View view
 ) {
@@ -137,11 +143,11 @@ void Visualizer::DrawTargets(
     std::set<unsigned> followed(followedTargetIds.begin(), followedTargetIds.end());
     for (const auto& data : smallDatas) {
         drawnTargets.insert(data.Id);
-        DrawTarget(data, followed.count(data.Id), view);
+        DrawTarget(data, priorities.at(data.Id), followed.count(data.Id), view);
     }
     for (const auto& data : bigDatas) {
         if (!drawnTargets.count(data.Id)) {
-            DrawTarget(data, followed.count(data.Id), view);
+            DrawTarget(data, priorities.at(data.Id), followed.count(data.Id), view);
         }
     }
 }

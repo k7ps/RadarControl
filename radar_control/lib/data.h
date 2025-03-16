@@ -6,7 +6,6 @@
 
 struct SmallRadarData {
     int Id;
-    double Priority;
     Vector3d Pos;
 };
 

@@ -21,7 +21,7 @@ big_radar {
 general {
     death_time: 2500
     play_speed: 5.0
-    big_radar_measure_cnt: 40
+    big_radar_measure_cnt: 60
     small_radar_measure_cnt: 100
     margin_angle: 3
 }

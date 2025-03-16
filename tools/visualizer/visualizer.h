@@ -22,6 +22,7 @@ public:
     void DrawFrame(
         const std::vector<BigRadarData>& bigDatas,
         const std::vector<SmallRadarData>& smallDatas,
+        const std::map<int, double>& priorities,
         const std::vector<unsigned>& followedTargetIds,
         const std::vector<Vector3d>& rockets,
         // const std::vector<Vector3d>& meetingPoints,
@@ -34,10 +35,11 @@ private:
     raylib::Vector2 ToWindowCoords(const Vector3d& p, View view) const;
     void DrawPoints(const std::vector<Vector3d>& points, View view, raylib::Color color);
 
-    void DrawTarget(const SmallRadarData& data, bool isFollowed, View view);
+    void DrawTarget(const SmallRadarData& data, double priority, bool isFollowed, View view);
     void DrawTargets(
         const std::vector<BigRadarData>& bigDatas,
         const std::vector<SmallRadarData>& smallDatas,
+        const std::map<int, double>& priorities,
         const std::vector<unsigned>& followedTargetIds,
         View view
     );

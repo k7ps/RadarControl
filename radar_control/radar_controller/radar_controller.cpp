@@ -12,16 +12,15 @@
 using namespace RC;
 
 
-Target::Target(int id, double priority, double deathTime, const Proto::Parameters& params)
+Target::Target(int id, double deathTime, const Proto::Parameters& params)
     : Id(id)
-    , Priority(priority)
     , DeathTime(deathTime)
     , BigRadarMeasureCount(params.general().big_radar_measure_cnt())
     , SmallRadarMeasureCount(params.general().small_radar_measure_cnt())
 {}
 
 Target::Target(const BigRadarData& data, double deathTime, const Proto::Parameters& params)
-    : Target(data.Id, data.Priority, deathTime, params)
+    : Target(data.Id, deathTime, params)
 {
     BigRadarUpdate(data.Pos, data.Speed);
 }
@@ -54,6 +53,7 @@ void Target::SmallRadarUpdate(Vector3d pos) {
     ABFilterIterate(dt);
 
     SetNeedToUpdateMeetingPoint(true);
+    EntryPoint = Vector3d::Zero();
 }
 
 void Target::ABFilterIterate(double dt) {
@@ -66,6 +66,14 @@ void Target::ABFilterIterate(double dt) {
 
     ++CurrSmallRadarMeasureCount;
 }
+
+bool Target::IsInSector(double rad, double angView, double angPos) const {
+    double startAng = angPos - angView / 2;
+    double endAng = angPos + angView / 2;
+    auto polarPos = CartesianToCylindrical(FilteredPos);
+    return polarPos.X <= rad && startAng <= polarPos.Y && polarPos.Y <= endAng;
+}
+
 
 std::string Target::DebugString() const {
     return std::string("TargetInfo:")
@@ -119,6 +127,15 @@ void RadarController::Process(
         Params.general().small_radar_measure_cnt() / Params.small_radar().frequency() * 1000;
 
     for (auto& target : Targets) {
+        if (target.GetPriority() == -1 && (target.NeedToUpdateEntryPoint() || target.NeedToUpdateMeetingPoint())) {
+            target.SetPriority(
+                CalculatePriority(
+                    target.GetFilteredPosition(),
+                    target.GetFilteredSpeed(),
+                    Params.simulator().max_target_speed()
+                )
+            );
+        }
         if (target.NeedToUpdateEntryPoint()) {
             target.SetEntryPoint(
                 CalculateEntryPoint(
@@ -130,16 +147,25 @@ void RadarController::Process(
             );
             target.SetNeedToUpdateEntryPoint(false);
         }
-        if (target.NeedToUpdateMeetingPoint()) {
-            target.SetApproximateMeetingPoint(
-                CalculateMeetingPoint(
+        if (target.NeedToUpdateMeetingPoint() && !target.IsRocketLaunched()) {
+            Vector3d meetingPoint;
+            if (IsTargetInSector(target)) {
+                meetingPoint = CalculateMeetingPoint(
+                    target.GetFilteredPosition() + target.GetFilteredSpeed() * Params.defense().time_to_launch_rocket(),
+                    target.GetFilteredSpeed(),
+                    Vector3d::Zero(),
+                    Params.defense().rocket_speed()
+                );
+            } else {
+                meetingPoint = CalculateMeetingPoint(
                     target.GetEntryPoint() + target.GetFilteredSpeed()
                         * (timeToCalculatePrecizeSpeed + Params.defense().time_to_launch_rocket()),
                     target.GetFilteredSpeed(),
                     Vector3d::Zero(),
                     Params.defense().rocket_speed()
-                )
-            );
+                );
+            }
+            target.SetApproximateMeetingPoint(meetingPoint);
             target.SetNeedToUpdateMeetingPoint(false);
         }
     }
@@ -183,7 +209,7 @@ void RadarController::TrySelectTargetToFollow() {
         return;
     }
     int targetId = -1;
-    double maxPriority = -1;
+    double maxPriority = -10;
     for (const auto& target : Targets) {
         if (target.CanBeFollowed() && target.GetPriority() > maxPriority) {
             maxPriority = target.GetPriority();
@@ -272,4 +298,19 @@ std::vector<Vector3d> RadarController::GetApproximateMeetingPoints() const {
         }
     }
     return res;
+}
+
+std::map<int, double> RadarController::GetPriorities() const {
+    std::map<int, double>  res;
+    for (const auto& target : Targets) {
+        res[target.GetId()] = target.GetPriority();
+    }
+    return res;
+}
+
+bool RadarController::IsTargetInSector(const RC::Target& target) const {
+    double startAng = RadarAnglePos - Params.small_radar().view_angle() / 2;
+    double endAng = RadarAnglePos + Params.small_radar().view_angle() / 2;
+    auto polarPos = CartesianToCylindrical(target.GetFilteredPosition());
+    return polarPos.X <= Params.small_radar().radius() && startAng <= polarPos.Y && polarPos.Y <= endAng;
 }

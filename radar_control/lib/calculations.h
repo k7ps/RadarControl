@@ -28,5 +28,7 @@ double CalculateRadarAngle1Target(
     double margin
 );
 
+double CalculatePriority(Vector3d pos, Vector3d speed, double maxSpeed, Vector3d radarPoint = Vector3d::Zero());
+
 
 #endif // CALCULATIONS_H

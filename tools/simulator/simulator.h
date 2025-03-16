@@ -15,7 +15,6 @@ namespace SIM {
         Target(
             const Proto::Parameters& params,
             unsigned int id,
-            double priority,
             Vector3d pos,
             Vector3d speed,
             double msFromStart = 0
@@ -40,7 +39,6 @@ namespace SIM {
         const Proto::Parameters& Params;
 
         int Id;
-        double Priority;
 
         Vector3d RealPos;
         Vector3d NoisedPos;
@@ -63,7 +61,6 @@ namespace SIM {
 struct LaunchParams {
     double AngPos;
     double HeightPos;
-    double Priority;
     double SpeedAbs;
     double AngDeviation;
     double HSpeedCoef;

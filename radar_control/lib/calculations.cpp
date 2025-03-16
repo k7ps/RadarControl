@@ -52,6 +52,17 @@ namespace {
         }
     }
 
+    // m0 - point for distance, a - vector of line, m1 - point on line
+    double DistancePoint2Line(Vector3d m0, Vector3d a, Vector3d m1) {
+        auto m1m0 = m1 - m0;
+        auto vecProd = Vector3d(
+              a.Y * m1m0.Z - a.Z * m1m0.Y,
+            - a.X * m1m0.Z + a.Z * m1m0.X,
+              a.X * m1m0.Y - a.Y * m1m0.X
+        );
+        return SqrtOfSumSquares(vecProd) / SqrtOfSumSquares(a);
+    }
+
 }
 
 std::pair<Vector3d, Vector3d> ABFilter(
@@ -131,8 +142,6 @@ double CalculateRadarAngle1Target(
     double viewAngle,
     double margin
 ) {
-    // std::cout << currRadarAngle << '\n' << entryPointAngle << '\n' << meetingPointAngle << '\n' << viewAngle << '\n' << margin << std::endl;
-
     auto halfView = viewAngle / 2;
     auto angL = currRadarAngle - halfView + margin;
     auto angR = currRadarAngle + halfView - margin;
@@ -141,17 +150,14 @@ double CalculateRadarAngle1Target(
     auto meetingIn = InSegment(meetingPointAngle, angL, angR);
 
     if (entryIn && meetingIn) {
-        // std::cout << "first\n";
         return currRadarAngle;
     } else if (std::abs(entryPointAngle - meetingPointAngle) >= viewAngle - 2 * margin) {
-        // std::cout << "second\n";
         if (entryPointAngle > meetingPointAngle) {
             return entryPointAngle - halfView + margin;
         } else {
             return entryPointAngle + halfView - margin;
         }
     } else if (entryIn || meetingIn) {
-        // std::cout << "third\n";
         auto ang = (entryIn ? meetingPointAngle : entryPointAngle);
         if (ang < angL) {
             return ang + halfView - margin;
@@ -159,11 +165,17 @@ double CalculateRadarAngle1Target(
             return ang - halfView + margin;
         }
     } else {
-        // std::cout << "fourth\n";
         if (entryPointAngle < angL) {
             return std::min(entryPointAngle, meetingPointAngle) + halfView - margin;
         } else {
             return std::max(entryPointAngle, meetingPointAngle) - halfView + margin;
         }
     }
+}
+
+
+double CalculatePriority(Vector3d pos, Vector3d speed, double maxSpeed, Vector3d radarPoint) {
+    auto dist2radar = DistancePoint2Line(radarPoint, speed, pos);
+    auto absSpeed = SqrtOfSumSquares(speed);
+    return 0.9 * std::pow(M_E, - 0.01 * dist2radar) + 0.1 * absSpeed / maxSpeed;
 }

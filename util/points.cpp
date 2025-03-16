@@ -69,12 +69,12 @@ bool operator!=(const Vector3d& p1, const Vector3d& p2) {
 }
 
 
-double GetSqrtOfSquareSum(const Vector3d& v) {
+double SqrtOfSumSquares(const Vector3d& v) {
     return std::sqrt(v.X * v.X + v.Y * v.Y + v.Z * v.Z);
 }
 
 double Distance(const Vector3d& p1, const Vector3d& p2) {
-    return GetSqrtOfSquareSum(p2 - p1);
+    return SqrtOfSumSquares(p2 - p1);
 }
 
 bool IsSignsEqual(const Vector3d& p1, const Vector3d& p2) {

@@ -67,6 +67,7 @@ int main(int argc, char* argv[]) {
         visualizer.DrawFrame(
             bigRadarTargets,
             smallRadarTargets,
+            radarController.GetPriorities(),
             res.FollowedTargetIds,
             defense.GetRocketsPositions(),
             // defense.GetMeetingPoints(),

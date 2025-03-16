@@ -54,7 +54,7 @@ bool operator!=(const Vector3d& p1, const Vector3d& p2);
 
 std::string Vector3dAsStr(const Vector3d& p);
 
-double GetSqrtOfSquareSum(const Vector3d& v);
+double SqrtOfSumSquares(const Vector3d& v);
 double Distance(const Vector3d& p1, const Vector3d& p2);
 bool IsSignsEqual(const Vector3d& p1, const Vector3d& p2);
 

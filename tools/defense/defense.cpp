@@ -7,7 +7,7 @@
 DefRocket::DefRocket(Vector3d meetingPoint, double speed, unsigned timeToLaunchMs)
     : Pos()
     , MeetingPoint(meetingPoint)
-    , Speed(MeetingPoint * speed / GetSqrtOfSquareSum(meetingPoint)), TimeToLaunchMs(timeToLaunchMs)
+    , Speed(MeetingPoint * speed / SqrtOfSumSquares(meetingPoint)), TimeToLaunchMs(timeToLaunchMs)
 {}
 
 void DefRocket::UpdatePosition() {

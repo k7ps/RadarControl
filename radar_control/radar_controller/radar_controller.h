@@ -12,7 +12,7 @@ namespace RC {
 
     class Target {
     public:
-        Target(int id, double priority, double deathTime, const Proto::Parameters& params);
+        Target(int id, double deathTime, const Proto::Parameters& params);
         Target(const BigRadarData& data, double deathTime, const Proto::Parameters& params);
 
         void SmallRadarUpdate(Vector3d pos);
@@ -20,6 +20,8 @@ namespace RC {
 
         int GetId() const { return Id; }
         double GetPriority() const { return Priority; }
+        void SetPriority(double p) { Priority = p; }
+
         Vector3d GetPosition() const { return Pos; }
         Vector3d GetFilteredPosition() const { return FilteredPos; }
 
@@ -48,6 +50,8 @@ namespace RC {
             return EntryPoint != Vector3d::Zero() && ApproximateMeetingPoint != Vector3d::Zero();
         }
 
+        bool IsInSector(double rad, double angView, double angPos) const;
+
         std::string DebugString() const;
 
     private:
@@ -55,7 +59,7 @@ namespace RC {
 
     private:
         int Id;
-        double Priority;
+        double Priority = -1;
 
         Vector3d Pos;
         Vector3d FilteredPos;
@@ -96,11 +100,13 @@ public:
     Result GetAngleAndMeetingPoints();
     std::vector<Vector3d> GetEntryPoints() const;
     std::vector<Vector3d> GetApproximateMeetingPoints() const;
+    std::map<int, double> GetPriorities() const;
 
 private:
     RC::Target& GetTargetById(int id);
     void TrySelectTargetToFollow();
     void RemoveDeadTargets();
+    bool IsTargetInSector(const RC::Target& target) const;
 
 private:
     const Proto::Parameters& Params;

@@ -17,14 +17,12 @@ using namespace SIM;
 Target::Target(
     const Proto::Parameters& params,
     unsigned int id,
-    double priority,
     Vector3d pos,
     Vector3d speed,
     double msFromStart
 )
     : Params(params)
     , Id(id)
-    , Priority(priority)
     , RealPos(pos)
     , RealSpeed(speed)
     , BigRadarUpdatePeriodMs(1000. / Params.big_radar().frequency())
@@ -76,7 +74,6 @@ Vector3d Target::GetCurrentRealPosition() const {
 SmallRadarData Target::GetSmallRadarData() const {
     return SmallRadarData{
         .Id = Id,
-        .Priority = Priority,
         .Pos = NoisedPos
     };
 }
@@ -85,7 +82,6 @@ BigRadarData Target::GetBigRadarData() const {
     return BigRadarData{
         SmallRadarData{
             .Id = Id,
-            .Priority = Priority,
             .Pos = FilteredPos
         },
         .Speed = FilteredSpeed
@@ -133,7 +129,6 @@ LaunchParams GetRandomLaunchParams(const Proto::Parameters& params, bool isAccur
     return LaunchParams{
         .AngPos = GetRandomDouble(0, M_PI),
         .HeightPos = GetRandomDouble(0, params.simulator().max_height()),
-        .Priority = GetRandomDouble(0, 1),
         .SpeedAbs = GetRandomDouble(params.simulator().min_target_speed(), params.simulator().max_target_speed()),
         .AngDeviation = angDeviation,
         .HSpeedCoef = hSpeedCoef
@@ -214,7 +209,6 @@ void Simulator::LaunchTarget(LaunchParams launchParams) {
     auto* targetPtr = new Target(
         Params,
         lastId,
-        launchParams.Priority,
         CylindricalToCartesian(Params.big_radar().radius(), launchParams.AngPos, launchParams.HeightPos),
         CylindricalToCartesian(launchParams.SpeedAbs, speedAngVertical, speedHorizontal),
         launchParams.MsFromStart
@@ -277,9 +271,6 @@ void TargetScheduler::LaunchTargets(Simulator& simulator) {
 
             launchParams.MsFromStart = currTime - protoLaunchParams.time();
             launchParams.AngPos = protoLaunchParams.angle_pos();
-            if (protoLaunchParams.has_priority()) {
-                launchParams.Priority = protoLaunchParams.priority();
-            }
             if (protoLaunchParams.has_height()) {
                 launchParams.HeightPos = protoLaunchParams.height();
             }
