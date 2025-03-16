@@ -55,8 +55,8 @@ int main(int argc, char* argv[]) {
     while (visualizer.IsWindowOpen()) {
         targetScheduler.LaunchTargets(simulator);
 
-        const auto& smallRadarTargets = simulator.GetSmallRadarTargets();
         const auto& bigRadarTargets = simulator.GetBigRadarTargets();
+        const auto& smallRadarTargets = simulator.GetSmallRadarTargets();
 
         radarController.Process(bigRadarTargets, smallRadarTargets);
 

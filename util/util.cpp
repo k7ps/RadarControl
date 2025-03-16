@@ -43,6 +43,11 @@ Vector3d CartesianToCylindrical(const Vector3d& p) {
     return CartesianToCylindrical(p.X, p.Y, p.Z);
 }
 
+double GetPhi(Vector3d p, Vector3d center) {
+    p = p - center;
+    return CartesianToCylindrical(p).Y;
+}
+
 bool GetRandomTrue(float probability) {
     float x = (float) rand() / RAND_MAX;
     return x <= probability;
@@ -101,11 +106,14 @@ float DegToRad(float angle) {
     return angle * M_PI / 180;
 }
 
-
 void PrintCurrentTime() {
     auto now = std::chrono::system_clock::now();
     auto time_t = std::chrono::system_clock::to_time_t(now);
     auto tm = *std::localtime(&time_t);
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
     std::cout << std::put_time(&tm, "%H:%M:%S") << '.' << std::setfill('0') << std::setw(3) << ms.count() << std::endl;
+}
+
+bool InSegment(double c, double a, double b) {
+    return a <= c && c <= b;
 }

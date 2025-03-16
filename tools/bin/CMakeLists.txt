@@ -5,13 +5,11 @@ set(TOOLS_BIN_SOURCES
 )
 
 include(FetchContent)
-
 FetchContent_Declare(
     argparse
     GIT_REPOSITORY https://github.com/p-ranav/argparse.git
     GIT_TAG v3.2
 )
-
 FetchContent_MakeAvailable(argparse)
 
 add_executable(${TOOLS_EXEC_NAME} ${TOOLS_BIN_SOURCES})

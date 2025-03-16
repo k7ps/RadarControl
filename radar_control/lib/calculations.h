@@ -20,5 +20,13 @@ Vector3d CalculateEntryPoint(
     double radius
 );
 
+double CalculateRadarAngle1Target(
+    double currRadarAngle,
+    double entryPointAngle,
+    double meetingPointAngle,
+    double viewAngle,
+    double margin
+);
+
 
 #endif // CALCULATIONS_H

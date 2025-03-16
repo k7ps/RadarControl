@@ -36,8 +36,8 @@ void Target::BigRadarUpdate(Vector3d pos, Vector3d speed) {
     ++CurrBigRadarMeasureCount;
 
     if (CurrBigRadarMeasureCount >= BigRadarMeasureCount) {
-        NeedToUpdateEntryPointFlag = true;
-        NeedToUpdateMeetingPointFlag = true;
+        SetNeedToUpdateEntryPoint(true);
+        SetNeedToUpdateMeetingPoint(true);
     }
 }
 
@@ -52,7 +52,7 @@ void Target::SmallRadarUpdate(Vector3d pos) {
     Pos = pos;
     ABFilterIterate(dt);
 
-    NeedToUpdateMeetingPointFlag = true;
+    SetNeedToUpdateMeetingPoint(true);
 }
 
 void Target::ABFilterIterate(double dt) {
@@ -64,82 +64,6 @@ void Target::ABFilterIterate(double dt) {
     FilteredSpeed = filtered.second;
 
     ++CurrSmallRadarMeasureCount;
-}
-
-int Target::GetId() const {
-    return Id;
-}
-
-double Target::GetPriority() const {
-    return Priority;
-}
-
-Vector3d Target::GetPosition() const {
-    return Pos;
-}
-
-Vector3d Target::GetFilteredPosition() const {
-    return FilteredPos;
-}
-
-Vector3d Target::GetFilteredSpeed() const {
-    return FilteredSpeed;
-}
-
-bool Target::HavePreciseSpeed() const {
-    return CurrSmallRadarMeasureCount >= SmallRadarMeasureCount;
-}
-
-bool Target::IsDead() const {
-    return (double) Timer.GetElapsedTimeAsMs() >= DeathTime;
-}
-
-void Target::SetFollowed(bool f) {
-    IsFollowedFlag = f;
-}
-
-bool Target::IsFollowed() const {
-    return IsFollowedFlag;
-}
-
-void Target::SetIsRocketLaunched(bool f) {
-    IsRocketLaunchedFlag = f;
-}
-
-bool Target::IsRocketLaunched() const {
-    return IsRocketLaunchedFlag;
-}
-
-void Target::SetEntryPoint(Vector3d p) {
-    EntryPoint = p;
-}
-
-Vector3d Target::GetEntryPoint() const {
-    return EntryPoint;
-}
-
-void Target::SetApproximateMeetingPoint(Vector3d p) {
-    ApproximateMeetingPoint = p;
-}
-
-Vector3d Target::GetApproximateMeetingPoint() const {
-    return ApproximateMeetingPoint;
-}
-
-bool Target::NeedToUpdateEntryPoint() const {
-    return NeedToUpdateEntryPointFlag;
-}
-
-void Target::SetNeedToUpdateEntryPoint(bool f) {
-    NeedToUpdateEntryPointFlag = f;
-}
-
-bool Target::NeedToUpdateMeetingPoint() const {
-    return NeedToUpdateMeetingPointFlag;
-}
-
-void Target::SetNeedToUpdateMeetingPoint(bool f) {
-    NeedToUpdateMeetingPointFlag = f;
 }
 
 
@@ -209,15 +133,20 @@ void RadarController::Process(
 
     // follow target
     if (FollowedTargetIds.empty()) {
-        SelectTargetToFollow();
+        TrySelectTargetToFollow();
     }
     if (!FollowedTargetIds.empty()) {
         int id = FollowedTargetIds.front();
         auto& target = GetTargetById(id);
         auto targetPos = target.GetFilteredPosition();
-        auto cylindricalPos = CartesianToCylindrical(targetPos);
 
-        RadarAngleTarget = cylindricalPos.Y;
+        RadarAngleTarget = CalculateRadarAngle1Target(
+            RadarAnglePos,
+            GetPhi(target.GetEntryPoint()),
+            GetPhi(target.GetApproximateMeetingPoint()),
+            Params.small_radar().view_angle(),
+            Params.general().margin_angle()
+        );
 
         if (!target.IsRocketLaunched() && target.HavePreciseSpeed()) {
             auto meetingPoint = CalculateMeetingPoint(
@@ -232,19 +161,21 @@ void RadarController::Process(
     }
 }
 
-void RadarController::SelectTargetToFollow() {
+void RadarController::TrySelectTargetToFollow() {
     if (Targets.empty()) {
         return;
     }
     int targetId = -1;
     double maxPriority = -1;
     for (const auto& target : Targets) {
-        if (target.GetPriority() > maxPriority) {
+        if (target.CanBeFollowed() && target.GetPriority() > maxPriority) {
             maxPriority = target.GetPriority();
             targetId = target.GetId();
         }
     }
-    FollowedTargetIds.push_back(targetId);
+    if (targetId != -1) {
+        FollowedTargetIds.push_back(targetId);
+    }
 }
 
 void RadarController::RemoveDeadTargets() {

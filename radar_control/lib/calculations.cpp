@@ -1,8 +1,10 @@
 #include "calculations.h"
 #include "util/points.h"
+#include "util/util.h"
 
-#include <vector>
 #include <cmath>
+#include <iostream>
+#include <vector>
 
 
 namespace {
@@ -119,5 +121,49 @@ Vector3d CalculateEntryPoint(
         double timeTo = minDist / std::sqrt(targetSpeed.X * targetSpeed.X + targetSpeed.Y * targetSpeed.Y);
         res.Z = targetPos.Z + targetSpeed.Z * timeTo;
         return res;
+    }
+}
+
+double CalculateRadarAngle1Target(
+    double currRadarAngle,
+    double entryPointAngle,
+    double meetingPointAngle,
+    double viewAngle,
+    double margin
+) {
+    // std::cout << currRadarAngle << '\n' << entryPointAngle << '\n' << meetingPointAngle << '\n' << viewAngle << '\n' << margin << std::endl;
+
+    auto halfView = viewAngle / 2;
+    auto angL = currRadarAngle - halfView + margin;
+    auto angR = currRadarAngle + halfView - margin;
+
+    auto entryIn = InSegment(entryPointAngle, angL, angR);
+    auto meetingIn = InSegment(meetingPointAngle, angL, angR);
+
+    if (entryIn && meetingIn) {
+        // std::cout << "first\n";
+        return currRadarAngle;
+    } else if (std::abs(entryPointAngle - meetingPointAngle) >= viewAngle - 2 * margin) {
+        // std::cout << "second\n";
+        if (entryPointAngle > meetingPointAngle) {
+            return entryPointAngle - halfView + margin;
+        } else {
+            return entryPointAngle + halfView - margin;
+        }
+    } else if (entryIn || meetingIn) {
+        // std::cout << "third\n";
+        auto ang = (entryIn ? meetingPointAngle : entryPointAngle);
+        if (ang < angL) {
+            return ang + halfView - margin;
+        } else {
+            return ang - halfView + margin;
+        }
+    } else {
+        // std::cout << "fourth\n";
+        if (entryPointAngle < angL) {
+            return std::min(entryPointAngle, meetingPointAngle) + halfView - margin;
+        } else {
+            return std::max(entryPointAngle, meetingPointAngle) - halfView + margin;
+        }
     }
 }

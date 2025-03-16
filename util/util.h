@@ -14,6 +14,8 @@ Vector3d CylindricalToCartesian(const Vector3d& p);
 Vector3d CartesianToCylindrical(double x, double y, double z);
 Vector3d CartesianToCylindrical(const Vector3d& p);
 
+double GetPhi(Vector3d p, Vector3d center = Vector3d::Zero());
+
 bool GetRandomTrue(float probability);
 double GetRandomDouble(double min, double max);
 Vector3d GetRandomVector3d(double min, double max);
@@ -29,6 +31,8 @@ double DegToRad(double angle);
 float DegToRad(float angle);
 
 void PrintCurrentTime();
+
+bool InSegment(double c, double a, double b);
 
 
 #endif // UTIL_H

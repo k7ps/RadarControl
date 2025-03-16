@@ -18,31 +18,35 @@ namespace RC {
         void SmallRadarUpdate(Vector3d pos);
         void BigRadarUpdate(Vector3d pos, Vector3d speed);
 
-        int GetId() const;
-        double GetPriority() const;
-        Vector3d GetPosition() const;
-        Vector3d GetFilteredPosition() const;
+        int GetId() const { return Id; }
+        double GetPriority() const { return Priority; }
+        Vector3d GetPosition() const { return Pos; }
+        Vector3d GetFilteredPosition() const { return FilteredPos; }
 
-        bool HavePreciseSpeed() const;
-        Vector3d GetFilteredSpeed() const;
+        bool HavePreciseSpeed() const { return CurrSmallRadarMeasureCount >= SmallRadarMeasureCount; }
+        Vector3d GetFilteredSpeed() const { return FilteredSpeed; }
 
-        bool IsDead() const;
-        void SetFollowed(bool f);
-        bool IsFollowed() const;
-        void SetIsRocketLaunched(bool f);
-        bool IsRocketLaunched() const;
+        bool IsDead() const { return (double) Timer.GetElapsedTimeAsMs() >= DeathTime; }
+        void SetFollowed(bool f) { IsFollowedFlag = f; }
+        bool IsFollowed() const { return IsFollowedFlag; }
+        void SetIsRocketLaunched(bool f) { IsRocketLaunchedFlag = f; }
+        bool IsRocketLaunched() const { return IsRocketLaunchedFlag; }
 
-        void SetEntryPoint(Vector3d p);
-        Vector3d GetEntryPoint() const;
+        void SetEntryPoint(Vector3d p) { EntryPoint = p; }
+        Vector3d GetEntryPoint() const { return EntryPoint; }
 
-        void SetApproximateMeetingPoint(Vector3d p);
-        Vector3d GetApproximateMeetingPoint() const;
+        void SetApproximateMeetingPoint(Vector3d p) { ApproximateMeetingPoint = p; }
+        Vector3d GetApproximateMeetingPoint() const { return ApproximateMeetingPoint; }
 
-        bool NeedToUpdateEntryPoint() const;
-        void SetNeedToUpdateEntryPoint(bool f);
+        bool NeedToUpdateEntryPoint() const { return NeedToUpdateEntryPointFlag; }
+        void SetNeedToUpdateEntryPoint(bool f) { NeedToUpdateEntryPointFlag = f; }
 
-        bool NeedToUpdateMeetingPoint() const;
-        void SetNeedToUpdateMeetingPoint(bool f);
+        bool NeedToUpdateMeetingPoint() const { return NeedToUpdateMeetingPointFlag; }
+        void SetNeedToUpdateMeetingPoint(bool f) { NeedToUpdateMeetingPointFlag = f; }
+
+        bool CanBeFollowed() const {
+            return EntryPoint != Vector3d::Zero() && ApproximateMeetingPoint != Vector3d::Zero();
+        }
 
     private:
         void ABFilterIterate(double dt);
@@ -93,7 +97,7 @@ public:
 
 private:
     RC::Target& GetTargetById(int id);
-    void SelectTargetToFollow();
+    void TrySelectTargetToFollow();
     void RemoveDeadTargets();
 
 private:
