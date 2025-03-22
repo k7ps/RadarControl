@@ -51,6 +51,7 @@ message Parameters {
     message Visualizer {
         optional uint32 radars_outline_thickness = 1 [default = 1];
         optional uint32 target_radius = 2 [default = 5];
+        optional bool need_draw_entry_points = 3 [default = false];
     }
 
     required SmallRadar small_radar = 1;

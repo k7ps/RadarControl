@@ -1,22 +1,30 @@
 launches {
     time: 0
-    angle_pos: 135
+    angle_pos: 90
     is_accurate: true
-    priority: 0.9
+    priority: 0.7
     abs_speed_share: 0.7
 }
 
 launches {
-    time: 40
-    angle_pos: 160
+    time: 10
+    angle_pos: 170
     is_accurate: true
     priority: 0.3
     abs_speed_share: 0.7
 }
 
 launches {
-    time: 50
-    angle_pos: 100
+    time: 40
+    angle_pos: 130
+    is_accurate: true
+    priority: 0.8
+    abs_speed_share: 0.7
+}
+
+launches {
+    time: 80
+    angle_pos: 70
     is_accurate: true
     priority: 0.6
     abs_speed_share: 0.7

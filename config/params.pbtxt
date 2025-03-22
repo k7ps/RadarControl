@@ -45,6 +45,7 @@ simulator {
 visualizer {
     radars_outline_thickness: 1
     target_radius: 5
+    need_draw_entry_points: false
 }
 
 # proto-file: proto/params.proto

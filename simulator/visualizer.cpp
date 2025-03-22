@@ -101,7 +101,7 @@ void Visualizer::DrawFrame(
             DrawRadars(radarPosAngle, view);
             DrawTargets(bigDatas, smallDatas, priorities, followedTargetIds, view);
             DrawRockets(rockets, view);
-            DrawEntryPoints(entryPoints, view);
+            // DrawEntryPoints(entryPoints, view);
             DrawApproximateMeetingPoints(approximateMeetingPoints, view);
         }
     }
@@ -232,7 +232,9 @@ void Visualizer::DrawPoints(const std::vector<Vector3d>& points, View view, rayl
 }
 
 void Visualizer::DrawEntryPoints(const std::vector<Vector3d>& entryPoints, View view) {
-    DrawPoints(entryPoints, view, raylib::Color::Gray());
+    if (Params.visualizer().need_draw_entry_points()) {
+        DrawPoints(entryPoints, view, raylib::Color::Gray());
+    }
 }
 
 void Visualizer::DrawApproximateMeetingPoints(const std::vector<Vector3d>& approximateMeetingPoints, View view) {
