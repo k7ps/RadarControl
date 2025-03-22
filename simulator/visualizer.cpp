@@ -101,7 +101,7 @@ void Visualizer::DrawFrame(
             DrawRadars(radarPosAngle, view);
             DrawTargets(bigDatas, smallDatas, priorities, followedTargetIds, view);
             DrawRockets(rockets, view);
-            // DrawEntryPoints(entryPoints, view);
+            DrawEntryPoints(entryPoints, view);
             DrawApproximateMeetingPoints(approximateMeetingPoints, view);
         }
     }
