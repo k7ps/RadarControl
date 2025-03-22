@@ -17,12 +17,14 @@ using namespace SIM;
 Target::Target(
     const Proto::Parameters& params,
     unsigned int id,
+    double presetPriority,
     Vector3d pos,
     Vector3d speed,
     double msFromStart
 )
     : Params(params)
     , Id(id)
+    , PresetPriority(presetPriority)
     , RealPos(pos)
     , RealSpeed(speed)
     , BigRadarUpdatePeriodMs(1000. / Params.big_radar().frequency())
@@ -84,7 +86,8 @@ BigRadarData Target::GetBigRadarData() const {
             .Id = Id,
             .Pos = FilteredPos
         },
-        .Speed = FilteredSpeed
+        .Speed = FilteredSpeed,
+        .PresetPriority = PresetPriority
     };
 }
 
@@ -127,6 +130,7 @@ LaunchParams GetRandomLaunchParams(const Proto::Parameters& params, bool isAccur
         hSpeedCoef = GetRandomDouble(0.7, 1.2);
     }
     return LaunchParams{
+        .PresetPriority = -1,
         .AngPos = GetRandomDouble(0, M_PI),
         .HeightPos = GetRandomDouble(0, params.simulator().max_height()),
         .SpeedAbs = GetRandomDouble(params.simulator().min_target_speed(), params.simulator().max_target_speed()),
@@ -156,7 +160,7 @@ void Simulator::UpdateTargets() {
         LaunchRandomTarget();
     }
 
-    std::vector<unsigned int> FlownAwayTargetIds;
+    std::vector<int> FlownAwayTargetIds;
     for (const auto* target : Targets) {
         if (target->IsOutOfView(Params.big_radar().radius())) {
             FlownAwayTargetIds.push_back(target->GetId());
@@ -169,7 +173,7 @@ void Simulator::SetRadarPosition(double angPos) {
     SmallRadarAngPosition = angPos;
 }
 
-void Simulator::RemoveTargets(std::vector<unsigned int> ids) {
+void Simulator::RemoveTargets(std::vector<int> ids) {
     for (auto id : ids) {
         for (int i = 0; i < Targets.size(); ++i) {
             if (Targets[i]->GetId() == id) {
@@ -209,6 +213,7 @@ void Simulator::LaunchTarget(LaunchParams launchParams) {
     auto* targetPtr = new Target(
         Params,
         lastId,
+        launchParams.PresetPriority,
         CylindricalToCartesian(Params.big_radar().radius(), launchParams.AngPos, launchParams.HeightPos),
         CylindricalToCartesian(launchParams.SpeedAbs, speedAngVertical, speedHorizontal),
         launchParams.MsFromStart
@@ -220,6 +225,12 @@ void Simulator::LaunchTarget(LaunchParams launchParams) {
 
 void Simulator::LaunchRandomTarget() {
     LaunchTarget(GetRandomLaunchParams(Params, GetRandomTrue(Params.simulator().probability_of_accurate_missile())));
+}
+
+Simulator::~Simulator() {
+    for (auto* target : Targets) {
+        delete target;
+    }
 }
 
 
@@ -271,10 +282,17 @@ void TargetScheduler::LaunchTargets(Simulator& simulator) {
 
             launchParams.MsFromStart = currTime - protoLaunchParams.time();
             launchParams.AngPos = protoLaunchParams.angle_pos();
-            if (protoLaunchParams.has_height()) {
+            if (protoLaunchParams.has_priority()) {
+                launchParams.PresetPriority = protoLaunchParams.priority();
+            }
+            if (protoLaunchParams.has_height_share()) {
+                launchParams.HeightPos = protoLaunchParams.height_share() * Params.simulator().max_height();
+            } else if (protoLaunchParams.has_height()) {
                 launchParams.HeightPos = protoLaunchParams.height();
             }
-            if (protoLaunchParams.has_abs_speed()) {
+            if (protoLaunchParams.has_abs_speed_share()) {
+                launchParams.SpeedAbs = protoLaunchParams.abs_speed_share() * Params.simulator().max_target_speed();
+            } else if (protoLaunchParams.has_abs_speed()) {
                 launchParams.SpeedAbs = protoLaunchParams.abs_speed();
             }
             if (protoLaunchParams.has_angle_deviation()) {

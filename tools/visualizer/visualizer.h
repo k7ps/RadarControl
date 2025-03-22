@@ -23,7 +23,7 @@ public:
         const std::vector<BigRadarData>& bigDatas,
         const std::vector<SmallRadarData>& smallDatas,
         const std::map<int, double>& priorities,
-        const std::vector<unsigned>& followedTargetIds,
+        const std::vector<int>& followedTargetIds,
         const std::vector<Vector3d>& rockets,
         // const std::vector<Vector3d>& meetingPoints,
         const std::vector<Vector3d>& entryPoints,
@@ -40,7 +40,7 @@ private:
         const std::vector<BigRadarData>& bigDatas,
         const std::vector<SmallRadarData>& smallDatas,
         const std::map<int, double>& priorities,
-        const std::vector<unsigned>& followedTargetIds,
+        const std::vector<int>& followedTargetIds,
         View view
     );
     void DrawRockets(const std::vector<Vector3d>& rockets, View view);

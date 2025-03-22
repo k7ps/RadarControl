@@ -85,12 +85,12 @@ std::pair<Vector3d, Vector3d> ABFilter(
 Vector3d CalculateMeetingPoint(
     const Vector3d& targetPos,
     const Vector3d& targetSpeed,
-    const Vector3d& rocketPos,
-    double rocketSpeed
+    double rocketSpeed,
+    const Vector3d& radarPos
 ) {
-    auto check = [&targetPos, &targetSpeed, &rocketPos, &rocketSpeed](double time) {
+    auto check = [&targetPos, &targetSpeed, &radarPos, &rocketSpeed](double time) {
         auto targetNewPos = targetPos + targetSpeed * time;
-        auto dist = Distance(targetNewPos, rocketPos);
+        auto dist = Distance(targetNewPos, radarPos);
         return rocketSpeed * time >= dist;
     };
     double timeL = 0, timeR = 1e5;
@@ -108,8 +108,8 @@ Vector3d CalculateMeetingPoint(
 Vector3d CalculateEntryPoint(
     const Vector3d& targetPos,
     const Vector3d& targetSpeed,
-    const Vector3d& radarPos,
-    double radius
+    double radius,
+    const Vector3d& radarPos
 ) {
     auto points = FindIntersectionsOfCircleAndLine(radarPos, radius, targetPos, targetSpeed);
     if (points.empty()) {
@@ -150,13 +150,13 @@ double CalculateRadarAngleOneTarget(
 
     auto angL = currRadarAngle - halfView + margin;
     auto angR = currRadarAngle + halfView - margin;
-    auto entryIn = entryPointAngle == -1 || InSegment(entryPointAngle, angL, angR);
-    auto meetingIn = meetingPointAngle == -1 || InSegment(meetingPointAngle, angL, angR);
+    auto entryIn = entryPointAngle == -1 || IsInSegment(entryPointAngle, angL, angR);
+    auto meetingIn = meetingPointAngle == -1 || IsInSegment(meetingPointAngle, angL, angR);
 
     if (
         currRadarTargetAngle != -1
-        && (entryPointAngle == -1 || InSegment(entryPointAngle, willAngL, willAngR))
-        && (entryPointAngle == -1 || InSegment(meetingPointAngle, willAngL, willAngR))
+        && (entryPointAngle == -1 || IsInSegment(entryPointAngle, willAngL, willAngR))
+        && (entryPointAngle == -1 || IsInSegment(meetingPointAngle, willAngL, willAngR))
     ) {
         return currRadarTargetAngle;
     } else if (entryIn && meetingIn) {
@@ -183,17 +183,22 @@ double CalculateRadarAngleOneTarget(
     }
 }
 
-
-// double CalculateRadarAngleMultiTarget(
-//     double currRadarAngle,
-//     const std::vector<double>& entryPointAngles,
-//     const std::vector<double>& meetingPointAngles,
-//     const std::vector<float>& priorities,
-//     double viewAngle,
-//     double margin
-// ) {
-
-// }
+double CalculateRadarAngleMultiTarget(
+    double currRadarAngle,
+    double currRadarTargetAngle,
+    const std::vector<double>& angles,
+    double viewAngle,
+    double margin
+) {
+    return CalculateRadarAngleOneTarget(
+        currRadarAngle,
+        currRadarTargetAngle,
+        *std::min_element(angles.begin(), angles.end()),
+        *std::max_element(angles.begin(), angles.end()),
+        viewAngle,
+        margin
+    );
+}
 
 
 double CalculatePriority(Vector3d pos, Vector3d speed, double maxSpeed, Vector3d radarPoint) {

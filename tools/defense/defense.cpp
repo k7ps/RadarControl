@@ -52,7 +52,7 @@ Defense::Defense(const Proto::Parameters& params)
     : Params(params)
 {}
 
-void Defense::LaunchRockets(const std::vector<std::pair<Vector3d, unsigned>>& meetingPointsAndTargetIds) {
+void Defense::LaunchRockets(const std::vector<std::pair<Vector3d, int>>& meetingPointsAndTargetIds) {
     for (const auto& [point, targetId] : meetingPointsAndTargetIds) {
         Rockets.emplace_back(
             DefRocket(point, Params.defense().rocket_speed(), Params.defense().time_to_launch_rocket()),
@@ -61,8 +61,8 @@ void Defense::LaunchRockets(const std::vector<std::pair<Vector3d, unsigned>>& me
     }
 }
 
-std::vector<unsigned> Defense::GetDestroyedTargetsId() {
-    std::vector<unsigned> res;
+std::vector<int> Defense::GetDestroyedTargetsId() {
+    std::vector<int> res;
     for (int i = 0; i < Rockets.size(); i++) {
         auto& rocket = Rockets[i].first;
         rocket.UpdatePosition();

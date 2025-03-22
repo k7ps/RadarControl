@@ -1,6 +1,9 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <vector>
+#include <algorithm>
+
 #include "points.h"
 
 
@@ -32,7 +35,12 @@ float DegToRad(float angle);
 
 void PrintCurrentTime();
 
-bool InSegment(double c, double a, double b);
+bool IsInSegment(double c, double a, double b);
+
+template<class T>
+bool IsInVector(const std::vector<T>& vec, const T& i) {
+    return std::find(vec.begin(), vec.end(), i) != vec.end();
+}
 
 
 #endif // UTIL_H

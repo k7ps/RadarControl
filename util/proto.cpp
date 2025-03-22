@@ -15,6 +15,7 @@ void PrepareParams(Proto::Parameters& params) {
     params.mutable_simulator()->set_max_deviation_angle_vertical(DegToRad(params.simulator().max_deviation_angle_vertical()));
     params.mutable_general()->set_margin_angle(DegToRad(params.general().margin_angle()));
 
+    params.mutable_small_radar()->set_angle_speed(params.small_radar().angle_speed() / 1000);
     params.mutable_simulator()->set_min_target_speed(params.simulator().min_target_speed() / 1000);
     params.mutable_simulator()->set_max_target_speed(params.simulator().max_target_speed() / 1000);
 

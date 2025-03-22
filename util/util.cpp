@@ -114,6 +114,6 @@ void PrintCurrentTime() {
     std::cout << std::put_time(&tm, "%H:%M:%S") << '.' << std::setfill('0') << std::setw(3) << ms.count() << std::endl;
 }
 
-bool InSegment(double c, double a, double b) {
+bool IsInSegment(double c, double a, double b) {
     return a <= c && c <= b;
 }

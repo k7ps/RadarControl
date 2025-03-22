@@ -35,16 +35,16 @@ class Defense {
 public:
     Defense(const Proto::Parameters& params);
 
-    void LaunchRockets(const std::vector<std::pair<Vector3d, unsigned>>& meetingPointsAndTargetIds);
+    void LaunchRockets(const std::vector<std::pair<Vector3d, int>>& meetingPointsAndTargetIds);
 
-    std::vector<unsigned> GetDestroyedTargetsId();
+    std::vector<int> GetDestroyedTargetsId();
     std::vector<Vector3d> GetRocketsPositions();
     std::vector<Vector3d> GetMeetingPoints();
 
 private:
     const Proto::Parameters& Params;
 
-    std::vector<std::pair<DefRocket, unsigned>> Rockets;
+    std::vector<std::pair<DefRocket, int>> Rockets;
 };
 
 

@@ -11,6 +11,7 @@ struct SmallRadarData {
 
 struct BigRadarData : public SmallRadarData {
     Vector3d Speed;
+    double PresetPriority = -1;
 };
 
 

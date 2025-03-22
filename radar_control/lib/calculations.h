@@ -8,12 +8,12 @@
 #include "util/points.h"
 
 
-struct TargetCalculationInfo {
-    int Id;
-    double Priority;
-    double MeetingPointAngle;
-    double EntryPointAngle;
-};
+// struct TargetCalculationInfo {
+//     int Id;
+//     double Priority;
+//     double MeetingPointAngle;
+//     double EntryPointAngle;
+// };
 
 
 std::pair<Vector3d, Vector3d> ABFilter(Vector3d x, Vector3d prevX, Vector3d prevSpeed, double dt, int measureCount);
@@ -21,15 +21,15 @@ std::pair<Vector3d, Vector3d> ABFilter(Vector3d x, Vector3d prevX, Vector3d prev
 Vector3d CalculateMeetingPoint(
     const Vector3d& targetPos,
     const Vector3d& targetSpeed,
-    const Vector3d& rocketPos,
-    double rocketSpeed
+    double rocketSpeed,
+    const Vector3d& radarPos = Vector3d::Zero()
 );
 
 Vector3d CalculateEntryPoint(
     const Vector3d& targetPos,
     const Vector3d& targetSpeed,
-    const Vector3d& radarPos,
-    double radius
+    double radius,
+    const Vector3d& radarPos = Vector3d::Zero()
 );
 
 double CalculateRadarAngleOneTarget(
@@ -41,11 +41,10 @@ double CalculateRadarAngleOneTarget(
     double margin
 );
 
-std::pair<double, std::vector<int>> CalculateRadarAngleMultiTarget(
+double CalculateRadarAngleMultiTarget(
     double currRadarAngle,
     double currRadarTargetAngle,
-    const std::vector<int> followedTargets,
-    const std::vector<TargetCalculationInfo>& targets,
+    const std::vector<double>& angles,
     double viewAngle,
     double margin
 );

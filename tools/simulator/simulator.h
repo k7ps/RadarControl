@@ -15,6 +15,7 @@ namespace SIM {
         Target(
             const Proto::Parameters& params,
             unsigned int id,
+            double presetPriority,
             Vector3d pos,
             Vector3d speed,
             double msFromStart = 0
@@ -39,6 +40,7 @@ namespace SIM {
         const Proto::Parameters& Params;
 
         int Id;
+        double PresetPriority = -1;
 
         Vector3d RealPos;
         Vector3d NoisedPos;
@@ -59,6 +61,7 @@ namespace SIM {
 
 
 struct LaunchParams {
+    double PresetPriority;
     double AngPos;
     double HeightPos;
     double SpeedAbs;
@@ -77,13 +80,15 @@ public:
     void UpdateTargets();
     void SetRadarPosition(double angPos);
 
-    void RemoveTargets(std::vector<unsigned int> ids);
+    void RemoveTargets(std::vector<int> ids);
 
     std::vector<BigRadarData> GetBigRadarTargets();
     std::vector<SmallRadarData> GetSmallRadarTargets();
 
     void LaunchTarget(LaunchParams launchParams);
     void LaunchRandomTarget();
+
+    ~Simulator();
 
 private:
     bool IsTargetInSector(const SIM::Target& target) const;

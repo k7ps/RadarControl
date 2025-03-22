@@ -9,10 +9,13 @@ message TargetScenario {
         required double angle_pos = 2; // degrees
 
         // all random if not set
-        optional double abs_speed = 3;
-        optional double angle_deviation = 4; // degrees
-        optional double height = 5;
-        optional bool is_accurate = 6;
+        optional double priority = 3;
+        optional double abs_speed = 4;
+        optional double abs_speed_share = 5; // share of max speed
+        optional double angle_deviation = 6; // degrees
+        optional double height = 7;
+        optional double height_share = 8; // share of max height
+        optional bool is_accurate = 9;
     }
 
     repeated Launch launches = 1;

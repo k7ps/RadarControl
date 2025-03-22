@@ -87,7 +87,7 @@ void Visualizer::DrawFrame(
     const std::vector<BigRadarData>& bigDatas,
     const std::vector<SmallRadarData>& smallDatas,
     const std::map<int, double>& priorities,
-    const std::vector<unsigned>& followedTargetIds,
+    const std::vector<int>& followedTargetIds,
     const std::vector<Vector3d>& rockets,
     // const std::vector<Vector3d>& meetingPoints,
     const std::vector<Vector3d>& entryPoints,
@@ -136,11 +136,11 @@ void Visualizer::DrawTargets(
     const std::vector<BigRadarData>& bigDatas,
     const std::vector<SmallRadarData>& smallDatas,
     const std::map<int, double>& priorities,
-    const std::vector<unsigned>& followedTargetIds,
+    const std::vector<int>& followedTargetIds,
     View view
 ) {
     std::set<uint32_t> drawnTargets;
-    std::set<unsigned> followed(followedTargetIds.begin(), followedTargetIds.end());
+    std::set<int> followed(followedTargetIds.begin(), followedTargetIds.end());
     for (const auto& data : smallDatas) {
         drawnTargets.insert(data.Id);
         DrawTarget(data, priorities.at(data.Id), followed.count(data.Id), view);
