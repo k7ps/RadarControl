@@ -2,16 +2,18 @@
 
 #include <cmath>
 
+#include "util.h"
+
 
 void PrepareParams(Proto::Parameters& params) {
-    params.mutable_small_radar()->set_view_angle(params.small_radar().view_angle() * M_PI / 180);
-    params.mutable_small_radar()->set_ang_stddev(params.small_radar().ang_stddev() * M_PI / 180);
-    params.mutable_small_radar()->set_angle_speed(params.small_radar().angle_speed() * M_PI / 180);
-    params.mutable_small_radar()->set_responsible_sector_start(params.small_radar().responsible_sector_start() * M_PI / 180);
-    params.mutable_small_radar()->set_responsible_sector_end(params.small_radar().responsible_sector_end() * M_PI / 180);
-    params.mutable_big_radar()->set_ang_stddev(params.big_radar().ang_stddev() * M_PI / 180);
-    params.mutable_simulator()->set_max_deviation_angle_vertical(params.simulator().max_deviation_angle_vertical() * M_PI / 180);
-    params.mutable_general()->set_margin_angle(params.general().margin_angle() * M_PI / 180);
+    params.mutable_small_radar()->set_view_angle(DegToRad(params.small_radar().view_angle()));
+    params.mutable_small_radar()->set_ang_stddev(DegToRad(params.small_radar().ang_stddev()));
+    params.mutable_small_radar()->set_angle_speed(DegToRad(params.small_radar().angle_speed()));
+    params.mutable_small_radar()->set_responsible_sector_start(DegToRad(params.small_radar().responsible_sector_start()));
+    params.mutable_small_radar()->set_responsible_sector_end(DegToRad(params.small_radar().responsible_sector_end()));
+    params.mutable_big_radar()->set_ang_stddev(DegToRad(params.big_radar().ang_stddev()));
+    params.mutable_simulator()->set_max_deviation_angle_vertical(DegToRad(params.simulator().max_deviation_angle_vertical()));
+    params.mutable_general()->set_margin_angle(DegToRad(params.general().margin_angle()));
 
     params.mutable_simulator()->set_min_target_speed(params.simulator().min_target_speed() / 1000);
     params.mutable_simulator()->set_max_target_speed(params.simulator().max_target_speed() / 1000);

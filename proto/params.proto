@@ -29,7 +29,8 @@ message Parameters {
         optional double play_speed = 2 [default = 1.0];
         optional double big_radar_measure_cnt = 3 [default = 30];
         optional double small_radar_measure_cnt = 4 [default = 40];
-        optional double margin_angle = 5 [default = 5];
+        optional double aprox_small_radar_measure_cnt = 5 [default = 10];
+        optional double margin_angle = 6 [default = 5];
     }
 
     message Defense {

@@ -1,7 +1,19 @@
 #ifndef CALCULATIONS_H
 #define CALCULATIONS_H
 
+
+#include <vector>
+#include <utility>
+
 #include "util/points.h"
+
+
+struct TargetCalculationInfo {
+    int Id;
+    double Priority;
+    double MeetingPointAngle;
+    double EntryPointAngle;
+};
 
 
 std::pair<Vector3d, Vector3d> ABFilter(Vector3d x, Vector3d prevX, Vector3d prevSpeed, double dt, int measureCount);
@@ -20,10 +32,20 @@ Vector3d CalculateEntryPoint(
     double radius
 );
 
-double CalculateRadarAngle1Target(
+double CalculateRadarAngleOneTarget(
     double currRadarAngle,
+    double currRadarTargetAngle,
     double entryPointAngle,
     double meetingPointAngle,
+    double viewAngle,
+    double margin
+);
+
+std::pair<double, std::vector<int>> CalculateRadarAngleMultiTarget(
+    double currRadarAngle,
+    double currRadarTargetAngle,
+    const std::vector<int> followedTargets,
+    const std::vector<TargetCalculationInfo>& targets,
     double viewAngle,
     double margin
 );

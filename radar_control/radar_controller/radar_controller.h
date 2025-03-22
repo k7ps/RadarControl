@@ -80,6 +80,7 @@ namespace RC {
         int BigRadarMeasureCount;
         int CurrSmallRadarMeasureCount = 0;
         int SmallRadarMeasureCount;
+        int ApproxSmallRadarMeasureCount;
     };
 
 }
@@ -113,7 +114,6 @@ private:
 
     double RadarAnglePos;
     double RadarAngleTarget = -1;
-    bool IsRadarAngleTargetSet = false;
 
     std::vector<RC::Target> Targets;
 

@@ -135,21 +135,31 @@ Vector3d CalculateEntryPoint(
     }
 }
 
-double CalculateRadarAngle1Target(
+double CalculateRadarAngleOneTarget(
     double currRadarAngle,
+    double currRadarTargetAngle,
     double entryPointAngle,
     double meetingPointAngle,
     double viewAngle,
     double margin
 ) {
     auto halfView = viewAngle / 2;
+
+    auto willAngL = currRadarTargetAngle - halfView + margin;
+    auto willAngR = currRadarTargetAngle + halfView - margin;
+
     auto angL = currRadarAngle - halfView + margin;
     auto angR = currRadarAngle + halfView - margin;
+    auto entryIn = entryPointAngle == -1 || InSegment(entryPointAngle, angL, angR);
+    auto meetingIn = meetingPointAngle == -1 || InSegment(meetingPointAngle, angL, angR);
 
-    auto entryIn = InSegment(entryPointAngle, angL, angR);
-    auto meetingIn = InSegment(meetingPointAngle, angL, angR);
-
-    if (entryIn && meetingIn) {
+    if (
+        currRadarTargetAngle != -1
+        && (entryPointAngle == -1 || InSegment(entryPointAngle, willAngL, willAngR))
+        && (entryPointAngle == -1 || InSegment(meetingPointAngle, willAngL, willAngR))
+    ) {
+        return currRadarTargetAngle;
+    } else if (entryIn && meetingIn) {
         return currRadarAngle;
     } else if (std::abs(entryPointAngle - meetingPointAngle) >= viewAngle - 2 * margin) {
         if (entryPointAngle > meetingPointAngle) {
@@ -172,6 +182,18 @@ double CalculateRadarAngle1Target(
         }
     }
 }
+
+
+// double CalculateRadarAngleMultiTarget(
+//     double currRadarAngle,
+//     const std::vector<double>& entryPointAngles,
+//     const std::vector<double>& meetingPointAngles,
+//     const std::vector<float>& priorities,
+//     double viewAngle,
+//     double margin
+// ) {
+
+// }
 
 
 double CalculatePriority(Vector3d pos, Vector3d speed, double maxSpeed, Vector3d radarPoint) {

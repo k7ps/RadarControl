@@ -17,6 +17,7 @@ Target::Target(int id, double deathTime, const Proto::Parameters& params)
     , DeathTime(deathTime)
     , BigRadarMeasureCount(params.general().big_radar_measure_cnt())
     , SmallRadarMeasureCount(params.general().small_radar_measure_cnt())
+    , ApproxSmallRadarMeasureCount(params.general().aprox_small_radar_measure_cnt())
 {}
 
 Target::Target(const BigRadarData& data, double deathTime, const Proto::Parameters& params)
@@ -52,7 +53,11 @@ void Target::SmallRadarUpdate(Vector3d pos) {
     Pos = pos;
     ABFilterIterate(dt);
 
-    SetNeedToUpdateMeetingPoint(true);
+    if (CurrSmallRadarMeasureCount >= ApproxSmallRadarMeasureCount) {
+        SetNeedToUpdateMeetingPoint(true);
+    } else {
+        ApproximateMeetingPoint = Vector3d::Zero();
+    }
     EntryPoint = Vector3d::Zero();
 }
 
@@ -180,16 +185,14 @@ void RadarController::Process(
         auto& target = GetTargetById(id);
         auto targetPos = target.GetFilteredPosition();
 
-        if (!IsRadarAngleTargetSet) {
-            RadarAngleTarget = CalculateRadarAngle1Target(
-                RadarAnglePos,
-                GetPhi(target.GetEntryPoint()),
-                GetPhi(target.GetApproximateMeetingPoint()),
-                Params.small_radar().view_angle(),
-                Params.general().margin_angle()
-            );
-            IsRadarAngleTargetSet = true;
-        }
+        RadarAngleTarget = CalculateRadarAngleOneTarget(
+            RadarAnglePos,
+            RadarAngleTarget,
+            (target.GetEntryPoint() == Vector3d::Zero() ? -1 : GetPhi(target.GetEntryPoint())),
+            (target.GetApproximateMeetingPoint() == Vector3d::Zero() ? -1 : GetPhi(target.GetApproximateMeetingPoint())),
+            Params.small_radar().view_angle(),
+            Params.general().margin_angle()
+        );
 
         if (!target.IsRocketLaunched() && target.HavePreciseSpeed()) {
             auto meetingPoint = CalculateMeetingPoint(
@@ -218,7 +221,6 @@ void RadarController::TrySelectTargetToFollow() {
     }
     if (targetId != -1) {
         FollowedTargetIds.push_back(targetId);
-        IsRadarAngleTargetSet = false;
     }
 }
 
