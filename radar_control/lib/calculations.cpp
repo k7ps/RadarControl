@@ -156,7 +156,7 @@ double CalculateRadarAngleOneTarget(
     if (
         currRadarTargetAngle != -1
         && (entryPointAngle == -1 || IsInSegment(entryPointAngle, willAngL, willAngR))
-        && (entryPointAngle == -1 || IsInSegment(meetingPointAngle, willAngL, willAngR))
+        && (meetingPointAngle == -1 || IsInSegment(meetingPointAngle, willAngL, willAngR))
     ) {
         return currRadarTargetAngle;
     } else if (entryIn && meetingIn) {

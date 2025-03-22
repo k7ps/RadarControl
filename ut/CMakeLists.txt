@@ -1,5 +1,5 @@
 set(UT_SOURCES
-    calc_angle_one_target.cpp
+    calculate_angle.cpp
 )
 
 include(FetchContent)
