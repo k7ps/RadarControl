@@ -5,8 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 project(RadarControl)
 
 add_subdirectory(proto)
-# add_subdirectory(radar_control/lib)
-# add_subdirectory(radar_control/radar_controller)
 add_subdirectory(radar_control)
 add_subdirectory(simulator)
 add_subdirectory(ut)
