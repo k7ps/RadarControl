@@ -109,7 +109,7 @@ class TargetScheduler {
 public:
     TargetScheduler(const Proto::Parameters& params);
 
-    void SetScenario(const std::string& filename, double playSpeed);
+    void SetScenario(const std::string& filename);
 
     void LaunchTargets(Simulator& simulator);
 

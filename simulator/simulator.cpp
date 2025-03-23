@@ -238,17 +238,17 @@ TargetScheduler::TargetScheduler(const Proto::Parameters& params)
     : Params(params)
 {}
 
-void TargetScheduler::SetScenario(const std::string& filename, double playSpeed) {
+void TargetScheduler::SetScenario(const std::string& filename) {
     const auto scenario = ParseProtoFromFile<Proto::TargetScenario>(filename);
     for (const auto& launch : scenario.launches()) {
         Proto::TargetScenario::Launch correctLaunch(launch);
-        correctLaunch.set_time(correctLaunch.time() * 1000. / playSpeed);
+        correctLaunch.set_time(correctLaunch.time() * 1000. / Params.general().play_speed());
         correctLaunch.set_angle_pos(correctLaunch.angle_pos() * M_PI / 180);
         if (launch.has_angle_deviation()) {
             correctLaunch.set_angle_deviation(correctLaunch.angle_deviation() * M_PI / 180);
         }
         if (launch.has_abs_speed()) {
-            correctLaunch.set_abs_speed(correctLaunch.abs_speed() * playSpeed / 1000);
+            correctLaunch.set_abs_speed(correctLaunch.abs_speed() * Params.general().play_speed() / 1000);
         }
 
         TargetLaunches.push_back(correctLaunch);

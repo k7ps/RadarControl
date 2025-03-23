@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <sstream>
 
 #include "points.h"
 
@@ -40,6 +41,16 @@ bool IsInSegment(double c, double a, double b);
 template<class T>
 bool IsInVector(const std::vector<T>& vec, const T& i) {
     return std::find(vec.begin(), vec.end(), i) != vec.end();
+}
+
+template<class T>
+std::string VectorToString(const std::vector<T>& vec) {
+    std::ostringstream res;
+    for (int i = 0; i < vec.size(); ++i) {
+        if (i != 0) res << ", ";
+        res << vec[i];
+    }
+    return res.str();
 }
 
 
