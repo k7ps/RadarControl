@@ -1,4 +1,4 @@
-set(SIM_EXEC_NAME "Simulator")
+set(SIM_EXEC_NAME "RadarControl")
 
 set(SIM_HEADERS
     defense.h
@@ -26,13 +26,5 @@ include_directories(/home/k1ps/raylib-cpp-5.0.2/include)
 
 add_executable(${SIM_EXEC_NAME} ${SIM_HEADERS} ${SIM_SOURCES})
 
-target_include_directories(
-    ${SIM_EXEC_NAME}
-    PRIVATE ${CMAKE_SOURCE_DIR} ${argparse_SOURCE_DIR}/include
-)
-target_link_libraries(
-    ${SIM_EXEC_NAME}
-    PRIVATE radar_control util_lib argparse raylib
-)
-
-# set_target_properties(${SIM_EXEC_NAME} PROPERTIES LINK_SEARCH_START_STATIC ON)
+target_include_directories(${SIM_EXEC_NAME} PRIVATE ${CMAKE_SOURCE_DIR} ${argparse_SOURCE_DIR}/include)
+target_link_libraries(${SIM_EXEC_NAME}PRIVATE radar_control util_lib argparse raylib)
