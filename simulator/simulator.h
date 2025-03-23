@@ -1,7 +1,7 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
-#include "radar_control/lib/data.h"
+#include "radar_control/data.h"
 #include "proto/generated/params.pb.h"
 #include "proto/generated/scenario.pb.h"
 #include "util/points.h"

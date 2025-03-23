@@ -12,7 +12,7 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(ut ${UT_SOURCES})
 target_include_directories(ut PRIVATE ${CMAKE_SOURCE_DIR})
-target_link_libraries(ut PRIVATE radar_control_lib gtest gtest_main)
+target_link_libraries(ut PRIVATE radar_control gtest gtest_main)
 
 include(GoogleTest)
 gtest_discover_tests(ut)

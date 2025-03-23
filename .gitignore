@@ -5,5 +5,7 @@ build
 # protobuf generated files
 generated
 
-# dynamic libs
-lib
+# AppImage
+AppDir
+linuxdeploy-x86_64.AppImage
+RadarControl-x86_64.AppImage

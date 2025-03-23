@@ -1,7 +1,7 @@
 #ifndef RADAR_CONTROLLER_H
 #define RADAR_CONTROLLER_H
 
-#include "lib/data.h"
+#include "data.h"
 #include "proto/generated/params.pb.h"
 #include "util/points.h"
 #include "util/timer.h"

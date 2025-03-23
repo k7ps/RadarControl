@@ -1,4 +1,4 @@
-#include "radar_control/lib/calculations.h"
+#include "radar_control/calculations.h"
 
 #include <gtest/gtest.h>
 

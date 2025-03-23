@@ -1,6 +1,6 @@
 #include "defense.h"
 #include "proto/generated/params.pb.h"
-#include "radar_control/radar_controller/radar_controller.h"
+#include "radar_control/radar_controller.h"
 #include "simulator.h"
 #include "util/proto.h"
 #include "util/util.h"

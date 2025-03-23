@@ -1,9 +1,8 @@
 #include "radar_controller.h"
-#include "lib/data.h"
 #include "proto/generated/params.pb.h"
 #include "util/points.h"
 #include "util/util.h"
-#include "lib/calculations.h"
+#include "calculations.h"
 
 #include <algorithm>
 #include <cmath>

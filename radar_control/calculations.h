@@ -8,14 +8,6 @@
 #include "util/points.h"
 
 
-// struct TargetCalculationInfo {
-//     int Id;
-//     double Priority;
-//     double MeetingPointAngle;
-//     double EntryPointAngle;
-// };
-
-
 std::pair<Vector3d, Vector3d> ABFilter(Vector3d x, Vector3d prevX, Vector3d prevSpeed, double dt, int measureCount);
 
 Vector3d CalculateMeetingPoint(

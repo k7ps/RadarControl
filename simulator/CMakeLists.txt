@@ -28,11 +28,11 @@ add_executable(${SIM_EXEC_NAME} ${SIM_HEADERS} ${SIM_SOURCES})
 
 target_include_directories(
     ${SIM_EXEC_NAME}
-    PRIVATE ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/simulator ${argparse_SOURCE_DIR}/include
+    PRIVATE ${CMAKE_SOURCE_DIR} ${argparse_SOURCE_DIR}/include
 )
 target_link_libraries(
     ${SIM_EXEC_NAME}
-    PRIVATE radar_controller util_lib argparse raylib
+    PRIVATE radar_control util_lib argparse raylib
 )
 
 # set_target_properties(${SIM_EXEC_NAME} PROPERTIES LINK_SEARCH_START_STATIC ON)
