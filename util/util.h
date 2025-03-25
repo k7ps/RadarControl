@@ -37,6 +37,8 @@ float DegToRad(float angle);
 void PrintCurrentTime();
 
 bool IsInSegment(double c, double a, double b);
+bool IsInSegment(const std::vector<double>& c, double a, double b);
+
 
 template<class T>
 bool IsInVector(const std::vector<T>& vec, const T& i) {

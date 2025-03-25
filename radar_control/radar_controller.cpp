@@ -67,50 +67,53 @@ namespace {
         if (targets.empty()) {
             return {currRadarAngle, {}};
         }
-        const auto* priorityTarget = targets.front();
-        double halfView = viewAngle / 2;
+        double halfview = viewAngle / 2;
+        double willAngL = currRadarTargetAngle - halfview + margin;
+        double willAngR = currRadarTargetAngle + halfview - margin;
 
         std::vector<int> newFollowedTargetIds;
-
-        if (!IsInVector(followedTargetIds, priorityTarget->GetId())) {
-            auto time2rotate = TimeToRotate(
-                currRadarTargetAngle,
-                {priorityTarget->GetEntryAngle(), priorityTarget->GetMeetAngle()},
-                priorityTarget->GetFilteredPosition(),
-                radarAngleSpeed
-            );
-            auto time2entry = priorityTarget->GetTimeToEntryPoint();
-
-            std::vector<int> targets2hit;
-            for (auto id : followedTargetIds) {
-                const auto* target = GetTargetById(targets, id);
-                auto time2meet = target->GetTimeToMeetingPoint();
-                if (target->IsRocketLaunched() || time2meet + time2rotate < time2entry) {
-                    targets2hit.push_back(id);
-                }
-            }
-            if (!targets2hit.empty()) {
-                return {currRadarTargetAngle, targets2hit};
-            }
-        }
-
-        newFollowedTargetIds.push_back(priorityTarget->GetId());
-
         std::vector<double> followedAngles;
-        if (priorityTarget->GetEntryAngle() != -1) followedAngles.push_back(priorityTarget->GetEntryAngle() );
-        if (priorityTarget->GetMeetAngle() != -1) followedAngles.push_back(priorityTarget->GetMeetAngle());
-        for (int i = 1; i < targets.size(); ++i) {
-            auto& target = *targets[i];
-            auto entryAngle = target.GetEntryAngle();
-            auto meetAngle = target.GetMeetAngle();
+
+        for (const auto* target : targets) {
+            auto entryAngle = target->GetEntryAngle();
+            auto meetAngle = target->GetMeetAngle();
             if (CanAddToAngleList(viewAngle - 2 * margin, followedAngles, {entryAngle, meetAngle})) {
-                newFollowedTargetIds.push_back(target.GetId());
+                if (
+                    !IsInSegment({entryAngle, meetAngle}, willAngL, willAngR)
+                    && !IsInVector(followedTargetIds, target->GetId())
+                ) {
+                    auto time2rotate = TimeToRotate(
+                        currRadarTargetAngle,
+                        {entryAngle, meetAngle},
+                        target->GetFilteredPosition(),
+                        radarAngleSpeed
+                    );
+                    auto time2entry = target->GetTimeToEntryPoint();
+
+                    std::vector<int> targets2hit;
+                    for (auto id : followedTargetIds) {
+                        const auto* target = GetTargetById(targets, id);
+                        auto time2meet = target->GetTimeToMeetingPoint();
+                        if (
+                            target->IsRocketLaunched()
+                            || target->CanLaunchRocket()
+                            || time2meet + time2rotate < time2entry
+                        ) {
+                            targets2hit.push_back(id);
+                        }
+                    }
+                    if (!targets2hit.empty()) {
+                        return {currRadarTargetAngle, targets2hit};
+                    }
+                }
+
+                newFollowedTargetIds.push_back(target->GetId());
                 if (entryAngle != -1) followedAngles.push_back(entryAngle);
                 if (meetAngle != -1) followedAngles.push_back(meetAngle);
             }
         }
         if (followedAngles.empty()) {
-            followedAngles.push_back(GetPhi(priorityTarget->GetFilteredPosition()));
+            followedAngles.push_back(GetPhi(targets.front()->GetFilteredPosition()));
         }
         auto newTargetRadarAngle = CalculateRadarAngleMultiTarget(
             currRadarAngle,

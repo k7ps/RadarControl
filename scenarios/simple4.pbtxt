@@ -1,0 +1,29 @@
+launches {
+    time: 0
+    angle_pos: 80
+    is_accurate: true
+    priority: 1
+    abs_speed_share: 0.7
+}
+
+launches {
+    time: 10
+    angle_pos: 50
+    is_accurate: true
+    priority: 0.5
+    abs_speed_share: 0.7
+}
+
+launches {
+    time: 30
+    angle_pos: 60
+    is_accurate: true
+    priority: 0.7
+    abs_speed_share: 0.7
+}
+
+
+
+
+# proto-file: proto/scenario.proto
+# proto-message: Proto::TargetScenario
