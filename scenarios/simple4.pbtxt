@@ -22,8 +22,5 @@ launches {
     abs_speed_share: 0.7
 }
 
-
-
-
 # proto-file: proto/scenario.proto
 # proto-message: Proto::TargetScenario

@@ -115,7 +115,7 @@ void PrintCurrentTime() {
 }
 
 bool IsInSegment(double c, double a, double b) {
-    return a <= c && c <= b;
+    return (a <= b && a <= c && c <= b) || (b <= a && b <= c && c <= a);
 }
 
 bool IsInSegment(const std::vector<double>& c, double a, double b) {

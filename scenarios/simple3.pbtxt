@@ -22,7 +22,6 @@ launches {
     abs_speed_share: 0.9
 }
 
-
 launches {
     time: 60
     angle_pos: 45

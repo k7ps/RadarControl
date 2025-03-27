@@ -42,23 +42,20 @@ namespace {
 
     double TimeToRotate(
         double currAngle,
-        const std::vector<double>& angles,
-        Vector3d pos,
+        const std::vector<double>& targetAngles,
         double angleSpeed
     ) {
         std::vector<double> diffs;
-        for (auto angle : angles)
-            if (angle != -1)
-                diffs.push_back(std::abs(angle - currAngle));
-        if (diffs.empty())
-            diffs.push_back(std::abs(GetPhi(pos) - currAngle));
+        for (auto angle : targetAngles) {
+            diffs.push_back(std::abs(angle - currAngle));
+        }
         return *std::max_element(diffs.begin(), diffs.end()) / angleSpeed;
     }
 
     std::pair<double, std::vector<int>> CalculateRadarAngle(
         double currRadarAngle,
         double currRadarTargetAngle,
-        const std::vector<int>& followedTargetIds,
+        const std::vector<int>& prevFollowedTargetIds,
         const std::vector<const Target*>& targets, // sorted by priorities
         double radarAngleSpeed,
         double viewAngle,
@@ -71,27 +68,29 @@ namespace {
         double willAngL = currRadarTargetAngle - halfview + margin;
         double willAngR = currRadarTargetAngle + halfview - margin;
 
-        std::vector<int> newFollowedTargetIds;
+        std::vector<int> followedTargetIds;
         std::vector<double> followedAngles;
-
         for (const auto* target : targets) {
-            auto entryAngle = target->GetEntryAngle();
-            auto meetAngle = target->GetMeetAngle();
-            if (CanAddToAngleList(viewAngle - 2 * margin, followedAngles, {entryAngle, meetAngle})) {
+            std::vector<double> targetAngles;
+            if (target->GetEntryAngle() != -1) targetAngles.push_back(target->GetEntryAngle());
+            if (target->GetMeetAngle() != -1) targetAngles.push_back(target->GetMeetAngle());
+            if (targetAngles.empty()) targetAngles.push_back(GetPhi(target->GetFilteredPosition()));
+
+            if (CanAddToAngleList(viewAngle - 2 * margin, followedAngles, targetAngles)) {
                 if (
-                    !IsInSegment({entryAngle, meetAngle}, willAngL, willAngR)
-                    && !IsInVector(followedTargetIds, target->GetId())
+                    !IsInSegment(targetAngles, willAngL, willAngR)
+                    && !IsInVector(prevFollowedTargetIds, target->GetId())
                 ) {
                     auto time2rotate = TimeToRotate(
                         currRadarTargetAngle,
-                        {entryAngle, meetAngle},
-                        target->GetFilteredPosition(),
+                        targetAngles,
                         radarAngleSpeed
                     );
                     auto time2entry = target->GetTimeToEntryPoint();
 
                     std::vector<int> targets2hit;
-                    for (auto id : followedTargetIds) {
+                    std::vector<double> targets2hitAngles;
+                    for (auto id : prevFollowedTargetIds) {
                         const auto* target = GetTargetById(targets, id);
                         auto time2meet = target->GetTimeToMeetingPoint();
                         if (
@@ -100,16 +99,24 @@ namespace {
                             || time2meet + time2rotate < time2entry
                         ) {
                             targets2hit.push_back(id);
+
+                            if (target->GetEntryAngle() != -1) targets2hitAngles.push_back(target->GetEntryAngle());
+                            if (target->GetMeetAngle() != -1) targets2hitAngles.push_back(target->GetMeetAngle());
+                            if (target->GetEntryAngle() == -1 && target->GetMeetAngle() == -1)
+                                targets2hitAngles.push_back(GetPhi(target->GetFilteredPosition()));
                         }
                     }
-                    if (!targets2hit.empty()) {
+                    if (
+                        !targets2hit.empty()
+                        && !CanAddToAngleList(viewAngle - 2 * margin, targets2hitAngles, targetAngles)
+                    ) {
                         return {currRadarTargetAngle, targets2hit};
                     }
                 }
 
-                newFollowedTargetIds.push_back(target->GetId());
-                if (entryAngle != -1) followedAngles.push_back(entryAngle);
-                if (meetAngle != -1) followedAngles.push_back(meetAngle);
+                followedTargetIds.push_back(target->GetId());
+                for (auto angle : targetAngles)
+                    followedAngles.push_back(angle);
             }
         }
         if (followedAngles.empty()) {
@@ -122,7 +129,7 @@ namespace {
             viewAngle,
             margin
         );
-        return {newTargetRadarAngle, newFollowedTargetIds};
+        return {newTargetRadarAngle, followedTargetIds};
     }
 
 }
@@ -273,8 +280,7 @@ void RadarController::Process(
                 fromPoint = target->GetFilteredPosition();
                 time2hit += time2CalculatePrecizeSpeed + TimeToRotate(
                     RadarAnglePos,
-                    {},
-                    target->GetFilteredPosition(),
+                    {GetPhi(target->GetFilteredPosition())},
                     Params.small_radar().angle_speed()
                 );
             } else {
