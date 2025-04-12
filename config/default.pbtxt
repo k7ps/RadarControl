@@ -29,7 +29,7 @@ general {
 
 defense {
     time_to_launch_rocket: 3000
-    rocket_speed: 0.06
+    rocket_speed: 5
 }
 
 simulator {

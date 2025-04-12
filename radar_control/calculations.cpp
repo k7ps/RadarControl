@@ -16,9 +16,14 @@ namespace {
         if (measureCount == 1) {
             return {measuredX, (measuredX - prevX) / dt};
         }
+        if (measureCount > 50) {
+            measureCount = 50;
+        }
 
         double alpha = 2. * (2. * measureCount - 1.) / (measureCount * (measureCount + 1.));
         double beta = 6. / (measureCount * (measureCount + 1.));
+        // double alpha = 0.4;
+        // double beta = 0.1;
 
         double predictedX = prevX + prevSpeed * dt;
         double predictedSpeed = prevSpeed;

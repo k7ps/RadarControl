@@ -209,9 +209,9 @@ std::string Target::DebugString() const {
 }
 
 
-RadarController::RadarController(const Proto::Parameters& params)
+RadarController::RadarController(const Proto::Parameters& params, double startAngle)
     : Params(params)
-    , RadarAnglePos(M_PI_2)
+    , RadarAnglePos(startAngle)
 {}
 
 void RadarController::Process(

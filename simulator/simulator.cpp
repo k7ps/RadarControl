@@ -7,6 +7,7 @@
 #include "util/util.h"
 
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <math.h>
 
@@ -139,11 +140,11 @@ LaunchParams GetRandomLaunchParams(const Proto::Parameters& params, bool isAccur
 }
 
 
-Simulator::Simulator(const Proto::Parameters& params, bool isUsingScenario)
+Simulator::Simulator(const Proto::Parameters& params, double startAngle, bool isUsingScenario)
     : Params(params)
     , NewTargetProbability((double) Params.simulator().targets_per_minute() / Params.small_radar().frequency() / 60)
     , IsUsingScenario(isUsingScenario)
-    , SmallRadarAngPosition(1.57079)
+    , SmallRadarAngPosition(startAngle)
 {}
 
 bool Simulator::IsTargetInSector(const Target& target) const {
@@ -235,10 +236,13 @@ Simulator::~Simulator() {
 
 TargetScheduler::TargetScheduler(const Proto::Parameters& params)
     : Params(params)
+    , RadarStartAngle(M_PI_2)
 {}
 
 void TargetScheduler::SetScenario(const std::string& filename) {
     const auto scenario = ParseProtoFromFile<Proto::TargetScenario>(filename);
+    RadarStartAngle = DegToRad(scenario.radar_start_angle());
+
     for (const auto& launch : scenario.launches()) {
         Proto::TargetScenario::Launch correctLaunch(launch);
         correctLaunch.set_time(correctLaunch.time() * 1000. / Params.general().play_speed());

@@ -18,6 +18,7 @@ void PrepareParams(Proto::Parameters& params) {
     params.mutable_small_radar()->set_angle_speed(params.small_radar().angle_speed() / 1000);
     params.mutable_simulator()->set_min_target_speed(params.simulator().min_target_speed() / 1000);
     params.mutable_simulator()->set_max_target_speed(params.simulator().max_target_speed() / 1000);
+    params.mutable_defense()->set_rocket_speed(params.defense().rocket_speed() / 1000);
 
     const auto play_speed = params.general().play_speed();
     params.mutable_small_radar()->set_angle_speed(params.small_radar().angle_speed() * play_speed);

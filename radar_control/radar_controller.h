@@ -110,7 +110,7 @@ public:
         std::vector<std::pair<Vector3d, int>> MeetingPointsAndTargetIds;
     };
 
-    RadarController(const Proto::Parameters& params);
+    RadarController(const Proto::Parameters& params, double startAngle);
 
     void Process(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&);
 

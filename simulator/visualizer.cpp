@@ -158,26 +158,26 @@ void Visualizer::DrawRadars(double radarPosAngle, View view) {
             float radarStartAngle = std::max(0.f, radarPosAngleDeg - radarViewAngleDeg / 2);
             float radarEndAngle   = std::min(180.f, radarPosAngleDeg + radarViewAngleDeg / 2);
 
-            DrawDashedRadius(
-                RadarPositionStraight,
-                Params.big_radar().radius(),
-                Params.small_radar().responsible_sector_start(),
-                raylib::Color::Gray()
-            );
-            DrawDashedRadius(
-                RadarPositionStraight,
-                Params.big_radar().radius(),
-                Params.small_radar().responsible_sector_end(),
-                raylib::Color::Gray()
-            );
-            DrawCircleSector(
-                RadarPositionStraight,
-                Params.big_radar().radius(),
-                -Params.small_radar().responsible_sector_start() * 180 / M_PI,
-                -Params.small_radar().responsible_sector_end() * 180 / M_PI,
-                30,
-                raylib::Color(0, 0, 0, 15)
-            );
+            // DrawDashedRadius(
+            //     RadarPositionStraight,
+            //     Params.big_radar().radius(),
+            //     Params.small_radar().responsible_sector_start(),
+            //     raylib::Color::Gray()
+            // );
+            // DrawDashedRadius(
+            //     RadarPositionStraight,
+            //     Params.big_radar().radius(),
+            //     Params.small_radar().responsible_sector_end(),
+            //     raylib::Color::Gray()
+            // );
+            // DrawCircleSector(
+            //     RadarPositionStraight,
+            //     Params.big_radar().radius(),
+            //     -Params.small_radar().responsible_sector_start() * 180 / M_PI,
+            //     -Params.small_radar().responsible_sector_end() * 180 / M_PI,
+            //     30,
+            //     raylib::Color(0, 0, 0, 15)
+            // );
 
             DrawCircleSectorLines(
                 RadarPositionStraight,

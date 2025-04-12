@@ -35,13 +35,13 @@ message Parameters {
 
     message Defense {
         optional double time_to_launch_rocket = 1 [default = 3000];
-        optional double rocket_speed = 2 [default = 0.06];
+        optional double rocket_speed = 2 [default = 5];
     }
 
     message Simulator {
         optional uint32 targets_per_minute = 1 [default = 3];
-        optional double min_target_speed = 2 [default = 0.005];
-        optional double max_target_speed = 3 [default = 0.01];
+        optional double min_target_speed = 2 [default = 1];
+        optional double max_target_speed = 3 [default = 2];
         required double max_height = 4;
         optional double max_deviation_angle_vertical = 5 [default = 15];
         optional double probability_of_accurate_missile = 6 [default = 0.4];

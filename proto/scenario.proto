@@ -18,5 +18,6 @@ message TargetScenario {
         optional bool is_accurate = 9;
     }
 
-    repeated Launch launches = 1;
+    optional double radar_start_angle = 1 [default = 90];
+    repeated Launch launches = 2;
 }

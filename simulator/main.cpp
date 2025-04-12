@@ -26,10 +26,8 @@ int main(int argc, char* argv[]) {
 
     std::vector<std::string> available_scenarios;
     for (const auto& file : std::filesystem::recursive_directory_iterator(scenariod_dir)) {
-        if (file.is_regular_file()) {
-            if (file.path().extension() == scenario_extension) {
-                available_scenarios.emplace_back(file.path().stem());
-            }
+        if (file.is_regular_file() && file.path().extension() == scenario_extension) {
+            available_scenarios.emplace_back(file.path().stem());
         }
     }
     std::sort(available_scenarios.begin(), available_scenarios.end());
@@ -61,16 +59,15 @@ int main(int argc, char* argv[]) {
         srand(time(NULL));
     }
 
-
-    RadarController radarController(params);
-    Simulator simulator(params, !scenario_name.empty());
     TargetScheduler targetScheduler(params);
-    Defense defense(params);
-    Visualizer visualizer(params);
-
     if (!scenario_name.empty()) {
         targetScheduler.SetScenario(scenariod_dir + "/" + scenario_name + scenario_extension);
     }
+
+    RadarController radarController(params, targetScheduler.GetRadarStartAngle());
+    Simulator simulator(params, targetScheduler.GetRadarStartAngle(), !scenario_name.empty());
+    Defense defense(params);
+    Visualizer visualizer(params);
 
 
     while (visualizer.IsWindowOpen()) {

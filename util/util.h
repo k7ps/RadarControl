@@ -46,10 +46,10 @@ bool IsInVector(const std::vector<T>& vec, const T& i) {
 }
 
 template<class T>
-std::string VectorToString(const std::vector<T>& vec) {
+std::string VectorToString(const std::vector<T>& vec, const std::string& sep = ", ") {
     std::ostringstream res;
     for (int i = 0; i < vec.size(); ++i) {
-        if (i != 0) res << ", ";
+        if (i != 0) res << sep;
         res << vec[i];
     }
     return res.str();

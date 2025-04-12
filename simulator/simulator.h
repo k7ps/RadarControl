@@ -75,7 +75,7 @@ LaunchParams GetRandomLaunchParams(const Proto::Parameters& params, bool isAccur
 
 class Simulator {
 public:
-    Simulator(const Proto::Parameters& params, bool isUsingScenario);
+    Simulator(const Proto::Parameters& params, double startAngle, bool isUsingScenario);
 
     void UpdateTargets();
     void SetRadarPosition(double angPos);
@@ -113,11 +113,15 @@ public:
 
     void LaunchTargets(Simulator& simulator);
 
+    double GetRadarStartAngle() const { return RadarStartAngle; }
+
 private:
     const Proto::Parameters& Params;
 
     std::vector<Proto::TargetScenario::Launch> TargetLaunches;
     SimpleTimer Timer;
+
+    double RadarStartAngle;
 };
 
 
