@@ -70,6 +70,7 @@ namespace {
 
         std::vector<int> followedTargetIds;
         std::vector<double> followedAngles;
+
         for (const auto* target : targets) {
             std::vector<double> targetAngles;
             if (target->GetEntryAngle() != -1) targetAngles.push_back(target->GetEntryAngle());
@@ -91,19 +92,21 @@ namespace {
                     std::vector<int> targets2hit;
                     std::vector<double> targets2hitAngles;
                     for (auto id : prevFollowedTargetIds) {
-                        const auto* target = GetTargetById(targets, id);
-                        auto time2meet = target->GetTimeToMeetingPoint();
+                        const auto* followedTarget = GetTargetById(targets, id);
+                        auto time2meet = followedTarget->GetTimeToMeetingPoint();
                         if (
-                            target->IsRocketLaunched()
-                            || target->CanLaunchRocket()
-                            || time2meet + time2rotate < time2entry
+                            followedTarget->IsRocketLaunched()
+                            || followedTarget->CanLaunchRocket()
+                            || time2meet + time2rotate < time2entry + 2000
                         ) {
                             targets2hit.push_back(id);
 
-                            if (target->GetEntryAngle() != -1) targets2hitAngles.push_back(target->GetEntryAngle());
-                            if (target->GetMeetAngle() != -1) targets2hitAngles.push_back(target->GetMeetAngle());
-                            if (target->GetEntryAngle() == -1 && target->GetMeetAngle() == -1)
-                                targets2hitAngles.push_back(GetPhi(target->GetFilteredPosition()));
+                            if (followedTarget->GetEntryAngle() != -1)
+                                targets2hitAngles.push_back(followedTarget->GetEntryAngle());
+                            if (followedTarget->GetMeetAngle() != -1)
+                                targets2hitAngles.push_back(followedTarget->GetMeetAngle());
+                            if (followedTarget->GetEntryAngle() == -1 && followedTarget->GetMeetAngle() == -1)
+                                targets2hitAngles.push_back(GetPhi(followedTarget->GetFilteredPosition()));
                         }
                     }
                     if (
