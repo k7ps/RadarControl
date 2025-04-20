@@ -2,15 +2,15 @@
 #define CALCULATIONS_H
 
 
-#include <vector>
-#include <utility>
-
 #include "util/points.h"
+
+#include <utility>
+#include <vector>
 
 
 std::pair<Vector3d, Vector3d> ABFilter(Vector3d x, Vector3d prevX, Vector3d prevSpeed, double dt, int measureCount);
 
-Vector3d CalculateMeetingPoint(
+Vector3d CalculateMeetPoint(
     const Vector3d& targetPos,
     const Vector3d& targetSpeed,
     double rocketSpeed,
@@ -28,7 +28,7 @@ double CalculateRadarAngleOneTarget(
     double currRadarAngle,
     double currRadarTargetAngle,
     double entryPointAngle,
-    double meetingPointAngle,
+    double meetPointAngle,
     double viewAngle,
     double margin
 );
@@ -42,6 +42,8 @@ double CalculateRadarAngleMultiTarget(
 );
 
 double CalculatePriority(Vector3d pos, Vector3d speed, double maxSpeed, Vector3d radarPoint = Vector3d::Zero());
+
+std::vector<double> SolveQuadraticEquation(double a, double b, double c);
 
 
 #endif // CALCULATIONS_H

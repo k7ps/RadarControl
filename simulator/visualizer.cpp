@@ -2,10 +2,11 @@
 #include "util/points.h"
 #include "util/util.h"
 
-#include "Color.hpp"
-#include <Vector2.hpp>
-#include <iostream>
 #include <raylib.h>
+#include <Color.hpp>
+#include <Vector2.hpp>
+
+#include <iostream>
 #include <set>
 #include <string>
 #include <vector>
@@ -90,7 +91,7 @@ void Visualizer::DrawFrame(
     const std::vector<int>& followedTargetIds,
     const std::vector<Vector3d>& rockets,
     const std::vector<Vector3d>& entryPoints,
-    const std::vector<Vector3d>& approximateMeetingPoints,
+    const std::vector<Vector3d>& approximateMeetPoints,
     double radarPosAngle
 ) {
     BeginDrawing();
@@ -102,7 +103,7 @@ void Visualizer::DrawFrame(
             DrawTargets(bigDatas, smallDatas, priorities, followedTargetIds, view);
             DrawRockets(rockets, view);
             DrawEntryPoints(entryPoints, view);
-            DrawApproximateMeetingPoints(approximateMeetingPoints, view);
+            DrawApproximateMeetPoints(approximateMeetPoints, view);
         }
     }
     EndDrawing();
@@ -158,26 +159,26 @@ void Visualizer::DrawRadars(double radarPosAngle, View view) {
             float radarStartAngle = std::max(0.f, radarPosAngleDeg - radarViewAngleDeg / 2);
             float radarEndAngle   = std::min(180.f, radarPosAngleDeg + radarViewAngleDeg / 2);
 
-            // DrawDashedRadius(
-            //     RadarPositionStraight,
-            //     Params.big_radar().radius(),
-            //     Params.small_radar().responsible_sector_start(),
-            //     raylib::Color::Gray()
-            // );
-            // DrawDashedRadius(
-            //     RadarPositionStraight,
-            //     Params.big_radar().radius(),
-            //     Params.small_radar().responsible_sector_end(),
-            //     raylib::Color::Gray()
-            // );
-            // DrawCircleSector(
-            //     RadarPositionStraight,
-            //     Params.big_radar().radius(),
-            //     -Params.small_radar().responsible_sector_start() * 180 / M_PI,
-            //     -Params.small_radar().responsible_sector_end() * 180 / M_PI,
-            //     30,
-            //     raylib::Color(0, 0, 0, 15)
-            // );
+            DrawDashedRadius(
+                RadarPositionStraight,
+                Params.big_radar().radius(),
+                Params.small_radar().responsible_sector_start(),
+                raylib::Color::Gray()
+            );
+            DrawDashedRadius(
+                RadarPositionStraight,
+                Params.big_radar().radius(),
+                Params.small_radar().responsible_sector_end(),
+                raylib::Color::Gray()
+            );
+            DrawCircleSector(
+                RadarPositionStraight,
+                Params.big_radar().radius(),
+                -Params.small_radar().responsible_sector_start() * 180 / M_PI,
+                -Params.small_radar().responsible_sector_end() * 180 / M_PI,
+                30,
+                raylib::Color(0, 0, 0, 15)
+            );
 
             DrawCircleSectorLines(
                 RadarPositionStraight,
@@ -232,11 +233,11 @@ void Visualizer::DrawPoints(const std::vector<Vector3d>& points, View view, rayl
 }
 
 void Visualizer::DrawEntryPoints(const std::vector<Vector3d>& entryPoints, View view) {
-    if (Params.visualizer().need_draw_entry_points()) {
+    if (Params.visualizer().draw_entry_points()) {
         DrawPoints(entryPoints, view, raylib::Color::Gray());
     }
 }
 
-void Visualizer::DrawApproximateMeetingPoints(const std::vector<Vector3d>& approximateMeetingPoints, View view) {
-    DrawPoints(approximateMeetingPoints, view, raylib::Color::Red());
+void Visualizer::DrawApproximateMeetPoints(const std::vector<Vector3d>& approximateMeetPoints, View view) {
+    DrawPoints(approximateMeetPoints, view, raylib::Color::Red());
 }

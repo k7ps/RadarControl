@@ -2,7 +2,8 @@ small_radar {
     radius: 400
     view_angle: 60
     frequency: 20
-    angle_speed: 5
+    max_eps: 0.2
+    max_angle_speed: 2
     rad_stddev: 0.2
     ang_stddev: 0.04
     h_stddev: 0.1
@@ -20,7 +21,7 @@ big_radar {
 
 general {
     death_time: 2500
-    play_speed: 4.0
+    play_speed: 5.0
     big_radar_measure_cnt: 60
     small_radar_measure_cnt: 100
     aprox_small_radar_measure_cnt: 50
@@ -45,7 +46,7 @@ simulator {
 visualizer {
     radars_outline_thickness: 1
     target_radius: 5
-    need_draw_entry_points: false
+    draw_entry_points: true
 }
 
 # proto-file: proto/params.proto

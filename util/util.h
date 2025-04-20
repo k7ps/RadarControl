@@ -1,11 +1,11 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include <vector>
+#include "points.h"
+
 #include <algorithm>
 #include <sstream>
-
-#include "points.h"
+#include <vector>
 
 
 Vector2d PolarToCartesian(double rad, double ang);
@@ -18,7 +18,7 @@ Vector3d CylindricalToCartesian(const Vector3d& p);
 Vector3d CartesianToCylindrical(double x, double y, double z);
 Vector3d CartesianToCylindrical(const Vector3d& p);
 
-double GetPhi(Vector3d p, Vector3d center = Vector3d::Zero());
+double CalculateAngle(Vector3d p, Vector3d center = Vector3d::Zero());
 
 bool GetRandomTrue(float probability);
 double GetRandomDouble(double min, double max);
@@ -34,7 +34,8 @@ float RadToDeg(float angle);
 double DegToRad(double angle);
 float DegToRad(float angle);
 
-void PrintCurrentTime();
+std::string CurrentTimeToString();
+std::string MillisecondsToString(double ms);
 
 bool IsInSegment(double c, double a, double b);
 bool IsInSegment(const std::vector<double>& c, double a, double b);
@@ -53,6 +54,13 @@ std::string VectorToString(const std::vector<T>& vec, const std::string& sep = "
         res << vec[i];
     }
     return res.str();
+}
+
+template<class T>
+void JoinToVector(std::vector<T>& a, const std::vector<T>& b) {
+    for (auto i : b) {
+        a.push_back(i);
+    }
 }
 
 

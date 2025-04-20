@@ -4,10 +4,10 @@
 #include <iostream>
 
 
-DefRocket::DefRocket(Vector3d meetingPoint, double speed, unsigned timeToLaunchMs)
+DefRocket::DefRocket(Vector3d meetPoint, double speed, unsigned timeToLaunchMs)
     : Pos()
-    , MeetingPoint(meetingPoint)
-    , Speed(MeetingPoint * speed / SqrtOfSumSquares(meetingPoint)), TimeToLaunchMs(timeToLaunchMs)
+    , MeetPoint(meetPoint)
+    , Speed(MeetPoint * speed / SqrtOfSumSquares(meetPoint)), TimeToLaunchMs(timeToLaunchMs)
 {}
 
 void DefRocket::UpdatePosition() {
@@ -25,8 +25,8 @@ void DefRocket::UpdatePosition() {
 
     Pos += Speed * ms;
 
-    if (IsSignsEqual(Pos - MeetingPoint, Speed)) {
-        Pos = MeetingPoint;
+    if (IsSignsEqual(Pos - MeetPoint, Speed)) {
+        Pos = MeetPoint;
         IsExplodedFlag = true;
     }
 }
@@ -35,8 +35,8 @@ Vector3d DefRocket::GetPosition() const {
     return Pos;
 }
 
-Vector3d DefRocket::GetMeetingPoint() const {
-    return MeetingPoint;
+Vector3d DefRocket::GetMeetPoint() const {
+    return MeetPoint;
 }
 
 bool DefRocket::IsLaunched() const {
@@ -52,8 +52,8 @@ Defense::Defense(const Proto::Parameters& params)
     : Params(params)
 {}
 
-void Defense::LaunchRockets(const std::vector<std::pair<Vector3d, int>>& meetingPointsAndTargetIds) {
-    for (const auto& [point, targetId] : meetingPointsAndTargetIds) {
+void Defense::LaunchRockets(const std::vector<std::pair<Vector3d, int>>& meetPointsAndTargetIds) {
+    for (const auto& [point, targetId] : meetPointsAndTargetIds) {
         Rockets.emplace_back(
             DefRocket(point, Params.defense().rocket_speed(), Params.defense().time_to_launch_rocket()),
             targetId
@@ -87,11 +87,11 @@ std::vector<Vector3d> Defense::GetRocketsPositions() {
     return res;
 }
 
-std::vector<Vector3d> Defense::GetMeetingPoints() {
+std::vector<Vector3d> Defense::GetMeetPoints() {
     std::vector<Vector3d> res;
     for (auto& [rocket, _] : Rockets) {
         if (!rocket.IsExploded()) {
-            res.push_back(rocket.GetMeetingPoint());
+            res.push_back(rocket.GetMeetPoint());
         }
     }
     return res;

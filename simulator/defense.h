@@ -8,18 +8,18 @@
 
 class DefRocket {
 public:
-    DefRocket(Vector3d meetingPoint, double speed, unsigned timeToLaunchMs);
+    DefRocket(Vector3d meetPoint, double speed, unsigned timeToLaunchMs);
 
     void UpdatePosition();
 
     Vector3d GetPosition() const;
-    Vector3d GetMeetingPoint() const;
+    Vector3d GetMeetPoint() const;
     bool IsLaunched() const;
     bool IsExploded() const;
 
 private:
     Vector3d Pos;
-    Vector3d MeetingPoint;
+    Vector3d MeetPoint;
     Vector3d Speed;
 
     SimpleTimer Timer;
@@ -35,11 +35,11 @@ class Defense {
 public:
     Defense(const Proto::Parameters& params);
 
-    void LaunchRockets(const std::vector<std::pair<Vector3d, int>>& meetingPointsAndTargetIds);
+    void LaunchRockets(const std::vector<std::pair<Vector3d, int>>& meetPointsAndTargetIds);
 
     std::vector<int> GetDestroyedTargetsId();
     std::vector<Vector3d> GetRocketsPositions();
-    std::vector<Vector3d> GetMeetingPoints();
+    std::vector<Vector3d> GetMeetPoints();
 
 private:
     const Proto::Parameters& Params;

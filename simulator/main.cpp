@@ -7,18 +7,19 @@
 #include "visualizer.h"
 
 #include <argparse/argparse.hpp>
+
+#include <cmath>
+#include <filesystem>
 #include <iomanip>
 #include <iostream>
-#include <filesystem>
 
 
 int main(int argc, char* argv[]) {
-    std::cout << std::fixed << std::setprecision(6);
+    std::cout << std::fixed << std::setprecision(9);
     SetTraceLogCallback([](int, const char*, va_list) {
         std::cout << '\0';
     });
     SetConfigFlags(FLAG_MSAA_4X_HINT);
-
 
     std::string scenariod_dir =
         getenv("RADARCONTROL_SCENARIOS_DIR") ? getenv("RADARCONTROL_SCENARIOS_DIR") : "../scenarios";
@@ -78,9 +79,9 @@ int main(int argc, char* argv[]) {
 
         radarController.Process(bigRadarTargets, smallRadarTargets);
 
-        auto res = radarController.GetAngleAndMeetingPoints();
+        auto res = radarController.GetAngleAndMeetPoints();
 
-        defense.LaunchRockets(res.MeetingPointsAndTargetIds);
+        defense.LaunchRockets(res.MeetPointsAndTargetIds);
 
         visualizer.DrawFrame(
             bigRadarTargets,
@@ -89,7 +90,7 @@ int main(int argc, char* argv[]) {
             res.FollowedTargetIds,
             defense.GetRocketsPositions(),
             radarController.GetEntryPoints(),
-            radarController.GetApproximateMeetingPoints(),
+            radarController.GetApproximateMeetPoints(),
             res.Angle
         );
 

@@ -1,8 +1,8 @@
 #ifndef VISUALIZER_H
 #define VISUALIZER_H
 
-#include "radar_control/data.h"
 #include "proto/generated/params.pb.h"
+#include "radar_control/data.h"
 #include "util/points.h"
 
 #include <raylib-cpp.hpp>
@@ -26,7 +26,7 @@ public:
         const std::vector<int>& followedTargetIds,
         const std::vector<Vector3d>& rockets,
         const std::vector<Vector3d>& entryPoints,
-        const std::vector<Vector3d>& approximateMeetingPoints,
+        const std::vector<Vector3d>& approximateMeetPoints,
         double radarPosAngle
     );
 
@@ -44,7 +44,7 @@ private:
     );
     void DrawRockets(const std::vector<Vector3d>& rockets, View view);
     void DrawEntryPoints(const std::vector<Vector3d>& entryPoints, View view);
-    void DrawApproximateMeetingPoints(const std::vector<Vector3d>& approximateMeetingPoints, View view);
+    void DrawApproximateMeetPoints(const std::vector<Vector3d>& approximateMeetPoints, View view);
     void DrawRadars(double radarPosAngle, View view);
 
 private:

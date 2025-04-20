@@ -1,5 +1,4 @@
 #include "simulator.h"
-
 #include "proto/generated/scenario.pb.h"
 #include "radar_control/calculations.h"
 #include "util/points.h"

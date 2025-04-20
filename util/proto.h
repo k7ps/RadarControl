@@ -1,13 +1,14 @@
 #ifndef PROTO_H
 #define PROTO_H
 
-#include <fcntl.h>
-#include <string>
+
+#include "proto/generated/params.pb.h"
 
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/text_format.h>
 
-#include "proto/generated/params.pb.h"
+#include <fcntl.h>
+#include <string>
 
 
 template<class T>

@@ -1,12 +1,13 @@
 #include "util.h"
 #include "util/points.h"
 
-#include <math.h>
-#include <random>
-#include <iostream>
-#include <iomanip>
 #include <chrono>
 #include <ctime>
+#include <iomanip>
+#include <iostream>
+#include <math.h>
+#include <random>
+#include <sstream>
 
 
 Vector2d PolarToCartesian(double rad, double ang) {
@@ -43,7 +44,7 @@ Vector3d CartesianToCylindrical(const Vector3d& p) {
     return CartesianToCylindrical(p.X, p.Y, p.Z);
 }
 
-double GetPhi(Vector3d p, Vector3d center) {
+double CalculateAngle(Vector3d p, Vector3d center) {
     p = p - center;
     return CartesianToCylindrical(p).Y;
 }
@@ -106,12 +107,34 @@ float DegToRad(float angle) {
     return angle * M_PI / 180;
 }
 
-void PrintCurrentTime() {
+std::string CurrentTimeToString() {
     auto now = std::chrono::system_clock::now();
     auto time_t = std::chrono::system_clock::to_time_t(now);
     auto tm = *std::localtime(&time_t);
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
-    std::cout << std::put_time(&tm, "%H:%M:%S") << '.' << std::setfill('0') << std::setw(3) << ms.count() << std::endl;
+
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "%H:%M:%S") << '.' << std::setfill('0') << std::setw(3) << ms.count();
+    return oss.str();
+}
+
+std::string MillisecondsToString(double milliseconds) {
+    auto ms = std::chrono::milliseconds(int(milliseconds));
+    auto hours = std::chrono::duration_cast<std::chrono::hours>(ms);
+    ms -= hours;
+    auto minutes = std::chrono::duration_cast<std::chrono::minutes>(ms);
+    ms -= minutes;
+    auto seconds = std::chrono::duration_cast<std::chrono::seconds>(ms);
+    ms -= seconds;
+
+    std::ostringstream oss;
+    oss << std::setfill('0')
+        << std::setw(2) << hours.count() << ":"
+        << std::setw(2) << minutes.count() << ":"
+        << std::setw(2) << seconds.count() << "."
+        << std::setw(3) << ms.count();
+
+    return oss.str();
 }
 
 bool IsInSegment(double c, double a, double b) {
