@@ -25,8 +25,9 @@ namespace RC {
         double GetPresetPriority() const { return PresetPriority; }
         void SetPriority(double p) { Priority = p; }
 
+        Vector3d GetUnfilteredPosition() const { return UnfilteredPos; }
         Vector3d GetPosition() const { return Pos; }
-        Vector3d GetFilteredPosition() const { return FilteredPos; }
+        double GetPosAngle() const { return CalculateAngle(Pos); }
 
         bool HavePreciseSpeed() const { return CurrSmallRadarMeasureCount >= SmallRadarMeasureCount; }
         Vector3d GetFilteredSpeed() const { return (CurrSmallRadarMeasureCount < ApproxSmallRadarMeasureCount ? SpeedFromBigRadar : FilteredSpeed); }
@@ -43,27 +44,27 @@ namespace RC {
         void SetEntryPoint(Vector3d p) { EntryPoint = p; }
         Vector3d GetEntryPoint() const { return EntryPoint; }
         double GetEntryAngle() const { return (EntryPoint == Vector3d::Zero() ? -1 : CalculateAngle(EntryPoint)); }
-        double GetTimeToEntryPoint() const { return Distance(FilteredPos, EntryPoint) / SqrtOfSumSquares(GetFilteredSpeed()); }
+        double GetTimeToEntryPoint() const { return Distance(Pos, EntryPoint) / SqrtOfSumSquares(GetFilteredSpeed()); }
         bool NeedToUpdateEntryPoint() const { return NeedToUpdateEntryPointFlag; }
         void SetNeedToUpdateEntryPoint(bool f) { NeedToUpdateEntryPointFlag = f; }
 
         void SetNearPoint(Vector3d p) { NearPoint = p; }
         Vector3d GetNearPoint() const { return NearPoint; }
         double GetNearAngle() const { return (NearPoint == Vector3d::Zero() ? -1 : CalculateAngle(NearPoint)); }
-        double GetTimeToNearPoint() const { return Distance(FilteredPos, NearPoint) / SqrtOfSumSquares(GetFilteredSpeed()); }
+        double GetTimeToNearPoint() const { return Distance(Pos, NearPoint) / SqrtOfSumSquares(GetFilteredSpeed()); }
         bool NeedToUpdateNearPoint() const { return NeedToUpdateNearPointFlag; }
         void SetNeedToUpdateNearPoint(bool f) { NeedToUpdateNearPointFlag = f; }
 
         void SetApproximateMeetPoint(Vector3d p) { ApproximateMeetPoint = p; }
         Vector3d GetApproximateMeetPoint() const { return ApproximateMeetPoint; }
         double GetMeetAngle() const { return (ApproximateMeetPoint == Vector3d::Zero() ? -1 : CalculateAngle(ApproximateMeetPoint)); }
-        double GetTimeToMeetPoint() const { return Distance(FilteredPos, ApproximateMeetPoint) / SqrtOfSumSquares(GetFilteredSpeed()); }
+        double GetTimeToMeetPoint() const { return Distance(Pos, ApproximateMeetPoint) / SqrtOfSumSquares(GetFilteredSpeed()); }
         bool NeedToUpdateMeetPoint() const { return NeedToUpdateMeetPointFlag; }
         void SetNeedToUpdateMeetPoint(bool f) { NeedToUpdateMeetPointFlag = f; }
 
         bool IsInSector(double rad, double angView, double angPos) const;
 
-        bool CanBeInRadarSector() const { return Distance(FilteredPos, Vector3d::Zero()) <= SmallRadarRadius; }
+        bool CanBeInRadarSector() const { return Distance(Pos, Vector3d::Zero()) <= SmallRadarRadius; }
 
         std::string DebugString() const;
 
@@ -73,8 +74,8 @@ namespace RC {
         double PresetPriority = -1;
         double SmallRadarRadius;
 
+        Vector3d UnfilteredPos;
         Vector3d Pos;
-        Vector3d FilteredPos;
         Vector3d SpeedFromBigRadar;
         Vector3d FilteredSpeed;
 
@@ -100,10 +101,6 @@ namespace RC {
 
 }
 
-struct RadarPos {
-    double Angle;
-    double Speed;
-};
 
 class RadarController {
 public:
@@ -133,7 +130,7 @@ private:
     const Proto::Parameters& Params;
 
     RadarPos Pos;
-    RadarPos TargetPos;
+    RadarTargetPos TargetPos;
 
     std::vector<RC::Target*> Targets;
 

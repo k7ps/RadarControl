@@ -2,6 +2,7 @@
 #define CALCULATIONS_H
 
 
+#include "data.h"
 #include "util/points.h"
 
 #include <utility>
@@ -44,6 +45,21 @@ double CalculateRadarAngleMultiTarget(
 double CalculatePriority(Vector3d pos, Vector3d speed, double maxSpeed, Vector3d radarPoint = Vector3d::Zero());
 
 std::vector<double> SolveQuadraticEquation(double a, double b, double c);
+
+double TimeToRotate(RadarPos curr, RadarTargetPos target, double maxEps);
+double TimeToRotateToTarget(
+    RadarPos pos,
+    RadarTargetPos targetPos,
+    const std::vector<double>& targetAngles,
+    double maxAngleSpeed,
+    double maxEps,
+    double viewAngle,
+    double margin
+);
+
+RadarPos UpdateRadarPos(RadarPos curr, RadarTargetPos target, double maxEps, double deltaTime);
+
+bool CanAddToAngleArray(double maxDiff, const std::vector<double>& angles, const std::vector<double>& newAngles);
 
 
 #endif // CALCULATIONS_H

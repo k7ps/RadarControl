@@ -17,22 +17,6 @@ using namespace RC;
 
 namespace {
 
-    bool CanAddToAngleArray(
-        double maxDiff,
-        const std::vector<double>& angles,
-        const std::vector<double>& newAngles
-    ) {
-        if (angles.empty()) return true;
-        auto min = *std::min_element(angles.begin(), angles.end());
-        auto max = *std::max_element(angles.begin(), angles.end());
-        for (auto newAngle : newAngles) {
-            if (newAngle != -1 && (std::abs(newAngle - min) > maxDiff || std::abs(newAngle - max) > maxDiff)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     const Target* GetTargetById(const std::vector<const Target*>& targets, int id){
         for (const auto* target : targets) {
             if (target->GetId() == id) {
@@ -52,115 +36,24 @@ namespace {
         );
     }
 
-    double TimeToRotate(RadarPos curr, RadarPos target, double maxEps) {
-        auto time = 0.;
-        auto distToTarget = target.Angle - curr.Angle;
-        auto direction = (distToTarget > 0 ? 1. : -1.);
-        if (std::abs(distToTarget) < 1e-3 && std::abs(curr.Speed) < maxEps * 400) return time;
-
-        auto stoppingDist = 0.5 * curr.Speed * curr.Speed / maxEps;
-        if (curr.Speed * direction < 0 || std::abs(distToTarget) < stoppingDist) {
-            time += std::abs(curr.Speed) / maxEps;
-            curr.Angle += (curr.Speed > 0 ? 1. : -1.) * curr.Speed * curr.Speed / (2 * maxEps);
-            curr.Speed = 0;
-            distToTarget = target.Angle - curr.Angle;
-        }
-        distToTarget = std::abs(distToTarget);
-
-        auto accDist = 0.;
-        auto decDist = 0.;
-        auto currAbsSpeed = std::abs(curr.Speed);
-
-        if (currAbsSpeed < target.Speed) {
-            auto timeToMaxSpeed = (target.Speed - currAbsSpeed) / maxEps;
-            accDist = currAbsSpeed * timeToMaxSpeed + 0.5 * maxEps * timeToMaxSpeed * timeToMaxSpeed;
-        }
-        decDist = 0.5 * target.Speed * target.Speed / maxEps;
-
-        if (accDist + decDist < distToTarget) {
-            time += (2 * target.Speed - currAbsSpeed) / maxEps + (distToTarget - accDist - decDist) / target.Speed;
-        } else {
-            auto times = SolveQuadraticEquation(
-                maxEps,
-                2 * currAbsSpeed,
-                0.5 * currAbsSpeed * currAbsSpeed / maxEps - distToTarget
-            );
-            if (!times.empty()) {
-                time += *std::max_element(times.begin(), times.end()) * 2;
-            }
-            time += currAbsSpeed / maxEps;
-        }
-        return time;
-    }
-
-    double TimeToRotateToTarget(
-        RadarPos pos,
-        RadarPos targetPos,
-        const std::vector<double>& targetAngles,
-        double maxAngleSpeed,
-        double maxEps,
-        double viewAngle,
-        double margin
-    ) {
-        auto to = CalculateRadarAngleMultiTarget(
-            pos.Angle,
-            targetPos.Angle,
-            targetAngles,
-            viewAngle,
-            margin
-        );
-        return TimeToRotate(pos, RadarPos{.Angle=to, .Speed=maxAngleSpeed}, maxEps);
-    }
-
     std::vector<double> GetTargetAngles(const Target* target) {
         std::vector<double> res;
         if (target->GetMeetAngle() != -1) res.push_back(target->GetMeetAngle());
         if (target->GetEntryAngle() != -1) res.push_back(target->GetEntryAngle());
-        else res.push_back(CalculateAngle(target->GetFilteredPosition()));
+        else res.push_back(target->GetPosAngle());
         return res;
     }
 
-    RadarPos UpdateRadarPos(RadarPos curr, RadarPos target, double maxEps, double deltaTime) {
-        auto distToTarget = target.Angle - curr.Angle;
-        auto direction = (distToTarget > 0 ? 1. : -1.);
-        auto stoppingDist = 0.5 * curr.Speed * curr.Speed / maxEps;
-
-        double eps = 0.;
-        if (std::abs(distToTarget) <= stoppingDist || direction * curr.Speed < 0) {
-            eps = (curr.Speed > 0 ? -1. : 1.) * maxEps;
-        } else {
-            if (std::abs(curr.Speed) < target.Speed) {
-                eps = (curr.Speed > 0 ? 1. : -1.) * maxEps;
-            } else {
-                eps = 0;
-            }
-        }
-        double newSpeed = curr.Speed + eps * deltaTime;
-        if (std::abs(newSpeed) > target.Speed) {
-            newSpeed = (newSpeed > 0 ? 1. : -1.) * target.Speed;
-        }
-
-        double newAngle = curr.Angle + newSpeed * deltaTime;
-        if (std::abs(newAngle - target.Angle) < 1e-3 && std::abs(newSpeed) < maxEps * 400) {
-            newAngle = target.Angle;
-            newSpeed = 0;
-        }
-        return RadarPos{
-            .Angle = newAngle,
-            .Speed = newSpeed
-        };
-    }
-
-    std::pair<RadarPos, std::vector<int>> CalculateRadarPos(
+    std::pair<RadarTargetPos, std::vector<int>> CalculateRadarPosBase(
         RadarPos currPos,
-        RadarPos currTargetPos,
+        RadarTargetPos currTargetPos,
         const std::vector<int>& currFollowedTargetIds,
         const std::vector<const Target*>& targetsInsideResponsible, // sorted by priorities
         const std::vector<const Target*>& targetsOutsideResponsible, // sorted by priorities
         const Proto::Parameters& params
     ) {
         if (targetsInsideResponsible.empty() && targetsOutsideResponsible.empty()) {
-            return {currPos, {}};
+            return {currTargetPos, {}};
         }
 
         const auto viewAngle = params.small_radar().view_angle();
@@ -266,6 +159,30 @@ namespace {
                 }
             }
         }
+        double nextTargetAngle = -1;
+        for (const Target* target : targetsInsideResponsible) {
+            if (!IsInVector(followedTargetIds, target->GetId())) {
+                nextTargetAngle = target->GetPosAngle();
+                break;
+            }
+        }
+        if (nextTargetAngle == -1) {
+            for (const Target* target : targetsOutsideResponsible) {
+                if (!IsInVector(followedTargetIds, target->GetId())) {
+                    nextTargetAngle = target->GetPosAngle();
+                    break;
+                }
+            }
+        }
+        if (nextTargetAngle != -1) {
+            auto minAngle = *std::min_element(followedTargetAngles.begin(), followedTargetAngles.end());
+            auto maxAngle = *std::max_element(followedTargetAngles.begin(), followedTargetAngles.end());
+            if (nextTargetAngle > maxAngle) {
+                followedTargetAngles.push_back(minAngle + viewAngle - 2 * margin);
+            } else if (nextTargetAngle < minAngle) {
+                followedTargetAngles.push_back(maxAngle - viewAngle + 2 * margin);
+            }
+        }
         auto newTargetRadarAngle = CalculateRadarAngleMultiTarget(
             currPos.Angle,
             currTargetPos.Angle,
@@ -273,7 +190,188 @@ namespace {
             viewAngle,
             margin
         );
-        return {RadarPos{.Angle=newTargetRadarAngle, .Speed=maxSpeed}, followedTargetIds};
+        return {RadarTargetPos{.Angle=newTargetRadarAngle, .Speed=maxSpeed}, followedTargetIds};
+    }
+
+    std::pair<RadarTargetPos, std::vector<int>> CalculateRadarPosImproved(
+        RadarPos currPos,
+        RadarTargetPos currTargetPos,
+        const std::vector<int>& currFollowedTargetIds,
+        const std::vector<const Target*>& targetsInsideResponsible, // sorted by priorities
+        const std::vector<const Target*>& targetsOutsideResponsible, // sorted by priorities
+        const Proto::Parameters& params
+    ) {
+        if (targetsInsideResponsible.empty() && targetsOutsideResponsible.empty()) {
+            return {currTargetPos, {}};
+        }
+
+        const auto viewAngle = params.small_radar().view_angle();
+        const auto maxSpeed  = params.small_radar().max_angle_speed();
+        const auto maxEps    = params.small_radar().max_eps();
+        const auto margin    = params.general().margin_angle();
+
+        const auto halfview = viewAngle / 2;
+        const auto angL     = currPos.Angle - halfview + margin;
+        const auto angR     = currPos.Angle + halfview - margin;
+        const auto willAngL = currTargetPos.Angle - halfview + margin;
+        const auto willAngR = currTargetPos.Angle + halfview - margin;
+
+        std::vector<int> followedTargetIds;
+        std::vector<double> followedTargetAngles;
+
+        for (const auto* target : targetsInsideResponsible) {
+            auto targetAngles = GetTargetAngles(target);
+
+            if (CanAddToAngleArray(viewAngle - 2 * margin, followedTargetAngles, targetAngles)) {
+                if (
+                    !IsInSegment(targetAngles, willAngL, willAngR)
+                    && !IsInVector(currFollowedTargetIds, target->GetId())
+                ) {
+                    auto timeToRotate = TimeToRotateToTarget(
+                        currPos, currTargetPos, targetAngles, maxSpeed, maxEps, viewAngle, margin
+                    );
+                    auto timeToNear = target->GetTimeToNearPoint();
+
+                    std::vector<int> targetsToHitIds;
+                    std::vector<double> targetsToHitAngles;
+                    for (auto id : currFollowedTargetIds) {
+                        const auto* followedTarget = GetTargetById(targetsInsideResponsible, id);
+                        auto timeToMeet = followedTarget->GetTimeToMeetPoint();
+                        if (
+                            followedTarget->IsRocketLaunched()
+                            || followedTarget->CanLaunchRocket()
+                            // radar should kill target and rotate to priority one before priority gets in near zone
+                            || timeToMeet + timeToRotate < timeToNear
+                        ) {
+                            targetsToHitIds.push_back(id);
+                            JoinToVector(targetsToHitAngles, GetTargetAngles(followedTarget));
+                        }
+                    }
+                    if (
+                        !targetsToHitIds.empty()
+                        && !CanAddToAngleArray(viewAngle - 2 * margin, targetsToHitAngles, targetAngles)
+                    ) {
+                        return {currTargetPos, targetsToHitIds};
+                    }
+                }
+
+                followedTargetIds.push_back(target->GetId());
+                JoinToVector(followedTargetAngles, targetAngles);
+            }
+        }
+        if (followedTargetIds.empty()) {
+            for (const auto* target : targetsOutsideResponsible) {
+                auto targetAngles = GetTargetAngles(target);
+
+                if (CanAddToAngleArray(viewAngle - 2 * margin, followedTargetAngles, targetAngles)) {
+                    if (
+                        !IsInSegment(targetAngles, willAngL, willAngR)
+                        && !IsInVector(currFollowedTargetIds, target->GetId())
+                    ) {
+                        auto timeToRotate = TimeToRotateToTarget(
+                            currPos, currTargetPos, targetAngles, maxSpeed, maxEps, viewAngle, margin
+                        );
+                        auto timeToNear = target->GetTimeToNearPoint();
+
+                        std::vector<int> targetsToHitIds;
+                        std::vector<double> targetsToHitAngles;
+                        for (auto id : currFollowedTargetIds) {
+                            const auto* followedTarget = GetTargetById(targetsOutsideResponsible, id);
+                            auto timeToMeet = followedTarget->GetTimeToMeetPoint();
+                            if (
+                                followedTarget->IsRocketLaunched()
+                                || followedTarget->CanLaunchRocket()
+                                // radar should kill target and rotate to priority one before priority gets in near zone
+                                || timeToMeet + timeToRotate < timeToNear
+                            ) {
+                                targetsToHitIds.push_back(id);
+                                JoinToVector(targetsToHitAngles, GetTargetAngles(followedTarget));
+                            }
+                        }
+                        if (
+                            !targetsToHitIds.empty()
+                            && !CanAddToAngleArray(viewAngle - 2 * margin, targetsToHitAngles, targetAngles)
+                        ) {
+                            return {currTargetPos, targetsToHitIds};
+                        }
+                    }
+
+                    followedTargetIds.push_back(target->GetId());
+                    JoinToVector(followedTargetAngles, targetAngles);
+                }
+            }
+        } else {
+            for (const auto* target : targetsOutsideResponsible) {
+                auto targetAngles = GetTargetAngles(target);
+
+                if (CanAddToAngleArray(viewAngle - 2 * margin, followedTargetAngles, targetAngles)) {
+                    followedTargetIds.push_back(target->GetId());
+                    JoinToVector(followedTargetAngles, targetAngles);
+                }
+            }
+        }
+        double nextTargetAngle = -1;
+        double timeToReach = -1;
+        for (const Target* target : targetsInsideResponsible) {
+            if (!IsInVector(followedTargetIds, target->GetId())) {
+                nextTargetAngle = target->GetPosAngle();
+                break;
+            }
+        }
+        if (nextTargetAngle == -1) {
+            for (const Target* target : targetsOutsideResponsible) {
+                if (!IsInVector(followedTargetIds, target->GetId())) {
+                    nextTargetAngle = target->GetPosAngle();
+                    break;
+                }
+            }
+        }
+        auto newTargetRadarAngle = CalculateRadarAngleMultiTarget(
+            currPos.Angle,
+            currTargetPos.Angle,
+            followedTargetAngles,
+            viewAngle,
+            margin
+        );
+        if (nextTargetAngle != -1) {
+            bool IsAllTargetsIn = true;
+            for (auto angle : followedTargetAngles) {
+                if (!IsInSegment(angle, angL, angR)) {
+                    IsAllTargetsIn = false;
+                    break;
+                }
+            }
+            if (IsAllTargetsIn) {
+                auto minAngle = *std::min_element(followedTargetAngles.begin(), followedTargetAngles.end());
+                auto maxAngle = *std::max_element(followedTargetAngles.begin(), followedTargetAngles.end());
+                if (nextTargetAngle > maxAngle) {
+                    followedTargetAngles.push_back(minAngle + viewAngle - 2 * margin);
+                } else {
+                    followedTargetAngles.push_back(maxAngle - viewAngle + 2 * margin);
+                }
+                newTargetRadarAngle = CalculateRadarAngleMultiTarget(
+                    currPos.Angle,
+                    currTargetPos.Angle,
+                    followedTargetAngles,
+                    viewAngle,
+                    margin
+                );
+                for (const auto* target : targetsInsideResponsible) {
+                    if (IsInVector(followedTargetIds, target->GetId())) {
+                        timeToReach = std::max(timeToReach, target->GetTimeToMeetPoint());
+                    }
+                }
+                for (const auto* target : targetsOutsideResponsible) {
+                    if (IsInVector(followedTargetIds, target->GetId())) {
+                        timeToReach = std::max(timeToReach, target->GetTimeToMeetPoint());
+                    }
+                }
+            }
+        }
+        return {
+            RadarTargetPos{.Angle=newTargetRadarAngle, .Speed=maxSpeed, .TimeToReach=timeToReach},
+            followedTargetIds
+        };
     }
 
 }
@@ -297,11 +395,11 @@ Target::Target(const BigRadarData& data, double deathTime, const Proto::Paramete
 
 void Target::BigRadarUpdate(Vector3d pos, Vector3d speed) {
     Timer.Restart();
-    if (FilteredPos == pos) {
+    if (Pos == pos) {
         return;
     }
 
-    FilteredPos = pos;
+    Pos = pos;
     SpeedFromBigRadar = speed;
     ++CurrBigRadarMeasureCount;
 
@@ -318,17 +416,17 @@ void Target::BigRadarUpdate(Vector3d pos, Vector3d speed) {
 }
 
 void Target::SmallRadarUpdate(Vector3d pos) {
-    if (Pos == pos) {
+    if (UnfilteredPos == pos) {
         return;
     }
 
     int dt = Timer.GetElapsedTimeAsMs();
     Timer.Restart();
 
-    Pos = pos;
+    UnfilteredPos = pos;
 
-    auto filtered = ABFilter(Pos, FilteredPos, FilteredSpeed, dt, CurrSmallRadarMeasureCount);
-    FilteredPos = filtered.first;
+    auto filtered = ABFilter(UnfilteredPos, Pos, FilteredSpeed, dt, CurrSmallRadarMeasureCount);
+    Pos = filtered.first;
     FilteredSpeed = filtered.second;
 
     if (CurrSmallRadarMeasureCount >= ApproxSmallRadarMeasureCount) {
@@ -342,7 +440,7 @@ void Target::SmallRadarUpdate(Vector3d pos) {
 bool Target::IsInSector(double rad, double angView, double angPos) const {
     double startAng = angPos - angView / 2;
     double endAng = angPos + angView / 2;
-    auto polarPos = CartesianToCylindrical(FilteredPos);
+    auto polarPos = CartesianToCylindrical(Pos);
     return polarPos.X <= rad && startAng <= polarPos.Y && polarPos.Y <= endAng;
 }
 
@@ -350,7 +448,7 @@ std::string Target::DebugString() const {
     return std::string("TargetInfo:")
         + "\n  ID: " + std::to_string(Id)
         + "\n  Priority: " + std::to_string(Priority)
-        + "\n  Pos: " + Pos.DebugString()
+        + "\n  UnfilteredPos: " + UnfilteredPos.DebugString()
         + "\n  IsFollowed: " + std::to_string(IsFollowedFlag)
         + "\n  IsRocketLaunchedFlag: " + std::to_string(IsFollowedFlag)
         + "\n  CanBeFollowed: " + std::to_string(CanBeFollowed())
@@ -402,7 +500,7 @@ void RadarController::Process(
             } else {
                 target->SetPriority(
                     CalculatePriority(
-                        target->GetFilteredPosition(),
+                        target->GetPosition(),
                         target->GetFilteredSpeed(),
                         Params.simulator().max_target_speed()
                     )
@@ -412,7 +510,7 @@ void RadarController::Process(
         if (target->NeedToUpdateEntryPoint()) {
             target->SetEntryPoint(
                 CalculateEntryPoint(
-                    target->GetFilteredPosition(),
+                    target->GetPosition(),
                     target->GetFilteredSpeed(),
                     Params.small_radar().radius()
                 )
@@ -422,7 +520,7 @@ void RadarController::Process(
         if (target->NeedToUpdateNearPoint()) {
             target->SetNearPoint(
                 CalculateEntryPoint(
-                    target->GetFilteredPosition(),
+                    target->GetPosition(),
                     target->GetFilteredSpeed(),
                     Params.small_radar().radius() * 0.5
                 )
@@ -431,34 +529,31 @@ void RadarController::Process(
         }
         if (target->NeedToUpdateMeetPoint() && !target->IsRocketLaunched()) {
             const double timeToCalculatePrecizeSpeed =
-                Params.general().small_radar_measure_cnt() / Params.small_radar().frequency() * 1000 * 0;
+                Params.general().small_radar_measure_cnt() / Params.small_radar().frequency() * 1000;
             double timeToHit = Params.defense().time_to_launch_rocket();
-            std::cout << CurrentTimeToString() << ": " << MillisecondsToString(timeToHit) << ", ";
             if (IsTargetInRadarSector(target)) {
                 timeToHit += target->GetMeasureCountToPreciseSpeed() / Params.small_radar().frequency() * 1000;
-                std::cout << MillisecondsToString(target->GetMeasureCountToPreciseSpeed() / Params.small_radar().frequency() * 1000) << '\n';
             } else {
-                timeToHit += timeToCalculatePrecizeSpeed + TimeToRotateToTarget(
+                auto timeToRotate = TimeToRotateToTarget(
                     Pos,
                     TargetPos,
-                    {CalculateAngle(target->GetFilteredPosition())},
+                    {target->GetPosAngle()},
                     Params.small_radar().max_angle_speed(),
                     Params.small_radar().max_eps(),
                     Params.small_radar().view_angle(),
                     Params.general().margin_angle()
                 );
-                std::cout << MillisecondsToString(timeToCalculatePrecizeSpeed) << ", " << MillisecondsToString(TimeToRotateToTarget(
-                    Pos,
-                    TargetPos,
-                    {CalculateAngle(target->GetFilteredPosition())},
-                    Params.small_radar().max_angle_speed(),
-                    Params.small_radar().max_eps(),
-                    Params.small_radar().view_angle(),
-                    Params.general().margin_angle()
-                )) << '\n';
+                if (
+                    !target->CanBeInRadarSector()
+                    && target->GetTimeToEntryPoint() + timeToCalculatePrecizeSpeed > timeToRotate
+                ) {
+                    timeToHit += target->GetTimeToEntryPoint() + timeToCalculatePrecizeSpeed;
+                } else {
+                    timeToHit += timeToRotate;
+                }
             }
             target->SetApproximateMeetPoint(CalculateMeetPoint(
-                target->GetFilteredPosition() + target->GetFilteredSpeed() * timeToHit,
+                target->GetPosition() + target->GetFilteredSpeed() * timeToHit,
                 target->GetFilteredSpeed(),
                 Params.defense().rocket_speed()
             ));
@@ -482,7 +577,7 @@ void RadarController::Process(
     SortTargetsByPriorities(targetsInsideResponsible);
     SortTargetsByPriorities(targetsOutsideResponsible);
 
-    auto res = CalculateRadarPos(
+    auto res = CalculateRadarPosImproved(
         Pos,
         TargetPos,
         FollowedTargetIds,
@@ -498,7 +593,7 @@ void RadarController::Process(
         auto id = target->GetId();
         if (IsInVector(FollowedTargetIds, id) && target->CanLaunchRocket() && !target->IsRocketLaunched()) {
             auto meetPoint = CalculateMeetPoint(
-                target->GetFilteredPosition() + target->GetFilteredSpeed() * Params.defense().time_to_launch_rocket(),
+                target->GetPosition() + target->GetFilteredSpeed() * Params.defense().time_to_launch_rocket(),
                 target->GetFilteredSpeed(),
                 Params.defense().rocket_speed()
             );
@@ -577,7 +672,7 @@ std::map<int, double> RadarController::GetPriorities() const {
 bool RadarController::IsTargetInRadarSector(const RC::Target* target) const {
     double startAng = Pos.Angle - Params.small_radar().view_angle() / 2;
     double endAng = Pos.Angle + Params.small_radar().view_angle() / 2;
-    auto polarPos = CartesianToCylindrical(target->GetFilteredPosition());
+    auto polarPos = CartesianToCylindrical(target->GetPosition());
     return polarPos.X <= Params.small_radar().radius() && startAng <= polarPos.Y && polarPos.Y <= endAng;
 }
 

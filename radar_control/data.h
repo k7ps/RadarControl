@@ -15,4 +15,16 @@ struct BigRadarData : public SmallRadarData {
 };
 
 
+struct RadarPos {
+    double Angle = 0;
+    double Speed = -1;
+};
+
+struct RadarTargetPos {
+    double Angle = 0;
+    double Speed = -1;
+    double TimeToReach = -1;
+};
+
+
 #endif // DATA_H

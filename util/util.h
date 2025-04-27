@@ -63,5 +63,10 @@ void JoinToVector(std::vector<T>& a, const std::vector<T>& b) {
     }
 }
 
+template<class T>
+T Clip(T x, T low, T up) {
+    return std::max(low, std::min(up, x));
+}
+
 
 #endif // UTIL_H
