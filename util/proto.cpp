@@ -15,6 +15,11 @@ void PrepareParams(Proto::Parameters& params) {
     params.mutable_simulator()->set_max_deviation_angle_vertical(DegToRad(params.simulator().max_deviation_angle_vertical()));
     params.mutable_general()->set_margin_angle(DegToRad(params.general().margin_angle()));
 
+    if (params.small_radar().has_dead_zone()) {
+        params.mutable_small_radar()->mutable_dead_zone()->set_start(DegToRad(params.small_radar().dead_zone().start()));
+        params.mutable_small_radar()->mutable_dead_zone()->set_end(DegToRad(params.small_radar().dead_zone().end()));
+    }
+
     params.mutable_small_radar()->set_max_angle_speed(params.small_radar().max_angle_speed() / 1000);
     params.mutable_small_radar()->set_max_eps(params.small_radar().max_eps() / 1000 / 1000);
     params.mutable_simulator()->set_min_target_speed(params.simulator().min_target_speed() / 1000);
@@ -27,6 +32,7 @@ void PrepareParams(Proto::Parameters& params) {
     params.mutable_small_radar()->set_frequency(params.small_radar().frequency() * play_speed);
     params.mutable_big_radar()->set_frequency(params.big_radar().frequency() * play_speed);
     params.mutable_general()->set_death_time(params.general().death_time() / play_speed);
+    params.mutable_general()->set_margin_time(params.general().margin_time() / play_speed);
     params.mutable_defense()->set_time_to_launch_rocket(params.defense().time_to_launch_rocket() / play_speed);
     params.mutable_defense()->set_rocket_speed(params.defense().rocket_speed() * play_speed);
     params.mutable_simulator()->set_targets_per_minute(params.simulator().targets_per_minute() * play_speed);

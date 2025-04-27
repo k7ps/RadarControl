@@ -154,11 +154,6 @@ void Visualizer::DrawTargets(
 void Visualizer::DrawRadars(double radarPosAngle, View view) {
     switch (view) {
         case STRAIGHT: {
-            float radarPosAngleDeg = RadToDeg(radarPosAngle);
-            float radarViewAngleDeg = RadToDeg(Params.small_radar().view_angle());
-            float radarStartAngle = std::max(0.f, radarPosAngleDeg - radarViewAngleDeg / 2);
-            float radarEndAngle   = std::min(180.f, radarPosAngleDeg + radarViewAngleDeg / 2);
-
             DrawDashedRadius(
                 RadarPositionStraight,
                 Params.big_radar().radius(),
@@ -180,14 +175,44 @@ void Visualizer::DrawRadars(double radarPosAngle, View view) {
                 raylib::Color(0, 0, 0, 15)
             );
 
-            DrawCircleSectorLines(
-                RadarPositionStraight,
-                Params.small_radar().radius(),
-                -radarStartAngle,
-                -radarEndAngle,
-                30,
-                raylib::Color::Black()
-            );
+            if (Params.small_radar().has_dead_zone()) {
+                float halfview = RadToDeg(Params.small_radar().view_angle()) / 2;
+
+                float start1 = RadToDeg(radarPosAngle) - halfview;
+                float end1 = start1 + RadToDeg(Params.small_radar().dead_zone().start());
+                float start2 =  start1 + RadToDeg(Params.small_radar().dead_zone().end());
+                float end2 = RadToDeg(radarPosAngle) + halfview;
+
+                start1 = std::max(0.f, start1);
+                end2 = std::min(180.f, end2);
+
+                for (auto i : {std::make_pair(start1, end1), std::make_pair(start2, end2)}) {
+                    if (i.first < i.second) {
+                        DrawCircleSectorLines(
+                            RadarPositionStraight,
+                            Params.small_radar().radius(),
+                            -i.first,
+                            -i.second,
+                            20,
+                            raylib::Color::Black()
+                        );
+                    }
+                }
+            } else {
+                float radarPos = RadToDeg(radarPosAngle);
+                float halfview = RadToDeg(Params.small_radar().view_angle()) / 2;
+                float start = std::max(0.f, radarPos - halfview);
+                float end   = std::min(180.f, radarPos + halfview);
+
+                DrawCircleSectorLines(
+                    RadarPositionStraight,
+                    Params.small_radar().radius(),
+                    -start,
+                    -end,
+                    30,
+                    raylib::Color::Black()
+                );
+            }
             DrawCircleSectorLines(
                 RadarPositionStraight,
                 Params.big_radar().radius(),

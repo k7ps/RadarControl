@@ -366,6 +366,7 @@ namespace {
                         timeToReach = std::max(timeToReach, target->GetTimeToMeetPoint());
                     }
                 }
+                timeToReach += params.general().margin_time();
             }
         }
         return {

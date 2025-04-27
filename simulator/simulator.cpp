@@ -94,11 +94,9 @@ unsigned int Target::GetId() const {
     return Id;
 }
 
-bool Target::IsInSector(double rad, double angView, double angPos) const {
-    double startAng = angPos - angView / 2;
-    double endAng = angPos + angView / 2;
+bool Target::IsInSector(double rad, double sectorStart, double sectorEnd) const {
     auto polarPos = CartesianToCylindrical(GetCurrentRealPosition());
-    return polarPos.X <= rad && startAng <= polarPos.Y && polarPos.Y <= endAng;
+    return polarPos.X <= rad && sectorStart <= polarPos.Y && polarPos.Y <= sectorEnd;
 }
 
 bool Target::IsOutOfView(double rad) const {
@@ -147,7 +145,29 @@ Simulator::Simulator(const Proto::Parameters& params, double startAngle, bool is
 {}
 
 bool Simulator::IsTargetInSector(const Target& target) const {
-    return target.IsInSector(Params.small_radar().radius(), Params.small_radar().view_angle(), SmallRadarAngPosition);
+    double sectorStart = SmallRadarAngPosition - Params.small_radar().view_angle() / 2;
+    double sectorEnd = SmallRadarAngPosition + Params.small_radar().view_angle() / 2;
+    return
+        (
+            !Params.small_radar().has_dead_zone()
+            && target.IsInSector(Params.small_radar().radius(), sectorStart, sectorEnd)
+        )
+        || (
+            Params.small_radar().has_dead_zone()
+            && (
+                target.IsInSector(
+                    Params.small_radar().radius(),
+                    sectorStart,
+                    sectorStart + Params.small_radar().dead_zone().start()
+                )
+                || target.IsInSector(
+                    Params.small_radar().radius(),
+                    sectorStart + Params.small_radar().dead_zone().end(),
+                    sectorEnd
+                )
+            )
+        )
+    ;
 }
 
 void Simulator::UpdateTargets() {

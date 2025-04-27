@@ -9,6 +9,11 @@ small_radar {
     h_stddev: 0.1
     responsible_sector_start: 45
     responsible_sector_end: 135
+
+    dead_zone {
+        start: 20
+        end: 30
+    }
 }
 
 big_radar {
@@ -26,6 +31,7 @@ general {
     small_radar_measure_cnt: 100
     aprox_small_radar_measure_cnt: 50
     margin_angle: 3
+    margin_time: 5000
 }
 
 defense {

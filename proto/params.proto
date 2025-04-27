@@ -5,6 +5,11 @@ package Proto;
 
 message Parameters {
     message SmallRadar {
+        message DeadZone {
+            required double start = 1;
+            required double end = 2;
+        }
+
         required double radius = 1;
         required double view_angle = 2;
         required double frequency = 3;
@@ -15,6 +20,7 @@ message Parameters {
         required double h_stddev = 8;
         required double responsible_sector_start = 9;
         required double responsible_sector_end = 10;
+        optional DeadZone dead_zone = 11;
     }
 
     message BigRadar {
@@ -32,6 +38,7 @@ message Parameters {
         optional double small_radar_measure_cnt = 4 [default = 40];
         optional double aprox_small_radar_measure_cnt = 5 [default = 10];
         optional double margin_angle = 6 [default = 5];
+        optional double margin_time = 7 [default = 3000];
     }
 
     message Defense {

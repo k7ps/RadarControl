@@ -27,7 +27,7 @@ namespace SIM {
         BigRadarData GetBigRadarData() const;
         unsigned int GetId() const;
 
-        bool IsInSector(double rad, double angView, double angPos) const;
+        bool IsInSector(double rad, double sectorStart, double sectorEnd) const;
         bool IsOutOfView(double rad) const;
 
         bool WasUpdated() const;
