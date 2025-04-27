@@ -42,6 +42,13 @@ double CalculateRadarAngleMultiTarget(
     double margin
 );
 
+double CalculateRadarAngleMultiTarget(
+    double currRadarAngle,
+    double currRadarTargetAngle,
+    const std::vector<double>& angles,
+    const std::vector<std::pair<double, double>>& radarSegments
+);
+
 double CalculatePriority(Vector3d pos, Vector3d speed, double maxSpeed, Vector3d radarPoint = Vector3d::Zero());
 
 std::vector<double> SolveQuadraticEquation(double a, double b, double c);
@@ -60,6 +67,27 @@ double TimeToRotateToTarget(
 RadarPos UpdateRadarPos(RadarPos curr, RadarTargetPos target, double maxEps, double deltaTime);
 
 bool CanAddToAngleArray(double maxDiff, const std::vector<double>& angles, const std::vector<double>& newAngles);
+
+bool CanAddTargetToFollow(
+    const std::vector<std::pair<double, double>>& radarSegments, // sorted
+    std::vector<double> angles,
+    const std::vector<double>& newAngles
+);
+
+bool IsInAnySegment(
+    const std::vector<std::pair<double, double>>& segments,
+    const std::vector<double>& points
+);
+
+int InWhichSegment(
+    const std::vector<std::pair<double, double>>& segments,
+    double point
+);
+
+std::vector<std::pair<double, double>> ShiftSegments(
+    const std::vector<std::pair<double, double>>& segments,
+    double shift
+);
 
 
 #endif // CALCULATIONS_H

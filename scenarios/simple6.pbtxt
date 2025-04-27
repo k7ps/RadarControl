@@ -4,15 +4,15 @@ launches {
     time: 0
     angle_pos: 100
     is_accurate: true
-    priority: 0.7
+    priority: 0.5
     abs_speed_share: 0.7
 }
 
 launches {
-    time: 40
-    angle_pos: 30
+    time: 10
+    angle_pos: 80
     is_accurate: true
-    priority: 0.5
+    priority: 0.6
     abs_speed_share: 0.7
 }
 

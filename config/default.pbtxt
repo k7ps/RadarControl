@@ -31,7 +31,7 @@ general {
     small_radar_measure_cnt: 100
     aprox_small_radar_measure_cnt: 50
     margin_angle: 3
-    margin_time: 5000
+    margin_time: 3000
 }
 
 defense {

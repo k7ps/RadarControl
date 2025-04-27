@@ -4,6 +4,7 @@
 #include "util/util.h"
 
 #include <cmath>
+#include <iostream>
 #include <vector>
 
 
@@ -64,6 +65,33 @@ namespace {
               a.X * m1m0.Y - a.Y * m1m0.X
         );
         return SqrtOfSumSquares(vecProd) / SqrtOfSumSquares(a);
+    }
+
+    std::vector<std::pair<double, double>> FindSegmentsIntersection(
+        std::vector<std::pair<double, double>> a,
+        std::vector<std::pair<double, double>> b
+    ) {
+        std::vector<std::pair<double, double>> result;
+        std::sort(a.begin(), a.end());
+        std::sort(b.begin(), b.end());
+
+        auto segIntersection = [](const std::pair<double, double>& a, const std::pair<double, double>& b) {
+            return std::make_pair(std::max(a.first, b.first), std::min(a.second, b.second));
+        };
+
+        int idxA = 0, idxB = 0;
+        while (idxA < a.size() && idxB < b.size()) {
+            auto intersection = segIntersection(a[idxA], b[idxB]);
+            if (intersection.first <= intersection.second) {
+                result.push_back(intersection);
+            }
+            if (a[idxA].second < b[idxB].second) {
+                idxA++;
+            } else {
+                idxB++;
+            }
+        }
+        return result;
     }
 
 }
@@ -347,4 +375,95 @@ bool CanAddToAngleArray(
         }
     }
     return true;
+}
+
+bool CanAddTargetToFollow(
+    const std::vector<std::pair<double, double>>& radarSegments, // sorted
+    std::vector<double> angles,
+    const std::vector<double>& newAngles
+) {
+    JoinToVector(angles, newAngles);
+    return CalculateRadarAngleMultiTarget(0, 0, angles, radarSegments) != -1;
+}
+
+bool IsInAnySegment(
+    const std::vector<std::pair<double, double>>& segments,
+    const std::vector<double>& points
+) {
+    for (auto p : points) {
+        bool isIn = false;
+        for (const auto& seg : segments) {
+            if (IsInSegment(p, seg.first, seg.second)) {
+                isIn = true;
+                break;
+            }
+        }
+        if (!isIn) {
+            return false;
+        }
+    }
+    return true;
+}
+
+int InWhichSegment(
+    const std::vector<std::pair<double, double>>& segments,
+    double point
+) {
+    for (int i = 0; i < segments.size(); i++) {
+        if (IsInSegment(point, segments[i].first, segments[i].second)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+double CalculateRadarAngleMultiTarget(
+    double currRadarAngle,
+    double currRadarTargetAngle,
+    const std::vector<double>& angles,
+    const std::vector<std::pair<double, double>>& radarSegments
+) {
+    std::vector<std::pair<double, double>> validRanges;
+    for (auto angle : angles) {
+        std::vector<std::pair<double, double>> ranges;
+        for (auto seg : radarSegments) {
+            ranges.emplace_back(angle - seg.second, angle - seg.first);
+        }
+        if (validRanges.empty()) {
+            validRanges = ranges;
+        } else {
+            validRanges = FindSegmentsIntersection(validRanges, ranges);
+            if (validRanges.empty()) break;
+        }
+    }
+    if (validRanges.empty()) {
+        return -1;
+    }
+    if (IsInAnySegment(validRanges, {currRadarTargetAngle})) {
+        return currRadarTargetAngle;
+    }
+    double result = -100;
+    for (const auto& seg : validRanges) {
+        if (IsInSegment(currRadarAngle, seg.first, seg.second)) {
+            return currRadarAngle;
+        }
+        if (std::abs(currRadarAngle - seg.first) < std::abs(currRadarAngle - result)) {
+            result = seg.first;
+        }
+        if (std::abs(currRadarAngle - seg.second) < std::abs(currRadarAngle - result)) {
+            result = seg.second;
+        }
+    }
+    return result;
+}
+
+std::vector<std::pair<double, double>> ShiftSegments(
+    const std::vector<std::pair<double, double>>& segments,
+    double shift
+) {
+    std::vector<std::pair<double, double>> res;
+    for (const auto& seg : segments) {
+        res.emplace_back(seg.first + shift, seg.second + shift);
+    }
+    return res;
 }
