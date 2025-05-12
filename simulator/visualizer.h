@@ -32,7 +32,6 @@ public:
 
 private:
     raylib::Vector2 ToWindowCoords(const Vector3d& p, View view) const;
-    void DrawPoints(const std::vector<Vector3d>& points, View view, raylib::Color color);
 
     void DrawTarget(const SmallRadarData& data, double priority, bool isFollowed, View view);
     void DrawTargets(

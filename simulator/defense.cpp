@@ -1,8 +1,6 @@
 #include "defense.h"
 #include "util/points.h"
 
-#include <iostream>
-
 
 DefRocket::DefRocket(Vector3d meetPoint, double speed, unsigned timeToLaunchMs)
     : Pos()

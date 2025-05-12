@@ -100,7 +100,9 @@ namespace {
                         !targetsToHitIds.empty()
                         && !CanAddToAngleArray(viewAngle - 2 * margin, targetsToHitAngles, targetAngles)
                     ) {
-                        return {currTargetPos, targetsToHitIds};
+                        followedTargetIds = targetsToHitIds;
+                        followedTargetAngles = targetsToHitAngles;
+                        break;
                     }
                 }
 
@@ -141,7 +143,9 @@ namespace {
                             !targetsToHitIds.empty()
                             && !CanAddToAngleArray(viewAngle - 2 * margin, targetsToHitAngles, targetAngles)
                         ) {
-                            return {currTargetPos, targetsToHitIds};
+                            followedTargetIds = targetsToHitIds;
+                            followedTargetAngles = targetsToHitAngles;
+                            break;
                         }
                     }
 
@@ -259,20 +263,31 @@ namespace {
                         }
                     }
                     if (!targetsToHitIds.empty()) {
-                        JoinToVector(targetsToHitAngles, targetAngles);
                         auto newPossibleTargetAngle = CalculateRadarAngleMultiTarget(
                             currPos.Angle,
                             currTargetPos.Angle,
-                            targetsToHitAngles,
+                            ConcatenateVectors(targetsToHitAngles, targetAngles),
                             radarSegments
                         );
+                        if (newPossibleTargetAngle == -1) {
+                            followedTargetIds = targetsToHitIds;
+                            followedTargetAngles = targetsToHitAngles;
+                            break;
+                        }
                         auto newPossibleRadarSegments = ShiftSegments(radarSegments, newPossibleTargetAngle);
+                        bool have_mismatch = false;
                         for (auto id : targetsToHitIds) {
                             const auto* targetTohit = GetTargetById(targetsInsideResponsible, id);
                             auto newSegmentIdx = InWhichSegment(newPossibleRadarSegments, GetTargetAngles(targetTohit)[0]);
                             if (newSegmentIdx != targetsSegmentsIdxs[id]) {
-                                return {currTargetPos, targetsToHitIds};
+                                have_mismatch = true;
+                                followedTargetIds = targetsToHitIds;
+                                followedTargetAngles = targetsToHitAngles;
+                                break;
                             }
+                        }
+                        if (have_mismatch) {
+                            break;
                         }
                     }
                 }
@@ -311,20 +326,31 @@ namespace {
                             }
                         }
                         if (!targetsToHitIds.empty()) {
-                            JoinToVector(targetsToHitAngles, targetAngles);
                             auto newPossibleTargetAngle = CalculateRadarAngleMultiTarget(
                                 currPos.Angle,
                                 currTargetPos.Angle,
-                                targetsToHitAngles,
+                                ConcatenateVectors(targetsToHitAngles, targetAngles),
                                 radarSegments
                             );
+                            if (newPossibleTargetAngle == -1) {
+                                followedTargetIds = targetsToHitIds;
+                                followedTargetAngles = targetsToHitAngles;
+                                break;
+                            }
                             auto newPossibleRadarSegments = ShiftSegments(radarSegments, newPossibleTargetAngle);
+                            bool have_mismatch = false;
                             for (auto id : targetsToHitIds) {
                                 const auto* targetTohit = GetTargetById(targetsOutsideResponsible, id);
                                 auto newSegmentIdx = InWhichSegment(newPossibleRadarSegments, GetTargetAngles(targetTohit)[0]);
                                 if (newSegmentIdx != targetsSegmentsIdxs[id]) {
-                                    return {currTargetPos, targetsToHitIds};
+                                    have_mismatch = true;
+                                    followedTargetIds = targetsToHitIds;
+                                    followedTargetAngles = targetsToHitAngles;
+                                    break;
                                 }
+                            }
+                            if (have_mismatch) {
+                                break;
                             }
                         }
                     }
@@ -369,7 +395,7 @@ namespace {
             if (currTargetPos.Angle == -1) {
                 newTargetRadarAngle = currPos.Angle;
             } else {
-                nextTargetAngle = currTargetPos.Angle;
+                newTargetRadarAngle = currTargetPos.Angle;
             }
         }
         if (nextTargetAngle != -1 && IsInAnySegment(currRadarSegments, followedTargetAngles)) {
@@ -383,7 +409,7 @@ namespace {
                     auto targetAngle = GetTargetAngles(target)[0];
                     auto segIdx = InWhichSegment(newTargetRadarSegments, targetAngle);
                     maxDown = std::min(maxDown, newTargetRadarSegments[segIdx].second - targetAngle);
-                    maxUp = std::min(maxDown, targetAngle - newTargetRadarSegments[segIdx].first );
+                    maxUp = std::min(maxUp, targetAngle - newTargetRadarSegments[segIdx].first );
                 }
             }
             for (const auto* target : targetsOutsideResponsible) {
@@ -393,7 +419,7 @@ namespace {
                     auto targetAngle = GetTargetAngles(target)[0];
                     auto segIdx = InWhichSegment(newTargetRadarSegments, targetAngle);
                     maxDown = std::min(maxDown, newTargetRadarSegments[segIdx].second - targetAngle);
-                    maxUp = std::min(maxDown, targetAngle - newTargetRadarSegments[segIdx].first );
+                    maxUp = std::min(maxUp, targetAngle - newTargetRadarSegments[segIdx].first );
                 }
             }
             if (nextTargetAngle > newTargetRadarAngle) {

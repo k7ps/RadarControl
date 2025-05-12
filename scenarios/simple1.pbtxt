@@ -1,27 +1,27 @@
 launches {
     time: 0
-    angle_pos: 45
-    angle_deviation: 20
+    angle_pos: 55
+    angle_deviation: 7
     priority: 0.1
     abs_speed_share: 1.0
 }
 
 launches {
-    time: 30
+    time: 40
     angle_pos: 125
     is_accurate: true
     priority: 0.8
 }
 
 launches {
-    time: 60
+    time: 70
     angle_pos: 90
     is_accurate: true
     priority: 0.5
 }
 
 launches {
-    time: 90
+    time: 100
     angle_pos: 170
     is_accurate: true
     priority: 0.9

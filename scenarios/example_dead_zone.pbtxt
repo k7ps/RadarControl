@@ -1,0 +1,20 @@
+radar_start_angle: 70
+
+launches {
+    time: 0
+    angle_pos: 80
+    is_accurate: true
+    priority: 0.3
+    abs_speed_share: 1.0
+}
+
+launches {
+    time: 100
+    angle_pos: 125
+    is_accurate: true
+    priority: 0.8
+    abs_speed_share: 1.0
+}
+
+# proto-file: proto/scenario.proto
+# proto-message: Proto::TargetScenario

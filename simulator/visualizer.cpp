@@ -6,7 +6,6 @@
 #include <Color.hpp>
 #include <Vector2.hpp>
 
-#include <iostream>
 #include <set>
 #include <string>
 #include <vector>
@@ -63,6 +62,22 @@ namespace {
     auto DrawDashedRadius(raylib::Vector2 center, float radius, float ang, raylib::Color col) {
         auto end = center + raylib::Vector2(radius * std::cos(ang), - radius * std::sin(ang));
         DrawDashedLine(center, end, col);
+    }
+
+    void DrawCross(raylib::Vector2 center, float size, raylib::Color col, float thick = 2) {
+        auto halfsize = size * 0.5;
+        DrawLineEx(
+            center + raylib::Vector2(-halfsize, +halfsize),
+            center + raylib::Vector2(+halfsize, -halfsize),
+            thick,
+            col
+        );
+        DrawLineEx(
+            center + raylib::Vector2(+halfsize, +halfsize),
+            center + raylib::Vector2(-halfsize, -halfsize),
+            thick,
+            col
+        );
     }
 }
 
@@ -247,22 +262,24 @@ void Visualizer::DrawRockets(const std::vector<Vector3d>& rockets, View view) {
     }
 }
 
-void Visualizer::DrawPoints(const std::vector<Vector3d>& points, View view, raylib::Color color) {
-    for (const auto& point : points) {
-        DrawCircleLinesV(
-            ToWindowCoords(point, view),
-            Params.visualizer().target_radius(),
-            color
-        );
-    }
-}
-
 void Visualizer::DrawEntryPoints(const std::vector<Vector3d>& entryPoints, View view) {
     if (Params.visualizer().draw_entry_points()) {
-        DrawPoints(entryPoints, view, raylib::Color::Gray());
+        for (const auto& point : entryPoints) {
+            DrawCircleLinesV(
+                ToWindowCoords(point, view),
+                Params.visualizer().target_radius(),
+                raylib::Color::Gray()
+            );
+        }
     }
 }
 
 void Visualizer::DrawApproximateMeetPoints(const std::vector<Vector3d>& approximateMeetPoints, View view) {
-    DrawPoints(approximateMeetPoints, view, raylib::Color::Red());
+    for (const auto& point : approximateMeetPoints) {
+        DrawCross(
+            ToWindowCoords(point, view),
+            Params.visualizer().target_radius() * 1.5,
+            raylib::Color::Red()
+        );
+    }
 }

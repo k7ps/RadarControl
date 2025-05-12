@@ -36,7 +36,7 @@ general {
 
 defense {
     time_to_launch_rocket: 3000
-    rocket_speed: 5
+    rocket_speed: 4
 }
 
 simulator {
@@ -52,7 +52,7 @@ simulator {
 visualizer {
     radars_outline_thickness: 1
     target_radius: 5
-    draw_entry_points: true
+    draw_entry_points: false
 }
 
 # proto-file: proto/params.proto

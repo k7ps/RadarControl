@@ -64,6 +64,18 @@ void JoinToVector(std::vector<T>& a, const std::vector<T>& b) {
 }
 
 template<class T>
+std::vector<T> ConcatenateVectors(const std::vector<T>& a, const std::vector<T>& b) {
+    std::vector<T> res;
+    for (auto i : a) {
+        res.push_back(i);
+    }
+    for (auto i : b) {
+        res.push_back(i);
+    }
+    return res;
+}
+
+template<class T>
 T Clip(T x, T low, T up) {
     return std::max(low, std::min(up, x));
 }
