@@ -75,10 +75,11 @@ LaunchParams GetRandomLaunchParams(const Proto::Parameters& params, bool isAccur
 
 class Simulator {
 public:
-    Simulator(const Proto::Parameters& params, double startAngle, bool isUsingScenario);
+    Simulator(const Proto::Parameters& params, double radarStartAngle, double shipStartAngle, bool isUsingScenario);
 
     void UpdateTargets();
     void SetRadarPosition(double angPos);
+    void SetShipPosition(double angPos);
 
     void RemoveTargets(std::vector<int> ids);
 
@@ -92,6 +93,7 @@ public:
 
 private:
     bool IsTargetInSector(const SIM::Target& target) const;
+    bool IsTargetInDeadZone(const SIM::Target& target) const;
 
 private:
     const Proto::Parameters& Params;
@@ -102,6 +104,7 @@ private:
     const bool IsUsingScenario;
 
     double SmallRadarAngPosition;
+    double ShipAngPosition;
 };
 
 
@@ -114,6 +117,7 @@ public:
     void LaunchTargets(Simulator& simulator);
 
     double GetRadarStartAngle() const { return RadarStartAngle; }
+    double GetShipStartAngle() const { return ShipStartAngle; }
 
 private:
     const Proto::Parameters& Params;
@@ -122,6 +126,7 @@ private:
     SimpleTimer Timer;
 
     double RadarStartAngle;
+    double ShipStartAngle;
 };
 
 

@@ -136,36 +136,33 @@ LaunchParams GetRandomLaunchParams(const Proto::Parameters& params, bool isAccur
 }
 
 
-Simulator::Simulator(const Proto::Parameters& params, double startAngle, bool isUsingScenario)
+Simulator::Simulator(const Proto::Parameters& params, double radarStartAngle, double shipStartAngle, bool isUsingScenario)
     : Params(params)
     , NewTargetProbability((double) Params.simulator().targets_per_minute() / Params.small_radar().frequency() / 60)
     , IsUsingScenario(isUsingScenario)
-    , SmallRadarAngPosition(startAngle)
+    , SmallRadarAngPosition(radarStartAngle)
+    , ShipAngPosition(shipStartAngle)
 {}
 
+bool Simulator::IsTargetInDeadZone(const SIM::Target& target) const {
+    auto deadZones = SegmentsFromProto(Params.ship().dead_zones());
+    ShiftSegments(deadZones, ShipAngPosition);
+    for (const auto& seg : deadZones) {
+        if (target.IsInSector(Params.small_radar().radius(), seg.first, seg.second)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool Simulator::IsTargetInSector(const Target& target) const {
-    double sectorStart = SmallRadarAngPosition - Params.small_radar().view_angle() / 2;
-    double sectorEnd = SmallRadarAngPosition + Params.small_radar().view_angle() / 2;
     return
-        (
-            !Params.small_radar().has_dead_zone()
-            && target.IsInSector(Params.small_radar().radius(), sectorStart, sectorEnd)
+        target.IsInSector(
+            Params.small_radar().radius(),
+            SmallRadarAngPosition - Params.small_radar().view_angle() / 2,
+            SmallRadarAngPosition + Params.small_radar().view_angle() / 2
         )
-        || (
-            Params.small_radar().has_dead_zone()
-            && (
-                target.IsInSector(
-                    Params.small_radar().radius(),
-                    sectorStart,
-                    sectorStart + Params.small_radar().dead_zone().start()
-                )
-                || target.IsInSector(
-                    Params.small_radar().radius(),
-                    sectorStart + Params.small_radar().dead_zone().end(),
-                    sectorEnd
-                )
-            )
-        )
+        && !IsTargetInDeadZone(target)
     ;
 }
 
@@ -189,6 +186,10 @@ void Simulator::UpdateTargets() {
 
 void Simulator::SetRadarPosition(double angPos) {
     SmallRadarAngPosition = angPos;
+}
+
+void Simulator::SetShipPosition(double angPos) {
+    ShipAngPosition = angPos;
 }
 
 void Simulator::RemoveTargets(std::vector<int> ids) {
@@ -255,11 +256,13 @@ Simulator::~Simulator() {
 TargetScheduler::TargetScheduler(const Proto::Parameters& params)
     : Params(params)
     , RadarStartAngle(M_PI_2)
+    , ShipStartAngle(0)
 {}
 
 void TargetScheduler::SetScenario(const std::string& filename) {
     const auto scenario = ParseProtoFromFile<Proto::TargetScenario>(filename);
     RadarStartAngle = DegToRad(scenario.radar_start_angle());
+    ShipStartAngle = DegToRad(scenario.ship_start_angle());
 
     for (const auto& launch : scenario.launches()) {
         Proto::TargetScenario::Launch correctLaunch(launch);

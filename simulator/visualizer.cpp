@@ -1,6 +1,7 @@
 #include "visualizer.h"
 #include "util/points.h"
 #include "util/util.h"
+#include "util/proto.h"
 
 #include <raylib.h>
 #include <Color.hpp>
@@ -107,13 +108,15 @@ void Visualizer::DrawFrame(
     const std::vector<Vector3d>& rockets,
     const std::vector<Vector3d>& entryPoints,
     const std::vector<Vector3d>& approximateMeetPoints,
-    double radarPosAngle
+    double radarPosAngle,
+    double shipPosAngle
 ) {
     BeginDrawing();
     {
         Window.ClearBackground(raylib::Color::RayWhite());
 
         for (auto view : {View::STRAIGHT, View::SIDE}) {
+            DrawDeadZones(shipPosAngle, view);
             DrawRadars(radarPosAngle, view);
             DrawTargets(bigDatas, smallDatas, priorities, followedTargetIds, view);
             DrawRockets(rockets, view);
@@ -189,45 +192,21 @@ void Visualizer::DrawRadars(double radarPosAngle, View view) {
                 30,
                 raylib::Color(0, 0, 0, 15)
             );
+\
+            float radarPos = RadToDeg(radarPosAngle);
+            float halfview = RadToDeg(Params.small_radar().view_angle()) / 2;
+            float start = std::max(0.f, radarPos - halfview);
+            float end   = std::min(180.f, radarPos + halfview);
 
-            if (Params.small_radar().has_dead_zone()) {
-                float halfview = RadToDeg(Params.small_radar().view_angle()) / 2;
+            DrawCircleSectorLines(
+                RadarPositionStraight,
+                Params.small_radar().radius(),
+                -start,
+                -end,
+                30,
+                raylib::Color::Black()
+            );
 
-                float start1 = RadToDeg(radarPosAngle) - halfview;
-                float end1 = start1 + RadToDeg(Params.small_radar().dead_zone().start());
-                float start2 =  start1 + RadToDeg(Params.small_radar().dead_zone().end());
-                float end2 = RadToDeg(radarPosAngle) + halfview;
-
-                start1 = std::max(0.f, start1);
-                end2 = std::min(180.f, end2);
-
-                for (auto i : {std::make_pair(start1, end1), std::make_pair(start2, end2)}) {
-                    if (i.first < i.second) {
-                        DrawCircleSectorLines(
-                            RadarPositionStraight,
-                            Params.small_radar().radius(),
-                            -i.first,
-                            -i.second,
-                            20,
-                            raylib::Color::Black()
-                        );
-                    }
-                }
-            } else {
-                float radarPos = RadToDeg(radarPosAngle);
-                float halfview = RadToDeg(Params.small_radar().view_angle()) / 2;
-                float start = std::max(0.f, radarPos - halfview);
-                float end   = std::min(180.f, radarPos + halfview);
-
-                DrawCircleSectorLines(
-                    RadarPositionStraight,
-                    Params.small_radar().radius(),
-                    -start,
-                    -end,
-                    30,
-                    raylib::Color::Black()
-                );
-            }
             DrawCircleSectorLines(
                 RadarPositionStraight,
                 Params.big_radar().radius(),
@@ -255,6 +234,34 @@ void Visualizer::DrawRadars(double radarPosAngle, View view) {
         }
     }
 }
+
+void Visualizer::DrawDeadZones(double shipPosAngle, View view) {
+    switch (view) {
+        case STRAIGHT: {
+            auto deadZones = SegmentsFromProto(Params.ship().dead_zones());
+            ShiftSegments(deadZones, shipPosAngle);
+
+            for (const auto& seg : deadZones) {
+                float start = std::max(0.f, (float) RadToDeg(seg.first));
+                float end = std::min(180.f, (float) RadToDeg(seg.second));
+                if (std::abs(end - start) > 0.1) {
+                    DrawCircleSector(
+                        RadarPositionStraight,
+                        Params.small_radar().radius(),
+                        -start,
+                        -end,
+                        30,
+                        raylib::Color(0, 0, 0, 35)
+                    );
+                }
+            }
+            break;
+        }
+        case SIDE:
+            break;
+    }
+}
+
 
 void Visualizer::DrawRockets(const std::vector<Vector3d>& rockets, View view) {
     for (const auto& rocketPos : rockets) {

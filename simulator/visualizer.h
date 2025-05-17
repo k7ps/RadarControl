@@ -27,7 +27,8 @@ public:
         const std::vector<Vector3d>& rockets,
         const std::vector<Vector3d>& entryPoints,
         const std::vector<Vector3d>& approximateMeetPoints,
-        double radarPosAngle
+        double radarPosAngle,
+        double shipPosAngle
     );
 
 private:
@@ -45,6 +46,7 @@ private:
     void DrawEntryPoints(const std::vector<Vector3d>& entryPoints, View view);
     void DrawApproximateMeetPoints(const std::vector<Vector3d>& approximateMeetPoints, View view);
     void DrawRadars(double radarPosAngle, View view);
+    void DrawDeadZones(double shipPosAngle, View view);
 
 private:
     const Proto::Parameters& Params;

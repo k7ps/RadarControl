@@ -22,5 +22,14 @@ T ParseProtoFromFile(const std::string& filename) {
 
 void PrepareParams(Proto::Parameters& params);
 
+template<class T>
+std::vector<std::pair<double, double>> SegmentsFromProto(const T& protoMsg) {
+    std::vector<std::pair<double, double>> res;
+    for (const auto& seg : protoMsg) {
+        res.emplace_back(seg.start(), seg.end());
+    }
+    return res;
+}
+
 
 #endif // PROTO_H

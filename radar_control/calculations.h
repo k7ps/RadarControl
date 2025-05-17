@@ -74,20 +74,5 @@ bool CanAddTargetToFollow(
     const std::vector<double>& newAngles
 );
 
-bool IsInAnySegment(
-    const std::vector<std::pair<double, double>>& segments,
-    const std::vector<double>& points
-);
-
-int InWhichSegment(
-    const std::vector<std::pair<double, double>>& segments,
-    double point
-);
-
-std::vector<std::pair<double, double>> ShiftSegments(
-    const std::vector<std::pair<double, double>>& segments,
-    double shift
-);
-
 
 #endif // CALCULATIONS_H

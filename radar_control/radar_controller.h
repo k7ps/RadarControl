@@ -105,7 +105,8 @@ namespace RC {
 class RadarController {
 public:
     struct Result {
-        double Angle;
+        double RadarAngle;
+        double ShipAngle;
         std::vector<int> FollowedTargetIds;
         std::vector<std::pair<Vector3d, int>> MeetPointsAndTargetIds;
     };
@@ -131,6 +132,9 @@ private:
 
     RadarPos Pos;
     RadarTargetPos TargetPos;
+
+    RadarPos ShipPis;
+    RadarTargetPos ShipTargetPos;
 
     std::vector<RC::Target*> Targets;
 

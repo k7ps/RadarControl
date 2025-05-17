@@ -40,6 +40,12 @@ std::string MillisecondsToString(double ms);
 bool IsInSegment(double c, double a, double b);
 bool IsInSegment(const std::vector<double>& c, double a, double b);
 
+bool IsInAnySegment(const std::vector<std::pair<double, double>>& segments, const std::vector<double>& points);
+int InWhichSegment(const std::vector<std::pair<double, double>>& segments, double point);
+std::vector<std::pair<double, double>> ShiftSegments(
+    const std::vector<std::pair<double, double>>& segments,
+    double shift
+);
 
 template<class T>
 bool IsInVector(const std::vector<T>& vec, const T& i) {

@@ -66,7 +66,12 @@ int main(int argc, char* argv[]) {
     }
 
     RadarController radarController(params, targetScheduler.GetRadarStartAngle());
-    Simulator simulator(params, targetScheduler.GetRadarStartAngle(), !scenario_name.empty());
+    Simulator simulator(
+        params,
+        targetScheduler.GetRadarStartAngle(),
+        targetScheduler.GetShipStartAngle(),
+        !scenario_name.empty()
+    );
     Defense defense(params);
     Visualizer visualizer(params);
 
@@ -91,11 +96,13 @@ int main(int argc, char* argv[]) {
             defense.GetRocketsPositions(),
             radarController.GetEntryPoints(),
             radarController.GetApproximateMeetPoints(),
-            res.Angle
+            res.RadarAngle,
+            res.ShipAngle
         );
 
         simulator.RemoveTargets(defense.GetDestroyedTargetsId());
-        simulator.SetRadarPosition(res.Angle);
+        simulator.SetRadarPosition(res.RadarAngle);
+        simulator.SetShipPosition(res.ShipAngle);
         simulator.UpdateTargets();
     }
 

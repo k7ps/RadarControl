@@ -385,37 +385,6 @@ bool CanAddTargetToFollow(
     return CalculateRadarAngleMultiTarget(0, 0, angles, radarSegments) != -1;
 }
 
-bool IsInAnySegment(
-    const std::vector<std::pair<double, double>>& segments,
-    const std::vector<double>& points
-) {
-    for (auto p : points) {
-        bool isIn = false;
-        for (const auto& seg : segments) {
-            if (IsInSegment(p, seg.first, seg.second)) {
-                isIn = true;
-                break;
-            }
-        }
-        if (!isIn) {
-            return false;
-        }
-    }
-    return true;
-}
-
-int InWhichSegment(
-    const std::vector<std::pair<double, double>>& segments,
-    double point
-) {
-    for (int i = 0; i < segments.size(); i++) {
-        if (IsInSegment(point, segments[i].first, segments[i].second)) {
-            return i;
-        }
-    }
-    return -1;
-}
-
 double CalculateRadarAngleMultiTarget(
     double currRadarAngle,
     double currRadarTargetAngle,
@@ -454,15 +423,4 @@ double CalculateRadarAngleMultiTarget(
         }
     }
     return result;
-}
-
-std::vector<std::pair<double, double>> ShiftSegments(
-    const std::vector<std::pair<double, double>>& segments,
-    double shift
-) {
-    std::vector<std::pair<double, double>> res;
-    for (const auto& seg : segments) {
-        res.emplace_back(seg.first + shift, seg.second + shift);
-    }
-    return res;
 }

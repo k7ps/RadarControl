@@ -19,5 +19,6 @@ message TargetScenario {
     }
 
     optional double radar_start_angle = 1 [default = 90];
-    repeated Launch launches = 2;
+    optional double ship_start_angle = 2 [default = 0];
+    repeated Launch launches = 3;
 }

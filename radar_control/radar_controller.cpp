@@ -221,12 +221,8 @@ namespace {
         const auto willAngR = currTargetPos.Angle + halfview - margin;
 
         std::vector<std::pair<double, double>> radarSegments;
-        if (params.small_radar().has_dead_zone()) {
-            radarSegments.emplace_back(margin, params.small_radar().dead_zone().start() - margin);
-            radarSegments.emplace_back(params.small_radar().dead_zone().end() + margin, viewAngle - margin);
-        } else {
-            radarSegments.emplace_back(margin, viewAngle - margin);
-        }
+        radarSegments.emplace_back(margin, viewAngle - margin);
+
         radarSegments = ShiftSegments(radarSegments, -halfview);
         auto currRadarSegments = ShiftSegments(radarSegments, currPos.Angle);
         auto currTargetRadarSegments = ShiftSegments(radarSegments, currTargetPos.Angle);
@@ -691,8 +687,9 @@ RadarController::Result RadarController::GetAngleAndMeetPoints() {
         Pos = UpdateRadarPos(Pos, TargetPos, Params.small_radar().max_eps(), ms);
     }
 
-    auto res = RadarController::Result{
-        .Angle = Pos.Angle,
+    RadarController::Result res{
+        .RadarAngle = Pos.Angle,
+        .ShipAngle = 0,
         .FollowedTargetIds = FollowedTargetIds,
         .MeetPointsAndTargetIds = MeetPointsAndTargetIds
     };

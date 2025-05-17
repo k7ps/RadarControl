@@ -5,11 +5,6 @@ package Proto;
 
 message Parameters {
     message SmallRadar {
-        message DeadZone {
-            required double start = 1;
-            required double end = 2;
-        }
-
         required double radius = 1;
         required double view_angle = 2;
         required double frequency = 3;
@@ -20,7 +15,6 @@ message Parameters {
         required double h_stddev = 8;
         required double responsible_sector_start = 9;
         required double responsible_sector_end = 10;
-        optional DeadZone dead_zone = 11;
     }
 
     message BigRadar {
@@ -29,6 +23,17 @@ message Parameters {
         required double rad_stddev = 3;
         required double ang_stddev = 4;
         required double h_stddev = 5;
+    }
+
+    message Ship {
+        message DeadZone {
+            required double start = 1;
+            required double end = 2;
+        }
+
+        required double max_eps = 1;
+        required double max_angle_speed = 2;
+        repeated DeadZone dead_zones = 3;
     }
 
     message General {
@@ -64,8 +69,9 @@ message Parameters {
 
     required SmallRadar small_radar = 1;
     required BigRadar big_radar = 2;
-    required General general = 3;
-    required Defense defense = 4;
-    required Simulator simulator = 5;
-    required Visualizer visualizer = 6;
+    required Ship ship = 3;
+    required General general = 4;
+    required Defense defense = 5;
+    required Simulator simulator = 6;
+    required Visualizer visualizer = 7;
 }

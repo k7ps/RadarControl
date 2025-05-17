@@ -2,18 +2,13 @@ small_radar {
     radius: 400
     view_angle: 60
     frequency: 20
-    max_eps: 0.2
-    max_angle_speed: 2
+    max_eps: 1
+    max_angle_speed: 5
     rad_stddev: 0.2
     ang_stddev: 0.04
     h_stddev: 0.1
     responsible_sector_start: 45
     responsible_sector_end: 135
-
-    dead_zone {
-        start: 20
-        end: 30
-    }
 }
 
 big_radar {
@@ -22,6 +17,21 @@ big_radar {
     rad_stddev: 1
     ang_stddev: 0.2
     h_stddev: 0.5
+}
+
+ship {
+    max_eps: 0.2
+    max_angle_speed: 2
+
+    dead_zones {
+        start: 40
+        end: 70
+    }
+
+    dead_zones {
+        start: 120
+        end: 140
+    }
 }
 
 general {
