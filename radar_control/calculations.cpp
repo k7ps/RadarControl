@@ -376,25 +376,16 @@ bool CanAddToAngleArray(
     return true;
 }
 
-bool CanAddTargetToFollow(
-    const std::vector<std::pair<double, double>>& radarSegments, // sorted
-    std::vector<double> angles,
-    const std::vector<double>& newAngles
-) {
-    JoinToVector(angles, newAngles);
-    return CalculateRadarAngleMultiTarget(0, 0, angles, radarSegments) != -1;
-}
-
-double CalculateRadarAngleMultiTarget(
-    double currRadarAngle,
-    double currRadarTargetAngle,
+double CalculateShipAngleMultiTarget(
+    double currShipAngle,
+    double currShipTargetAngle,
     const std::vector<double>& angles,
-    const std::vector<std::pair<double, double>>& radarSegments
+    const std::vector<std::pair<double, double>>& deadZones
 ) {
     std::vector<std::pair<double, double>> validRanges;
     for (auto angle : angles) {
         std::vector<std::pair<double, double>> ranges;
-        for (auto seg : radarSegments) {
+        for (auto seg : deadZones) {
             ranges.emplace_back(angle - seg.second, angle - seg.first);
         }
         if (validRanges.empty()) {
@@ -407,20 +398,37 @@ double CalculateRadarAngleMultiTarget(
     if (validRanges.empty()) {
         return -1;
     }
-    if (IsInAnySegment(validRanges, {currRadarTargetAngle})) {
-        return currRadarTargetAngle;
+    if (IsInAnySegment(validRanges, currShipTargetAngle)) {
+        return currShipTargetAngle;
     }
     double result = -100;
     for (const auto& seg : validRanges) {
-        if (IsInSegment(currRadarAngle, seg.first, seg.second)) {
-            return currRadarAngle;
+        if (IsInSegment(currShipAngle, seg.first, seg.second)) {
+            return currShipAngle;
         }
-        if (std::abs(currRadarAngle - seg.first) < std::abs(currRadarAngle - result)) {
+        if (std::abs(currShipAngle - seg.first) < std::abs(currShipAngle - result)) {
             result = seg.first;
         }
-        if (std::abs(currRadarAngle - seg.second) < std::abs(currRadarAngle - result)) {
+        if (std::abs(currShipAngle - seg.second) < std::abs(currShipAngle - result)) {
             result = seg.second;
         }
     }
     return result;
+}
+
+std::vector<std::pair<double, double>> InvertSegments(
+    const std::vector<std::pair<double, double>>& segments,
+    double edgeSegmentLen,
+    double margin
+) {
+    if (segments.empty()) {
+        return {{- edgeSegmentLen / 2, edgeSegmentLen / 2}};
+    }
+    std::vector<std::pair<double, double>> res;
+    res.emplace_back(segments.front().first - edgeSegmentLen, segments.front().first - margin);
+    for (int i = 0; i + 1 < segments.size(); ++i) {
+        res.emplace_back(segments[i].second + margin, segments[i+1].first - margin);
+    }
+    res.emplace_back(segments.back().second + margin, segments.back().second + edgeSegmentLen);
+    return res;
 }

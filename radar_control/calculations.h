@@ -42,11 +42,11 @@ double CalculateRadarAngleMultiTarget(
     double margin
 );
 
-double CalculateRadarAngleMultiTarget(
-    double currRadarAngle,
-    double currRadarTargetAngle,
+double CalculateShipAngleMultiTarget(
+    double currShipAngle,
+    double currShipTargetAngle,
     const std::vector<double>& angles,
-    const std::vector<std::pair<double, double>>& radarSegments
+    const std::vector<std::pair<double, double>>& deadZones
 );
 
 double CalculatePriority(Vector3d pos, Vector3d speed, double maxSpeed, Vector3d radarPoint = Vector3d::Zero());
@@ -68,10 +68,10 @@ RadarPos UpdateRadarPos(RadarPos curr, RadarTargetPos target, double maxEps, dou
 
 bool CanAddToAngleArray(double maxDiff, const std::vector<double>& angles, const std::vector<double>& newAngles);
 
-bool CanAddTargetToFollow(
-    const std::vector<std::pair<double, double>>& radarSegments, // sorted
-    std::vector<double> angles,
-    const std::vector<double>& newAngles
+std::vector<std::pair<double, double>> InvertSegments(
+    const std::vector<std::pair<double, double>>& segments,
+    double edgeSegmentLen,
+    double margin
 );
 
 

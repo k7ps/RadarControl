@@ -150,29 +150,25 @@ bool IsInSegment(const std::vector<double>& c, double a, double b) {
     return true;
 }
 
-bool IsInAnySegment(
-    const std::vector<std::pair<double, double>>& segments,
-    const std::vector<double>& points
-) {
-    for (auto p : points) {
-        bool isIn = false;
-        for (const auto& seg : segments) {
-            if (IsInSegment(p, seg.first, seg.second)) {
-                isIn = true;
-                break;
-            }
+bool IsInAnySegment(const std::vector<std::pair<double, double>>& segments, double point) {
+    for (const auto& seg : segments) {
+        if (IsInSegment(point, seg.first, seg.second)) {
+            return true;
         }
-        if (!isIn) {
+    }
+    return false;
+}
+
+bool IsInAnySegment(const std::vector<std::pair<double, double>>& segments, const std::vector<double>& points) {
+    for (auto point : points) {
+        if (!IsInAnySegment(segments, point)) {
             return false;
         }
     }
     return true;
 }
 
-int InWhichSegment(
-    const std::vector<std::pair<double, double>>& segments,
-    double point
-) {
+int InWhichSegment(const std::vector<std::pair<double, double>>& segments, double point) {
     for (int i = 0; i < segments.size(); i++) {
         if (IsInSegment(point, segments[i].first, segments[i].second)) {
             return i;
@@ -190,4 +186,14 @@ std::vector<std::pair<double, double>> ShiftSegments(
         res.emplace_back(seg.first + shift, seg.second + shift);
     }
     return res;
+}
+
+void ShiftSegmentsInPlace(
+    std::vector<std::pair<double, double>>& segments,
+    double shift
+) {
+    for (auto& seg : segments) {
+        seg.first += shift;
+        seg.second += shift;
+    }
 }

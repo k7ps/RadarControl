@@ -238,8 +238,7 @@ void Visualizer::DrawRadars(double radarPosAngle, View view) {
 void Visualizer::DrawDeadZones(double shipPosAngle, View view) {
     switch (view) {
         case STRAIGHT: {
-            auto deadZones = SegmentsFromProto(Params.ship().dead_zones());
-            ShiftSegments(deadZones, shipPosAngle);
+            auto deadZones = ShiftedSegmentsFromProto(Params.ship().dead_zones(), shipPosAngle);
 
             for (const auto& seg : deadZones) {
                 float start = std::max(0.f, (float) RadToDeg(seg.first));

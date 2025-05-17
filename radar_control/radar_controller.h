@@ -111,7 +111,7 @@ public:
         std::vector<std::pair<Vector3d, int>> MeetPointsAndTargetIds;
     };
 
-    RadarController(const Proto::Parameters& params, double startAngle);
+    RadarController(const Proto::Parameters& params, double startAngle, double shipStartAngle);
 
     void Process(const std::vector<BigRadarData>&, const std::vector<SmallRadarData>&);
 
@@ -133,7 +133,7 @@ private:
     RadarPos Pos;
     RadarTargetPos TargetPos;
 
-    RadarPos ShipPis;
+    RadarPos ShipPos;
     RadarTargetPos ShipTargetPos;
 
     std::vector<RC::Target*> Targets;

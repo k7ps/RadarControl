@@ -15,7 +15,7 @@ launches {
 
 launches {
     time: 70
-    angle_pos: 90
+    angle_pos: 85
     is_accurate: true
     priority: 0.5
 }

@@ -145,8 +145,7 @@ Simulator::Simulator(const Proto::Parameters& params, double radarStartAngle, do
 {}
 
 bool Simulator::IsTargetInDeadZone(const SIM::Target& target) const {
-    auto deadZones = SegmentsFromProto(Params.ship().dead_zones());
-    ShiftSegments(deadZones, ShipAngPosition);
+    auto deadZones = ShiftedSegmentsFromProto(Params.ship().dead_zones(), ShipAngPosition);
     for (const auto& seg : deadZones) {
         if (target.IsInSector(Params.small_radar().radius(), seg.first, seg.second)) {
             return true;
@@ -162,8 +161,7 @@ bool Simulator::IsTargetInSector(const Target& target) const {
             SmallRadarAngPosition - Params.small_radar().view_angle() / 2,
             SmallRadarAngPosition + Params.small_radar().view_angle() / 2
         )
-        && !IsTargetInDeadZone(target)
-    ;
+        && !IsTargetInDeadZone(target);
 }
 
 void Simulator::UpdateTargets() {

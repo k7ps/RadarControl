@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
         targetScheduler.SetScenario(scenariod_dir + "/" + scenario_name + scenario_extension);
     }
 
-    RadarController radarController(params, targetScheduler.GetRadarStartAngle());
+    RadarController radarController(params, targetScheduler.GetRadarStartAngle(), targetScheduler.GetShipStartAngle());
     Simulator simulator(
         params,
         targetScheduler.GetRadarStartAngle(),

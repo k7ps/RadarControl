@@ -24,13 +24,13 @@ ship {
     max_angle_speed: 2
 
     dead_zones {
-        start: 40
+        start: 30
         end: 70
     }
 
     dead_zones {
         start: 120
-        end: 140
+        end: 145
     }
 }
 
@@ -41,7 +41,7 @@ general {
     small_radar_measure_cnt: 100
     aprox_small_radar_measure_cnt: 50
     margin_angle: 3
-    margin_time: 3000
+    margin_time: 2000
 }
 
 defense {

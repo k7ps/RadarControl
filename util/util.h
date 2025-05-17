@@ -2,6 +2,7 @@
 #define UTIL_H
 
 #include "points.h"
+#include "proto.h"
 
 #include <algorithm>
 #include <sstream>
@@ -40,10 +41,17 @@ std::string MillisecondsToString(double ms);
 bool IsInSegment(double c, double a, double b);
 bool IsInSegment(const std::vector<double>& c, double a, double b);
 
+bool IsInAnySegment(const std::vector<std::pair<double, double>>& segments, double point);
 bool IsInAnySegment(const std::vector<std::pair<double, double>>& segments, const std::vector<double>& points);
+
 int InWhichSegment(const std::vector<std::pair<double, double>>& segments, double point);
+
 std::vector<std::pair<double, double>> ShiftSegments(
     const std::vector<std::pair<double, double>>& segments,
+    double shift
+);
+void ShiftSegmentsInPlace(
+    std::vector<std::pair<double, double>>& segments,
     double shift
 );
 
@@ -84,6 +92,11 @@ std::vector<T> ConcatenateVectors(const std::vector<T>& a, const std::vector<T>&
 template<class T>
 T Clip(T x, T low, T up) {
     return std::max(low, std::min(up, x));
+}
+
+template <class T>
+std::vector<std::pair<double, double>> ShiftedSegmentsFromProto(const T& protoMsg, double shift) {
+    return ShiftSegments(SegmentsFromProto(protoMsg), shift);
 }
 
 
