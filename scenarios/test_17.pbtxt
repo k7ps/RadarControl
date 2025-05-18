@@ -1,0 +1,104 @@
+radar_start_angle: 30
+ship_start_angle: -90
+description: "Unpredictable attack pattern with radar at low initial angle and ship fully rotated counterclockwise"
+launches {
+    time: 0
+    angle_pos: 173
+    angle_deviation: -13
+    priority: 0.62
+    abs_speed_share: 0.71
+}
+launches {
+    time: 35
+    angle_pos: 27
+    angle_deviation: 14
+    priority: 0.64
+    abs_speed_share: 0.73
+}
+launches {
+    time: 70
+    angle_pos: 118
+    angle_deviation: -8
+    priority: 0.79
+    abs_speed_share: 0.83
+}
+launches {
+    time: 105
+    angle_pos: 62
+    angle_deviation: 7
+    priority: 0.81
+    abs_speed_share: 0.85
+}
+launches {
+    time: 140
+    angle_pos: 145
+    angle_deviation: -10
+    priority: 0.73
+    abs_speed_share: 0.77
+}
+launches {
+    time: 175
+    angle_pos: 35
+    angle_deviation: 9
+    priority: 0.75
+    abs_speed_share: 0.79
+}
+launches {
+    time: 210
+    angle_pos: 92
+    angle_deviation: -4
+    priority: 0.91
+    abs_speed_share: 0.93
+}
+launches {
+    time: 245
+    angle_pos: 88
+    angle_deviation: 4
+    priority: 0.92
+    abs_speed_share: 0.94
+}
+launches {
+    time: 280
+    angle_pos: 164
+    angle_deviation: -15
+    priority: 0.65
+    abs_speed_share: 0.7
+}
+launches {
+    time: 315
+    angle_pos: 16
+    angle_deviation: 15
+    priority: 0.66
+    abs_speed_share: 0.72
+}
+launches {
+    time: 350
+    angle_pos: 78
+    angle_deviation: -5
+    priority: 0.87
+    abs_speed_share: 0.89
+}
+launches {
+    time: 385
+    angle_pos: 102
+    angle_deviation: 5
+    priority: 0.86
+    abs_speed_share: 0.88
+}
+launches {
+    time: 420
+    angle_pos: 50
+    angle_deviation: 12
+    priority: 0.77
+    abs_speed_share: 0.81
+}
+launches {
+    time: 455
+    angle_pos: 130
+    angle_deviation: -11
+    priority: 0.76
+    abs_speed_share: 0.8
+}
+
+# proto-file: proto/scenario.proto
+# proto-message: Proto::TargetScenario

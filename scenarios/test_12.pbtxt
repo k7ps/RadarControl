@@ -1,0 +1,83 @@
+radar_start_angle: 75
+ship_start_angle: -45
+description: "Ship rotated counterclockwise with sequential waves of attacks"
+launches {
+    time: 0
+    angle_pos: 30
+    angle_deviation: -6
+    priority: 0.7
+    abs_speed_share: 0.8
+}
+launches {
+    time: 25
+    angle_pos: 80
+    angle_deviation: 4
+    priority: 0.75
+    abs_speed_share: 0.9
+}
+launches {
+    time: 50
+    angle_pos: 130
+    angle_deviation: -5
+    priority: 0.72
+    abs_speed_share: 0.85
+}
+launches {
+    time: 150
+    angle_pos: 45
+    is_accurate: true
+    priority: 0.88
+    abs_speed_share: 0.92
+}
+launches {
+    time: 175
+    angle_pos: 95
+    is_accurate: true
+    priority: 0.9
+    abs_speed_share: 0.95
+}
+launches {
+    time: 200
+    angle_pos: 145
+    is_accurate: true
+    priority: 0.85
+    abs_speed_share: 0.9
+}
+launches {
+    time: 300
+    angle_pos: 60
+    angle_deviation: 7
+    priority: 0.92
+    abs_speed_share: 0.97
+}
+launches {
+    time: 325
+    angle_pos: 110
+    angle_deviation: -8
+    priority: 0.95
+    abs_speed_share: 0.99
+}
+launches {
+    time: 350
+    angle_pos: 15
+    angle_deviation: 10
+    priority: 0.7
+    abs_speed_share: 0.8
+}
+launches {
+    time: 375
+    angle_pos: 165
+    angle_deviation: -12
+    priority: 0.65
+    abs_speed_share: 0.75
+}
+launches {
+    time: 400
+    angle_pos: 90
+    is_accurate: true
+    priority: 1.0
+    abs_speed_share: 1.0
+}
+
+# proto-file: proto/scenario.proto
+# proto-message: Proto::TargetScenario

@@ -1,0 +1,55 @@
+radar_start_angle: 90
+ship_start_angle: 0
+description: "Testing response to targets at extreme angles of sector"
+launches {
+    time: 0
+    angle_pos: 45
+    is_accurate: true
+    priority: 0.9
+    abs_speed_share: 0.8
+}
+launches {
+    time: 30
+    angle_pos: 135
+    is_accurate: true
+    priority: 0.9
+    abs_speed_share: 0.8
+}
+launches {
+    time: 60
+    angle_pos: 20
+    is_accurate: true
+    priority: 0.7
+    abs_speed_share: 0.7
+}
+launches {
+    time: 90
+    angle_pos: 160
+    is_accurate: true
+    priority: 0.7
+    abs_speed_share: 0.7
+}
+launches {
+    time: 120
+    angle_pos: 90
+    is_accurate: true
+    priority: 0.8
+    abs_speed_share: 0.9
+}
+launches {
+    time: 150
+    angle_pos: 46
+    is_accurate: true
+    priority: 0.6
+    abs_speed_share: 0.8
+}
+launches {
+    time: 180
+    angle_pos: 134
+    is_accurate: true
+    priority: 0.6
+    abs_speed_share: 0.8
+}
+
+# proto-file: proto/scenario.proto
+# proto-message: Proto::TargetScenario

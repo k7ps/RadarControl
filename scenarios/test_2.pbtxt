@@ -1,0 +1,41 @@
+radar_start_angle: 90
+ship_start_angle: 0
+description: "Test with targets in blind spots requiring ship rotation"
+launches {
+    time: 0
+    angle_pos: 50
+    is_accurate: true
+    priority: 0.9
+    abs_speed_share: 0.8
+}
+launches {
+    time: 30
+    angle_pos: 135
+    is_accurate: true
+    priority: 0.7
+    abs_speed_share: 0.7
+}
+launches {
+    time: 60
+    angle_pos: 100
+    is_accurate: true
+    priority: 0.8
+    abs_speed_share: 0.9
+}
+launches {
+    time: 90
+    angle_pos: 40
+    is_accurate: true
+    priority: 0.6
+    abs_speed_share: 0.8
+}
+launches {
+    time: 120
+    angle_pos: 130
+    is_accurate: true
+    priority: 0.9
+    abs_speed_share: 1.0
+}
+
+# proto-file: proto/scenario.proto
+# proto-message: Proto::TargetScenario

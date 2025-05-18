@@ -1,0 +1,90 @@
+radar_start_angle: 90
+ship_start_angle: 0
+description: "Targets alternating between inside and outside the sector of responsibility"
+launches {
+    time: 0
+    angle_pos: 20
+    is_accurate: true
+    priority: 0.6
+    abs_speed_share: 0.7
+}
+launches {
+    time: 30
+    angle_pos: 90
+    is_accurate: true
+    priority: 0.8
+    abs_speed_share: 0.8
+}
+launches {
+    time: 60
+    angle_pos: 170
+    is_accurate: true
+    priority: 0.5
+    abs_speed_share: 0.6
+}
+launches {
+    time: 90
+    angle_pos: 110
+    is_accurate: true
+    priority: 0.9
+    abs_speed_share: 0.9
+}
+launches {
+    time: 120
+    angle_pos: 30
+    is_accurate: true
+    priority: 0.7
+    abs_speed_share: 0.7
+}
+launches {
+    time: 150
+    angle_pos: 70
+    is_accurate: true
+    priority: 0.8
+    abs_speed_share: 0.8
+}
+launches {
+    time: 180
+    angle_pos: 160
+    is_accurate: true
+    priority: 0.6
+    abs_speed_share: 0.6
+}
+launches {
+    time: 210
+    angle_pos: 130
+    is_accurate: true
+    priority: 0.9
+    abs_speed_share: 0.9
+}
+launches {
+    time: 240
+    angle_pos: 10
+    is_accurate: true
+    priority: 0.5
+    abs_speed_share: 0.5
+}
+launches {
+    time: 270
+    angle_pos: 50
+    is_accurate: true
+    priority: 0.7
+    abs_speed_share: 0.7
+}
+launches {
+    time: 300
+    angle_pos: 180
+    is_accurate: true
+    priority: 0.4
+    abs_speed_share: 0.4
+}
+launches {
+    time: 330
+    angle_pos: 120
+    is_accurate: true
+    priority: 0.8
+    abs_speed_share: 0.8
+}
+
+# proto-file: proto/scenario.proto
+# proto-message: Proto::TargetScenario

@@ -1,0 +1,111 @@
+radar_start_angle: 90
+ship_start_angle: 75
+description: "Comprehensive test combining multiple challenging scenarios with angled ship"
+launches {
+    time: 0
+    angle_pos: 45
+    angle_deviation: -7
+    priority: 0.85
+    abs_speed_share: 0.9
+}
+launches {
+    time: 30
+    angle_pos: 135
+    angle_deviation: 7
+    priority: 0.85
+    abs_speed_share: 0.9
+}
+launches {
+    time: 60
+    angle_pos: 70
+    is_accurate: true
+    priority: 0.9
+    abs_speed_share: 0.95
+}
+launches {
+    time: 90
+    angle_pos: 110
+    is_accurate: true
+    priority: 0.9
+    abs_speed_share: 0.95
+}
+launches {
+    time: 150
+    angle_pos: 25
+    angle_deviation: 10
+    priority: 0.6
+    abs_speed_share: 0.7
+}
+launches {
+    time: 180
+    angle_pos: 155
+    angle_deviation: -10
+    priority: 0.6
+    abs_speed_share: 0.7
+}
+launches {
+    time: 210
+    angle_pos: 105
+    angle_deviation: -3
+    priority: 0.95
+    abs_speed_share: 1.0
+}
+launches {
+    time: 230
+    angle_pos: 75
+    angle_deviation: 3
+    priority: 0.95
+    abs_speed_share: 1.0
+}
+launches {
+    time: 250
+    angle_pos: 90
+    is_accurate: true
+    priority: 1.0
+    abs_speed_share: 1.0
+}
+launches {
+    time: 300
+    angle_pos: 50
+    angle_deviation: 0
+    priority: 0.8
+    abs_speed_share: 0.8
+}
+launches {
+    time: 330
+    angle_pos: 65
+    angle_deviation: 0
+    priority: 0.85
+    abs_speed_share: 0.85
+}
+launches {
+    time: 360
+    angle_pos: 115
+    angle_deviation: 0
+    priority: 0.85
+    abs_speed_share: 0.85
+}
+launches {
+    time: 390
+    angle_pos: 130
+    angle_deviation: 0
+    priority: 0.8
+    abs_speed_share: 0.8
+}
+launches {
+    time: 420
+    angle_pos: 15
+    angle_deviation: 15
+    priority: 0.5
+    abs_speed_share: 0.6
+}
+launches {
+    time: 450
+    angle_pos: 165
+    angle_deviation: -15
+    priority: 0.5
+    abs_speed_share: 0.6
+}
+
+# proto-file: proto/scenario.proto
+# proto-message: Proto::TargetScenario

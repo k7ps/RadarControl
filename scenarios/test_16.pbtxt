@@ -1,0 +1,97 @@
+radar_start_angle: 135
+ship_start_angle: 90
+description: "Concentrated attacks at the extreme boundaries of the responsibility sector with fully rotated ship"
+launches {
+    time: 0
+    angle_pos: 45
+    angle_deviation: 0
+    priority: 0.9
+    abs_speed_share: 0.9
+}
+launches {
+    time: 30
+    angle_pos: 46
+    angle_deviation: 1
+    priority: 0.89
+    abs_speed_share: 0.89
+}
+launches {
+    time: 60
+    angle_pos: 47
+    angle_deviation: 2
+    priority: 0.88
+    abs_speed_share: 0.88
+}
+launches {
+    time: 90
+    angle_pos: 135
+    angle_deviation: 0
+    priority: 0.9
+    abs_speed_share: 0.9
+}
+launches {
+    time: 120
+    angle_pos: 134
+    angle_deviation: -1
+    priority: 0.89
+    abs_speed_share: 0.89
+}
+launches {
+    time: 150
+    angle_pos: 133
+    angle_deviation: -2
+    priority: 0.88
+    abs_speed_share: 0.88
+}
+launches {
+    time: 180
+    angle_pos: 44
+    angle_deviation: -1
+    priority: 0.87
+    abs_speed_share: 0.87
+}
+launches {
+    time: 210
+    angle_pos: 136
+    angle_deviation: 1
+    priority: 0.87
+    abs_speed_share: 0.87
+}
+launches {
+    time: 240
+    angle_pos: 90
+    angle_deviation: 0
+    priority: 1.0
+    abs_speed_share: 1.0
+}
+launches {
+    time: 270
+    angle_pos: 43
+    angle_deviation: -2
+    priority: 0.86
+    abs_speed_share: 0.86
+}
+launches {
+    time: 300
+    angle_pos: 137
+    angle_deviation: 2
+    priority: 0.86
+    abs_speed_share: 0.86
+}
+launches {
+    time: 330
+    angle_pos: 48
+    angle_deviation: 3
+    priority: 0.85
+    abs_speed_share: 0.85
+}
+launches {
+    time: 360
+    angle_pos: 132
+    angle_deviation: -3
+    priority: 0.85
+    abs_speed_share: 0.85
+}
+
+# proto-file: proto/scenario.proto
+# proto-message: Proto::TargetScenario

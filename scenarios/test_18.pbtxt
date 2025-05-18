@@ -1,0 +1,97 @@
+radar_start_angle: 105
+ship_start_angle: 15
+description: "Attack with progressively increasing speed from all directions"
+launches {
+    time: 0
+    angle_pos: 90
+    angle_deviation: 0
+    priority: 0.8
+    abs_speed_share: 0.2
+}
+launches {
+    time: 25
+    angle_pos: 60
+    angle_deviation: 3
+    priority: 0.78
+    abs_speed_share: 0.3
+}
+launches {
+    time: 50
+    angle_pos: 120
+    angle_deviation: -3
+    priority: 0.79
+    abs_speed_share: 0.4
+}
+launches {
+    time: 75
+    angle_pos: 45
+    angle_deviation: 5
+    priority: 0.77
+    abs_speed_share: 0.5
+}
+launches {
+    time: 100
+    angle_pos: 135
+    angle_deviation: -5
+    priority: 0.76
+    abs_speed_share: 0.6
+}
+launches {
+    time: 125
+    angle_pos: 30
+    angle_deviation: 7
+    priority: 0.75
+    abs_speed_share: 0.65
+}
+launches {
+    time: 150
+    angle_pos: 150
+    angle_deviation: -7
+    priority: 0.74
+    abs_speed_share: 0.7
+}
+launches {
+    time: 175
+    angle_pos: 15
+    angle_deviation: 10
+    priority: 0.7
+    abs_speed_share: 0.75
+}
+launches {
+    time: 200
+    angle_pos: 165
+    angle_deviation: -10
+    priority: 0.68
+    abs_speed_share: 0.8
+}
+launches {
+    time: 225
+    angle_pos: 75
+    angle_deviation: 2
+    priority: 0.85
+    abs_speed_share: 0.85
+}
+launches {
+    time: 250
+    angle_pos: 105
+    angle_deviation: -2
+    priority: 0.87
+    abs_speed_share: 0.9
+}
+launches {
+    time: 275
+    angle_pos: 90
+    angle_deviation: 0
+    priority: 0.95
+    abs_speed_share: 0.95
+}
+launches {
+    time: 300
+    angle_pos: 90
+    is_accurate: true
+    priority: 1.0
+    abs_speed_share: 1.0
+}
+
+# proto-file: proto/scenario.proto
+# proto-message: Proto::TargetScenario

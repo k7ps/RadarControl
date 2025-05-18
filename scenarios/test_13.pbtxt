@@ -1,0 +1,97 @@
+radar_start_angle: 45
+ship_start_angle: 60
+description: "Concentrated attack targeting the rotated blind spots"
+launches {
+    time: 0
+    angle_pos: 90
+    angle_deviation: -3
+    priority: 0.85
+    abs_speed_share: 0.9
+}
+launches {
+    time: 20
+    angle_pos: 95
+    angle_deviation: 4
+    priority: 0.8
+    abs_speed_share: 0.85
+}
+launches {
+    time: 40
+    angle_pos: 180
+    angle_deviation: -5
+    priority: 0.7
+    abs_speed_share: 0.75
+}
+launches {
+    time: 60
+    angle_pos: 175
+    angle_deviation: 6
+    priority: 0.72
+    abs_speed_share: 0.77
+}
+launches {
+    time: 80
+    angle_pos: 100
+    angle_deviation: -2
+    priority: 0.9
+    abs_speed_share: 0.95
+}
+launches {
+    time: 100
+    angle_pos: 105
+    angle_deviation: 3
+    priority: 0.88
+    abs_speed_share: 0.93
+}
+launches {
+    time: 120
+    angle_pos: 170
+    angle_deviation: -7
+    priority: 0.75
+    abs_speed_share: 0.8
+}
+launches {
+    time: 140
+    angle_pos: 165
+    angle_deviation: 8
+    priority: 0.73
+    abs_speed_share: 0.78
+}
+launches {
+    time: 160
+    angle_pos: 110
+    angle_deviation: -4
+    priority: 0.87
+    abs_speed_share: 0.92
+}
+launches {
+    time: 180
+    angle_pos: 115
+    angle_deviation: 5
+    priority: 0.86
+    abs_speed_share: 0.91
+}
+launches {
+    time: 200
+    angle_pos: 160
+    angle_deviation: -9
+    priority: 0.77
+    abs_speed_share: 0.82
+}
+launches {
+    time: 220
+    angle_pos: 155
+    angle_deviation: 10
+    priority: 0.76
+    abs_speed_share: 0.81
+}
+launches {
+    time: 240
+    angle_pos: 120
+    angle_deviation: -3
+    priority: 0.95
+    abs_speed_share: 1.0
+}
+
+# proto-file: proto/scenario.proto
+# proto-message: Proto::TargetScenario

@@ -1,0 +1,83 @@
+radar_start_angle: 150
+ship_start_angle: -30
+description: "Rapidly shifting priorities with radar initially at extreme position"
+launches {
+    time: 0
+    angle_pos: 60
+    is_accurate: true
+    priority: 0.5
+    abs_speed_share: 0.7
+}
+launches {
+    time: 25
+    angle_pos: 120
+    is_accurate: true
+    priority: 0.9
+    abs_speed_share: 0.85
+}
+launches {
+    time: 50
+    angle_pos: 45
+    is_accurate: true
+    priority: 0.6
+    abs_speed_share: 0.75
+}
+launches {
+    time: 75
+    angle_pos: 135
+    is_accurate: true
+    priority: 0.85
+    abs_speed_share: 0.8
+}
+launches {
+    time: 100
+    angle_pos: 75
+    is_accurate: true
+    priority: 0.7
+    abs_speed_share: 0.9
+}
+launches {
+    time: 125
+    angle_pos: 105
+    is_accurate: true
+    priority: 0.95
+    abs_speed_share: 0.95
+}
+launches {
+    time: 150
+    angle_pos: 30
+    is_accurate: true
+    priority: 0.4
+    abs_speed_share: 0.65
+}
+launches {
+    time: 175
+    angle_pos: 150
+    is_accurate: true
+    priority: 0.8
+    abs_speed_share: 0.75
+}
+launches {
+    time: 200
+    angle_pos: 90
+    is_accurate: true
+    priority: 1.0
+    abs_speed_share: 1.0
+}
+launches {
+    time: 225
+    angle_pos: 15
+    is_accurate: true
+    priority: 0.3
+    abs_speed_share: 0.6
+}
+launches {
+    time: 250
+    angle_pos: 165
+    is_accurate: true
+    priority: 0.75
+    abs_speed_share: 0.7
+}
+
+# proto-file: proto/scenario.proto
+# proto-message: Proto::TargetScenario

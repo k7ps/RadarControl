@@ -1,0 +1,83 @@
+radar_start_angle: 90
+ship_start_angle: 0
+description: "Test with initial low-priority diversion targets followed by high-priority critical targets"
+launches {
+    time: 0
+    angle_pos: 15
+    angle_deviation: 8
+    priority: 0.3
+    abs_speed_share: 0.9
+}
+launches {
+    time: 20
+    angle_pos: 30
+    angle_deviation: 5
+    priority: 0.32
+    abs_speed_share: 0.88
+}
+launches {
+    time: 40
+    angle_pos: 165
+    angle_deviation: -8
+    priority: 0.31
+    abs_speed_share: 0.89
+}
+launches {
+    time: 60
+    angle_pos: 150
+    angle_deviation: -5
+    priority: 0.33
+    abs_speed_share: 0.87
+}
+launches {
+    time: 100
+    angle_pos: 50
+    angle_deviation: 0
+    priority: 0.95
+    abs_speed_share: 0.95
+}
+launches {
+    time: 120
+    angle_pos: 130
+    angle_deviation: 0
+    priority: 0.96
+    abs_speed_share: 0.96
+}
+launches {
+    time: 140
+    angle_pos: 65
+    angle_deviation: 0
+    priority: 0.97
+    abs_speed_share: 0.97
+}
+launches {
+    time: 160
+    angle_pos: 115
+    angle_deviation: 0
+    priority: 0.98
+    abs_speed_share: 0.98
+}
+launches {
+    time: 180
+    angle_pos: 80
+    angle_deviation: 0
+    priority: 0.99
+    abs_speed_share: 0.99
+}
+launches {
+    time: 200
+    angle_pos: 100
+    angle_deviation: 0
+    priority: 0.99
+    abs_speed_share: 0.99
+}
+launches {
+    time: 220
+    angle_pos: 90
+    is_accurate: true
+    priority: 1.0
+    abs_speed_share: 1.0
+}
+
+# proto-file: proto/scenario.proto
+# proto-message: Proto::TargetScenario
