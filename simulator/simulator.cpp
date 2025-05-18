@@ -42,6 +42,13 @@ void Target::UpdatePosition(bool isInSector) {
             Params.small_radar().ang_stddev(),
             Params.small_radar().h_stddev()
         );
+        if (IsInSector(
+            Params.small_radar().radius(),
+            Params.small_radar().responsible_sector_start(),
+            Params.small_radar().responsible_sector_end()
+        )) {
+            WasInResponsibleFlag = true;
+        }
     } else {
         stddev = Vector3d(
             Params.big_radar().rad_stddev(),
@@ -114,6 +121,10 @@ void Target::SetWasUpdated(bool flag) {
     WasUpdatedFlag = flag;
 }
 
+bool Target::WasInResponsible() const {
+    return WasInResponsibleFlag;
+}
+
 
 LaunchParams GetRandomLaunchParams(const Proto::Parameters& params, bool isAccurate) {
     double angDeviation = 0;
@@ -176,10 +187,13 @@ void Simulator::UpdateTargets() {
     std::vector<int> FlownAwayTargetIds;
     for (const auto* target : Targets) {
         if (target->IsOutOfView(Params.big_radar().radius())) {
+            if (target->WasInResponsible()){
+                ++ResponsibleTargetsCount;
+            }
             FlownAwayTargetIds.push_back(target->GetId());
         }
     }
-    RemoveTargets(FlownAwayTargetIds);
+    RemoveTargets(FlownAwayTargetIds, false);
 }
 
 void Simulator::SetRadarPosition(double angPos) {
@@ -190,10 +204,18 @@ void Simulator::SetShipPosition(double angPos) {
     ShipAngPosition = angPos;
 }
 
-void Simulator::RemoveTargets(std::vector<int> ids) {
+void Simulator::RemoveTargets(std::vector<int> ids, bool isDestroyed) {
     for (auto id : ids) {
         for (int i = 0; i < Targets.size(); ++i) {
             if (Targets[i]->GetId() == id) {
+                if (isDestroyed) {
+                    ++DestroyedTargetsCount;
+                    if (Targets[i]->WasInResponsible()) {
+                        ++DestroyedResponsibleTargetsCount;
+                        ++ResponsibleTargetsCount;
+                    }
+                }
+
                 delete Targets[i];
                 Targets.erase(Targets.begin() + i);
                 break;
@@ -238,10 +260,24 @@ void Simulator::LaunchTarget(LaunchParams launchParams) {
 
     Targets.push_back(targetPtr);
     ++lastId;
+    ++TargetsCount;
 }
 
 void Simulator::LaunchRandomTarget() {
     LaunchTarget(GetRandomLaunchParams(Params, GetRandomTrue(Params.simulator().probability_of_accurate_missile())));
+}
+
+std::string Simulator::GetStatistics() const {
+    std::ostringstream out;
+    out << "Destroyed targets:             " << DestroyedTargetsCount << "/" << TargetsCount
+        << " " << AsPercents((double) DestroyedTargetsCount / TargetsCount) << "\n"
+        << "Destroyed responsible targets: " << DestroyedResponsibleTargetsCount << "/" << ResponsibleTargetsCount << " ";
+    if (ResponsibleTargetsCount != 0) {
+        out << AsPercents((double) DestroyedResponsibleTargetsCount / ResponsibleTargetsCount);
+    } else {
+        out << AsPercents(0);
+    }
+    return out.str();
 }
 
 Simulator::~Simulator() {
@@ -255,12 +291,17 @@ TargetScheduler::TargetScheduler(const Proto::Parameters& params)
     : Params(params)
     , RadarStartAngle(M_PI_2)
     , ShipStartAngle(0)
+    , IsScenarioEndedFlag(false)
+    , Description("")
 {}
 
 void TargetScheduler::SetScenario(const std::string& filename) {
     const auto scenario = ParseProtoFromFile<Proto::TargetScenario>(filename);
     RadarStartAngle = DegToRad(scenario.radar_start_angle());
     ShipStartAngle = DegToRad(scenario.ship_start_angle());
+    if (scenario.has_description()) {
+        Description = scenario.description();
+    }
 
     for (const auto& launch : scenario.launches()) {
         Proto::TargetScenario::Launch correctLaunch(launch);
@@ -323,7 +364,8 @@ void TargetScheduler::LaunchTargets(Simulator& simulator) {
 
             simulator.LaunchTarget(launchParams);
         } else {
-            break;
+            return;
         }
     }
+    IsScenarioEndedFlag = true;
 }

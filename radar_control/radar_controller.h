@@ -120,6 +120,8 @@ public:
     std::vector<Vector3d> GetApproximateMeetPoints() const;
     std::map<int, double> GetPriorities() const;
 
+    bool IsThereAnyTargets() const { return !Targets.empty(); };
+
     ~RadarController();
 
 private:

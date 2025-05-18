@@ -75,8 +75,14 @@ int main(int argc, char* argv[]) {
     Defense defense(params);
     Visualizer visualizer(params);
 
+    bool wasScenarioEndedSuccefully = false;
 
     while (visualizer.IsWindowOpen()) {
+        if (targetScheduler.IsScenarioEnded() && !simulator.IsThereAnyTargets() && !radarController.IsThereAnyTargets()) {
+            wasScenarioEndedSuccefully = true;
+            break;
+        }
+
         targetScheduler.LaunchTargets(simulator);
 
         const auto& bigRadarTargets = simulator.GetBigRadarTargets();
@@ -105,6 +111,16 @@ int main(int argc, char* argv[]) {
         simulator.SetShipPosition(res.ShipAngle);
         simulator.UpdateTargets();
     }
+
+    if (!scenario_name.empty()) {
+        std::cout << "Scenario " << scenario_name
+                  << (wasScenarioEndedSuccefully ? " finished successfully" : " was interrupted") << "\n";
+        if (!targetScheduler.GetScenarioDescription().empty()) {
+            std::cout << "  : " << targetScheduler.GetScenarioDescription() << "\n";
+        }
+        std::cout << "\n";
+    }
+    std::cout << simulator.GetStatistics() << std::endl;
 
     return 0;
 }

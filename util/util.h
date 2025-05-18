@@ -55,6 +55,8 @@ void ShiftSegmentsInPlace(
     double shift
 );
 
+std::string AsPercents(double value);
+
 template<class T>
 bool IsInVector(const std::vector<T>& vec, const T& i) {
     return std::find(vec.begin(), vec.end(), i) != vec.end();

@@ -32,6 +32,7 @@ namespace SIM {
 
         bool WasUpdated() const;
         void SetWasUpdated(bool flag);
+        bool WasInResponsible() const;
 
     private:
         Vector3d GetCurrentRealPosition() const;
@@ -55,6 +56,7 @@ namespace SIM {
 
         bool WasUpdatedFlag = true;
         int MeasureCount = 1;
+        bool WasInResponsibleFlag = false;
     };
 
 }
@@ -81,13 +83,16 @@ public:
     void SetRadarPosition(double angPos);
     void SetShipPosition(double angPos);
 
-    void RemoveTargets(std::vector<int> ids);
+    void RemoveTargets(std::vector<int> ids, bool isDestroyed = true);
 
     std::vector<BigRadarData> GetBigRadarTargets();
     std::vector<SmallRadarData> GetSmallRadarTargets();
 
     void LaunchTarget(LaunchParams launchParams);
     void LaunchRandomTarget();
+
+    bool IsThereAnyTargets() const { return !Targets.empty(); };
+    std::string GetStatistics() const;
 
     ~Simulator();
 
@@ -105,6 +110,11 @@ private:
 
     double SmallRadarAngPosition;
     double ShipAngPosition;
+
+    int TargetsCount = 0;
+    int ResponsibleTargetsCount = 0;
+    int DestroyedTargetsCount = 0;
+    int DestroyedResponsibleTargetsCount = 0;
 };
 
 
@@ -119,6 +129,9 @@ public:
     double GetRadarStartAngle() const { return RadarStartAngle; }
     double GetShipStartAngle() const { return ShipStartAngle; }
 
+    bool IsScenarioEnded() const { return IsScenarioEndedFlag; }
+    std::string GetScenarioDescription() const { return Description; };
+
 private:
     const Proto::Parameters& Params;
 
@@ -127,6 +140,9 @@ private:
 
     double RadarStartAngle;
     double ShipStartAngle;
+
+    bool IsScenarioEndedFlag;
+    std::string Description;
 };
 
 

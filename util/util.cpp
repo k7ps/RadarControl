@@ -197,3 +197,10 @@ void ShiftSegmentsInPlace(
         seg.second += shift;
     }
 }
+
+std::string AsPercents(double value) {
+    std::ostringstream out;
+    out << std::fixed << std::setprecision(2);
+    out << value * 100. << "%";
+    return out.str();
+}
